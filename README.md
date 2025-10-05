@@ -71,7 +71,7 @@ neural-voice-assistant/
 ├── conversations/                          # Conversation files
 ├── logs/                                   # Application log files
 ├── src/
-│   ├── config.py                           # Application configuration and environment variables
+│   ├── config.py                           # Application configuration
 │   ├── main.py                             # Application entry point
 │   ├── backend/
 │   │   ├── database/
@@ -125,12 +125,12 @@ neural-voice-assistant/
 
 ## **🚀 Development Phases 🚀**
 
-**1.** Basic call answering and speech recognition with file storage
+1. Basic call answering and speech recognition with file storage
 
-**2.** MongoDB integration for conversation persistence
+2. MongoDB integration for conversation persistence
 
-**3.** AI integration for intelligent conversation handling
+3. AI integration for intelligent conversation handling
 
-**4.** Advanced analytics and dashboard development
+4. Advanced analytics and dashboard development
 
-**5.** Production deployment and scaling optimizations
+5. Production deployment and scaling optimizations
