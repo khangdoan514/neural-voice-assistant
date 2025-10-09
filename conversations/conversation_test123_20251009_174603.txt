@@ -1,0 +1,10 @@
+Call SID: test123
+Timestamp: 20251009_174603
+User Request: Test request
+--------------------------------------------------
+CONVERSATION HISTORY:
+--------------------------------------------------
+
+Exchange 1:
+User: hi
+AI: hello
