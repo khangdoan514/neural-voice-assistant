@@ -1,6 +1,8 @@
+from backend.routes.call_routes import call_bp
 from flask import Flask
 
 app = Flask(__name__)
+app.register_blueprint(call_bp)
 
 @app.route("/")
 def hello():
