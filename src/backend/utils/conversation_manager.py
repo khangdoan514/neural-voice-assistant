@@ -5,7 +5,7 @@ class ConversationManager:
     def start_conversation(self, call_sid):
         self.active_conversations[call_sid] = {
             'history': [],
-            'state': 'greeting',  # greeting → listening → confirmation → complete
+            'state': 'greeting', # greeting → listening → confirmation → complete
             'user_request': None
         }
         print(f"Started conversation for {call_sid}")
