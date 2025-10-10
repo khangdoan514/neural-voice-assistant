@@ -9,12 +9,12 @@ app.register_blueprint(call_bp)
 
 @app.route("/")
 def hello():
-    return "Hello World :D"
+    return "VoiceFlow is running!", 200
 
 @app.route('/health')
 def health_check():
     return "OK", 200
 
 if __name__ == "__main__":
-    print("Starting Neural Voice Assistant...")
+    print("Starting VoiceFlow...")
     app.run(host='0.0.0.0', port=5001, debug=False)
