@@ -1,5 +1,5 @@
+from config import Config
 from twilio.rest import Client
-from src.config import Config
 
 client = Client(Config.TWILIO_ACCOUNT_SID, Config.TWILIO_AUTH_TOKEN)
 
@@ -10,6 +10,7 @@ def make_call(to_number, webhook_url):
             to=to_number,
             from_=Config.TWILIO_PHONE_NUMBER
         )
+        
         print(f"Call initiated: {call.sid}")
         return call.sid
     
