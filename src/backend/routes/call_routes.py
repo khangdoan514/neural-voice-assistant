@@ -1,6 +1,6 @@
-from src.backend.utils.conversation_manager import ConversationManager
-from src.backend.utils.file_handler import save_conversation
-from src.backend.services.openai_service import simple_ai_response
+from backend.utils.conversation_manager import ConversationManager
+from backend.utils.file_handler import save_conversation
+from backend.services.openai_service import simple_ai_response
 from flask import Blueprint, request, Response
 from twilio.twiml.voice_response import VoiceResponse
 import requests
