@@ -1,10 +1,34 @@
 from config import Config
 import openai
-import requests
 import os
+import requests
+import tempfile
 
 # Set up OpenAI
 openai.api_key = Config.OPENAI_API_KEY
+
+def download_audio(audio_url):
+    # Download audio file from Twilio recording URL
+    try:
+        print(f"Downloading audio from: {audio_url}")
+        
+        # Twilio recordings are in .wav format
+        response = requests.get(audio_url, auth=(Config.TWILIO_ACCOUNT_SID, Config.TWILIO_AUTH_TOKEN))
+        
+        if response.status_code == 200:
+            # Create temporary file
+            with tempfile.NamedTemporaryFile(delete=False, suffix='.wav') as temp_audio:
+                temp_audio.write(response.content)
+                print(f"Audio downloaded to: {temp_audio.name}")
+                return temp_audio.name
+        
+        else:
+            print(f"Failed to download audio: {response.status_code}")
+            return None
+            
+    except Exception as e:
+        print(f"Error downloading audio: {e}")
+        return None
 
 def transcribe_audio(audio_url):
     # Simple transcription function - mock response
