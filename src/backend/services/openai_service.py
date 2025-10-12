@@ -30,6 +30,45 @@ def download_audio(audio_url):
         print(f"Error downloading audio: {e}")
         return None
 
+def transcribe_audio_real(audio_url):
+    # Real transcription using OpenAI Whisper API
+    try:
+        print(f"Transcribing audio from: {audio_url}")
+        
+        # Download the audio file
+        audio_file_path = download_audio(audio_url)
+        
+        if not audio_file_path:
+            print("Could not download audio file")
+            return "I couldn't process the audio. Please try again."
+        
+        # Transcribe with OpenAI Whisper
+        with open(audio_file_path, 'rb') as audio_file:
+            transcript = openai.Audio.transcribe(
+                model="whisper-1",
+                file=audio_file
+            )
+        
+        transcription_text = transcript['text'].strip()
+        print(f"Transcription result: '{transcription_text}'")
+        
+        # Clean up temporary file
+        import os
+        os.unlink(audio_file_path)
+        
+        if not transcription_text:
+            return "I couldn't understand what you said. Please try again."
+            
+        return transcription_text
+        
+    except openai.error.AuthenticationError:
+        print("OpenAI authentication failed - check API key")
+        return "System error. Please try again later."
+    
+    except Exception as e:
+        print(f"Transcription error: {e}")
+        return "I encountered an error. Please repeat what you said."
+
 def transcribe_audio(audio_url):
     # Simple transcription function - mock response
     print(f"Would transcribe audio from: {audio_url}")
