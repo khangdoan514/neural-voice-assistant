@@ -15,6 +15,10 @@ def hello():
 def health_check():
     return "OK", 200
 
+@app.route('/ngrok-test')
+def ngrok_test():
+    return "Ngrok test successful!", 200
+
 if __name__ == "__main__":
     print("Starting VoiceFlow...")
     app.run(host='0.0.0.0', port=5001, debug=False)
