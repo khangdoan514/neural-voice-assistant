@@ -1,6 +1,6 @@
 from backend.utils.conversation_manager import ConversationManager
 from backend.utils.file_handler import save_conversation
-from backend.services.openai_service import simple_ai_response
+from backend.services.openai_service import simple_ai_response, transcribe_audio_real
 from flask import Blueprint, request, Response
 from twilio.twiml.voice_response import VoiceResponse
 import requests
@@ -50,7 +50,7 @@ def process_recording(call_sid):
     print(f"Processing recording for {call_sid}: {recording_url}")
     
     if recording_url:
-        transcript = "I need help with my account"  # Mock response
+        transcript = transcribe_audio_real(recording_url)
         
         current_state = conversation_manager.get_conversation_state(call_sid)
         print(f"Current conversation state: {current_state}")
