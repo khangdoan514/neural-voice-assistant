@@ -70,59 +70,31 @@ Beginning with call answering and confirmation features, VoiceFlow develops into
 
 ```bash
 neural-voice-assistant/
-├── conversations/                          # Conversation files
-├── logs/                                   # Application log files
-├── src/
-│   ├── config.py                           # Application configuration
-│   ├── main.py                             # Application entry point
-│   ├── backend/
-│   │   ├── database/
-│   │   │   ├── connection.py               # MongoDB connection setup and management
-│   │   │   └── operations.py               # CRUD operations for database interactions
-│   │   │
-│   │   ├── models/
-│   │   │   ├── call_analytics.py           # Analytics and metrics data models
-│   │   │   ├── conversation.py             # Conversation and message data models
-│   │   │   └── user.py                     # User and account management models
-│   │   │
-│   │   ├── routes/
-│   │   │   ├── call_routes.py              # Twilio webhook and call processing routes
-│   │   │   └── web_routes.py               # Web interface and health check routes
-│   │   │
-│   │   ├── services/
-│   │   │   ├── openai_service.py           # OpenAI API integration for AI responses
-│   │   │   └── twilio_service.py           # Twilio API for call handling
-│   │   │
-│   │   └── utils/
-│   │       ├── conversation_manager.py     # Manages active conversation states
-│   │       ├── file_handler.py             # File operations and backup management
-│   │       └── validators.py               # Data validation and sanitization utilities
-│   │
-│   └── frontend/
-│       ├── components/
-│       │   ├── charts.py                   # Data visualization components
-│       │   ├── forms.py                    # Input forms and validation components
-│       │   └── tables.py                   # Data table and grid components
-│       │
-│       ├── static/
-│       │   ├── css/
-│       │   │   └── styles.css              # Application styles
-│       │   ├── images/
-│       │   └── js/
-│       │       └── script.js               # Frontend interactivity and API calls
-│       │
-│       └── templates/
-│           ├── base.html                   # Base template with common layout
-│           ├── conversations.html          # Conversation viewer and search interface
-│           ├── dashboard.html              # Main analytics dashboard
-│           └── settings.html               # Configuration and settings interface
-│
-├── tests/
-│   └── test_services.py                    # Tests for service integrations
-│
-├── requirements.txt                        # Python dependencies
 ├── .env                                    # Environment variables
-└── README.md
+├── CODE_OF_CONDUCT.md
+├── LICENSE
+├── README.md
+├── requirements.txt                        # Python dependencies
+├── conversations/                          # Conversation files
+└── src/
+    ├── config.py                           # Application configuration
+    ├── main.py                             # Application entry point
+    └── backend/
+        ├── database/
+        │   ├── connection.py               # MongoDB connection setup and management
+        │   └── operations.py               # CRUD operations for database interactions
+        │
+        ├── routes/
+        │   └── call_routes.py              # Twilio webhook and call processing routes
+        │
+        ├── services/
+        │   ├── openai_service.py           # OpenAI API integration for AI responses
+        │   └── twilio_service.py           # Twilio API for call handling
+        │
+        └── utils/
+            ├── conversation_manager.py     # Manages active conversation states
+            └── file_handler.py             # File operations and backup management
+     
 ```
 
 ## **Development Phases**
