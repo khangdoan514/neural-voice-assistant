@@ -1,14 +1,24 @@
 from backend.routes.call_routes import call_bp
 from flask import Flask
+import sys
+import os
+import logging
+
+# Add the current directory to Python path so imports work
+sys.path.insert(0, os.path.dirname(__file__))
+
+# Remove warning
+# log = logging.getLogger('werkzeug')
+# log.setLevel(logging.WARNING)
 
 # Initialize Flask app
 app = Flask(__name__)
 
 # Register blueprints
-app.register_blueprint(call_bp)
+app.register_blueprint(call_bp, url_prefix='/twilio')
 
 @app.route("/")
-def hello():
+def home():
     return "VoiceFlow is running!", 200
 
 @app.route('/health')
@@ -21,4 +31,5 @@ def ngrok_test():
 
 if __name__ == "__main__":
     print("Starting VoiceFlow...")
+    print("In another terminal: ngrok http 5001")
     app.run(host='0.0.0.0', port=5001, debug=False)

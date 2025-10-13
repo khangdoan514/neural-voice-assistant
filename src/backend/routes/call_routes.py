@@ -1,10 +1,9 @@
-from backend.utils.conversation_manager import ConversationManager
-from backend.utils.file_handler import save_conversation
-from backend.services.openai_service import simple_ai_response, transcribe_audio_real
+from ..utils.conversation_manager import ConversationManager
+from ..utils.file_handler import save_conversation
+from ..services.openai_service import simple_ai_response, transcribe_audio_real
 from flask import Blueprint, request, Response
 from twilio.twiml.voice_response import VoiceResponse
-import requests
-import os
+import random
 
 # Create blueprint
 call_bp = Blueprint('call_routes', __name__)
@@ -23,6 +22,11 @@ def handle_incoming_call():
 
     print(f"Incoming call received: {call_sid}")
 
+    if not call_sid:
+        print("ERROR: No CallSid received from Twilio!")
+        response.say("System error. Please try again later.", voice='alice')
+        return str(response)
+
     # Start new conversation
     conversation_manager.start_conversation(call_sid)
     
@@ -33,7 +37,7 @@ def handle_incoming_call():
     response.record(
         action=f'{base_url}/twilio/process-recording/{call_sid}',
         method='POST',
-        max_length=10, # 10 seconds max
+        max_length=5, # 5 seconds max
         finish_on_key='#',
         play_beep=True,
         transcribe=False
@@ -43,22 +47,37 @@ def handle_incoming_call():
     response.say("I didn't hear anything. Goodbye!", voice='alice')
     return str(response)
 
-@call_bp.route('/process-recording/<call_sid>', methods=['POST'])
+@call_bp.route('/process-recording/<call_sid>', methods=['GET', 'POST'])
 def process_recording(call_sid):
     # Process the recording after user speaks
     response = VoiceResponse()
-    recording_url = request.form.get('RecordingUrl')
     
-    print(f"Processing recording for {call_sid}: {recording_url}")
+    # Debug
+    print(f"Processing recording for {call_sid}")
+    print(f"Request method: {request.method}")
+    
+    # Extract RecordingUrl based on request method
+    if request.method == 'POST':
+        recording_url = request.form.get('RecordingUrl')
+    
+    else:
+        recording_url = request.args.get('RecordingUrl')
+    
+    print(f"RecordingUrl extracted: {recording_url}")
     
     if recording_url:
+        print(f"Starting transcription for: {recording_url}")
+        
+        # Use REAL transcription
         transcript = transcribe_audio_real(recording_url)
+        print(f"Transcription result: '{transcript}'")
         
         current_state = conversation_manager.get_conversation_state(call_sid)
         print(f"Current conversation state: {current_state}")
         
         # Generate AI response based on state
         ai_response = simple_ai_response(transcript, current_state)
+        print(f"AI response: '{ai_response}'")
         
         if current_state == 'greeting':
             # Confirm what user said
@@ -67,9 +86,9 @@ def process_recording(call_sid):
             
             response.say(ai_response, voice='alice')
             response.record(
-                action=f'/twilio/process-confirmation/{call_sid}',
+                action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
                 method='POST',
-                max_length=5, # Shorter for yes/no
+                max_length=5, # 5 seconds max
                 finish_on_key='#'
             )
             
@@ -89,19 +108,21 @@ def process_recording(call_sid):
                 conversation_manager.update_conversation(call_sid, transcript, ai_response, 'greeting')
                 response.say(ai_response, voice='alice')
                 response.record(
-                    action=f'/twilio/process-recording/{call_sid}',
+                    action=f'{request.url_root.rstrip("/")}/twilio/process-recording/{call_sid}',
                     method='POST',
-                    max_length=10,
+                    max_length=5,
                     finish_on_key='#'
                 )
     
     else:
+        print("ERROR: No RecordingUrl found in request!")
         response.say("Sorry, I didn't get that. Please call back again.", voice='alice')
     
     return str(response)
 
-@call_bp.route('/process-confirmation/<call_sid>', methods=['POST'])
+@call_bp.route('/process-confirmation/<call_sid>', methods=['GET', 'POST'])
 def process_confirmation(call_sid):
     # Handle the confirmation response (yes/no)
     print(f"Processing confirmation for: {call_sid}")
+    print(f"Request method: {request.method}")
     return process_recording(call_sid) # Reuse the same logic
