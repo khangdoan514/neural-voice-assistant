@@ -7,6 +7,10 @@ client = OpenAI(api_key=Config.OPENAI_API_KEY)
 
 def generate_advanced_response(user_input, state, conversation_history=None):
     try:
+        # For confirmation state with "yes", use custom response
+        if state == 'confirmation' and any(word in user_input.lower() for word in ['yes', 'correct', 'right', 'yeah', 'yep', 'uh-huh', 'ok', 'okay']):
+            return "Is that all you need help with?"
+        
         # Conversation context for GPT
         messages = build_conversation(conversation_history or [], user_input, state)
         
@@ -14,7 +18,7 @@ def generate_advanced_response(user_input, state, conversation_history=None):
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=messages,
-            max_tokens=200,
+            max_tokens=1000,
             temperature=0.7
         )
         
@@ -36,14 +40,11 @@ def build_conversation(history, current_transcript, state):
     Conversation flow:
     1. Greeting: User states their need, you confirm what you heard
     2. Confirmation: User confirms or denies your understanding
-    3. After confirmation: Continue the conversation naturally
     
     Keep responses natural, conversational, and concise (1-2 sentences max).
     Speak like a friendly customer service agent.
     
-    IMPORTANT: After user confirms their request is correct, continue the conversation
-    by asking if they need help with anything else or offering further assistance.
-    DO NOT end the conversation abruptly.
+    IMPORTANT: When user confirms their request is correct, ask "Is that all you need help with?"
     """
     
     messages = [{"role": "system", "content": system_prompt}]
@@ -59,10 +60,10 @@ def build_conversation(history, current_transcript, state):
     # Add current user input with state context
     state_context = {
         'greeting': f"User is stating their initial request: '{current_transcript}'. Confirm what you heard and ask if it's correct.",
-        'confirmation': f"User is responding to your confirmation request: '{current_transcript}'. Process their yes/no response and continue the conversation naturally."
+        'confirmation': f"User is responding to your confirmation request: '{current_transcript}'. Process their yes/no response and ask if that's all they need help with."
     }
     
-    current_message = state_context.get(state, f"User said: '{current_transcript}'. Respond naturally and continue the conversation.")
+    current_message = state_context.get(state, f"User said: '{current_transcript}'")
     messages.append({"role": "user", "content": current_message})
     
     return messages
