@@ -1,6 +1,7 @@
 from ..utils.conversation_manager import ConversationManager
 from ..utils.file_handler import save_conversation
-from ..services.openai_service import generate_response, transcribe_audio
+from ..services.openai_service import transcribe_audio
+from ..services.advanced_openai_service import generate_advanced_response
 from flask import Blueprint, request, Response
 from twilio.twiml.voice_response import VoiceResponse
 import random
@@ -42,7 +43,7 @@ def handle_incoming_call():
     response.record(
         action=f'{base_url}/twilio/process-recording/{call_sid}',
         method='POST',
-        max_length=5, # 5 seconds wait
+        max_length=7, # 7 seconds wait
         finish_on_key='#',
         play_beep=True,
         transcribe=False
@@ -67,71 +68,76 @@ def process_recording(call_sid):
     
     else:
         recording_url = request.args.get('RecordingUrl')
-        
-    if recording_url:        
-        # Use transcription
-        transcript = transcribe_audio(recording_url)
-        print(f"User response: '{transcript}'")
 
-        # Current conversation state
-        state = conversation_manager.get_conversation_state(call_sid)
-        print(f"Current conversation state: {state}\n")
+    if not recording_url:
+        print("ERROR: No RecordingUrl found in request.")
+        response.say("Sorry, I didn't get that. Please try again.", voice='alice')
+        return str(response)
+
+    # Use transcription
+    transcript = transcribe_audio(recording_url)
+    print(f"User response: '{transcript}'")
+
+    # Current conversation state
+    state = conversation_manager.get_conversation_state(call_sid)
+    print(f"Current conversation state: {state}\n")
+    
+    # Generate AI response based on state
+    ai_response = generate_advanced_response(transcript, state)
+    print(f"AI response: '{ai_response}'")
+    
+    if state == 'greeting':
+        # Confirm user response
+        conversation_manager.set_user_request(call_sid, transcript)
+        conversation_manager.update_conversation(call_sid, transcript, ai_response, 'confirmation')
         
-        # Generate AI response based on state
-        ai_response = generate_response(transcript, state)
-        print(f"AI response: '{ai_response}'")
+        response.say(ai_response, voice='alice')
+        response.record(
+            action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
+            method='POST',
+            max_length=7, # 7 seconds wait
+            finish_on_key='#'
+        )
         
-        if state == 'greeting':
-            # Confirm user response
-            conversation_manager.set_user_request(call_sid, transcript)
-            conversation_manager.update_conversation(call_sid, transcript, ai_response, 'confirmation')
+    elif state == 'confirmation':
+        # Process confirmation response
+        if any(word in transcript.lower() for word in ['yes', 'correct', 'right', 'yeah', 'yep', 'uh-huh', 'ok', 'okay']):
+            # Save conversation
+            user_request = conversation_manager.get_user_request(call_sid)
+            conversation_history = conversation_manager.get_conversation_history(call_sid)
+            save_conversation(call_sid, user_request, conversation_history)
             
+            # Continue the conversation
+            conversation_manager.update_conversation(call_sid, transcript, ai_response, 'greeting')
             response.say(ai_response, voice='alice')
             response.record(
-                action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
+                action=f'{request.url_root.rstrip("/")}/twilio/process-recording/{call_sid}',
+                method='POST',
+                max_length=7, # 7 seconds wait
+                finish_on_key='#'
+            )
+            
+        elif any(word in transcript.lower() for word in ['no', 'wrong', 'incorrect', 'nope', 'nah']):
+            # Ask user to repeat - go back to greeting
+            conversation_manager.update_conversation(call_sid, transcript, ai_response, 'greeting')
+            response.say(ai_response, voice='alice')
+            response.record(
+                action=f'{request.url_root.rstrip("/")}/twilio/process-recording/{call_sid}',
                 method='POST',
                 max_length=5, # 5 seconds wait
                 finish_on_key='#'
             )
-            
-        elif state == 'confirmation':
-            # Process confirmation response
-            if any(word in transcript.lower() for word in ['yes', 'correct', 'right', 'yeah', 'yep', 'uh-huh', 'ok', 'okay']):
-                # Save conversation and end call
-                user_request = conversation_manager.get_user_request(call_sid)
-                conversation_history = conversation_manager.get_conversation_history(call_sid)
-                
-                save_conversation(call_sid, user_request, conversation_history)
-                response.say(ai_response, voice='alice')
-                conversation_manager.end_conversation(call_sid)
-                
-            elif any(word in transcript.lower() for word in ['no', 'wrong', 'incorrect', 'nope', 'nah']):
-                # Ask user to repeat - go back to greeting
-                conversation_manager.update_conversation(call_sid, transcript, ai_response, 'greeting')
-                response.say(ai_response, voice='alice')
-                response.record(
-                    action=f'{request.url_root.rstrip("/")}/twilio/process-recording/{call_sid}',
-                    method='POST',
-                    max_length=5, # 5 seconds wait
-                    finish_on_key='#'
-                )
 
-            else:
-                # Ask user to repeat
-                conversation_manager.update_conversation(call_sid, transcript, ai_response, 'confirmation')
-                response.say(ai_response, voice='alice')
-                response.record(
-                    action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
-                    method='POST',
-                    max_length=5, # 5 seconds wait
-                    finish_on_key='#'
-                )
-    
-    else:
-        print("ERROR: No RecordingUrl found in request.")
-        response.say("Sorry, I didn't get that. Please call back again.", voice='alice')
-        print("Sorry, I didn't get that. Please call back again.")
-        print(f"Current conversation state: {state}\n")
+        else:
+            # Ask user to repeat
+            conversation_manager.update_conversation(call_sid, transcript, ai_response, 'confirmation')
+            response.say(ai_response, voice='alice')
+            response.record(
+                action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
+                method='POST',
+                max_length=7, # 7 seconds wait
+                finish_on_key='#'
+            )
     
     return str(response)
 
