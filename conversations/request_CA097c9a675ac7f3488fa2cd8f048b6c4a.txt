@@ -1,0 +1,22 @@
+Call SID: CA097c9a675ac7f3488fa2cd8f048b6c4a
+Timestamp: 2025-10-13:01-09-48
+User Request: Hi, I need help.
+--------------------------------------------------
+CONVERSATION HISTORY:
+--------------------------------------------------
+
+Exchange 1:
+User: Sorry, I need help.
+AI: I heard: 'Sorry, I need help.'. Is this correct?
+
+Exchange 2:
+User: you
+AI: Please say yes if that's correct, or no if you'd like me to ask again.
+
+Exchange 3:
+User: No.
+AI: Please repeat what you need help with.
+
+Exchange 4:
+User: Hi, I need help.
+AI: I heard: 'Hi, I need help.'. Is this correct?

@@ -21,6 +21,4 @@ class Config:
         
         missing = [key for key, value in required.items() if not value]
         if missing:
-            raise ValueError(f"Missing environment variables: {', '.join(missing)}")
-        
-        print("All environment variables loaded successfully")
+            raise ValueError(f"ERROR: Missing environment variables: {', '.join(missing)}")

@@ -5,8 +5,8 @@ def save_conversation(call_sid, user_request, conversation_history):
     # Create conversations folder if it doesn't exist
     os.makedirs('conversations', exist_ok=True)
     
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"conversations/conversation_{call_sid}_{timestamp}.txt"
+    timestamp = datetime.now().strftime("%Y-%m-%d:%H-%M-%S")
+    filename = f"conversations/request_{call_sid}.txt"
     
     try:
         with open(filename, 'w', encoding='utf-8') as f:
@@ -22,8 +22,7 @@ def save_conversation(call_sid, user_request, conversation_history):
                 f.write(f"User: {exchange.get('user', 'N/A')}\n")
                 f.write(f"AI: {exchange.get('ai', 'N/A')}\n")
         
-        print(f"Conversation saved to: {filename}")
         return True
-    except Exception as e:
-        print(f"Error saving conversation: {e}")
+    except Exception:
+        print(f"ERROR: Failed to save conversation.")
         return False
