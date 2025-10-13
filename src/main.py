@@ -7,9 +7,11 @@ import logging
 # Add the current directory to Python path so imports work
 sys.path.insert(0, os.path.dirname(__file__))
 
-# Remove warning
-# log = logging.getLogger('werkzeug')
-# log.setLevel(logging.WARNING)
+# Disable warning
+logging.getLogger('werkzeug').disabled = True
+
+# Disable loggings
+logging.getLogger('flask.app').disabled = True
 
 # Initialize Flask app
 app = Flask(__name__)

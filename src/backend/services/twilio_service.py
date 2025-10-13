@@ -14,8 +14,8 @@ def make_call(to_number, webhook_url):
         print(f"Call initiated: {call.sid}")
         return call.sid
     
-    except Exception as e:
-        print(f"Error making call: {e}")
+    except Exception:
+        print(f"ERROR: Failed to make call.")
         return None
 
 def validate_twilio_signature(request):

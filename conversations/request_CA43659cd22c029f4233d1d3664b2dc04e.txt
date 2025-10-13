@@ -1,0 +1,26 @@
+Call SID: CA43659cd22c029f4233d1d3664b2dc04e
+Timestamp: 2025-10-13:01-00-37
+User Request: Yes.
+--------------------------------------------------
+CONVERSATION HISTORY:
+--------------------------------------------------
+
+Exchange 1:
+User: You
+AI: I heard: 'You'. Is this correct?
+
+Exchange 2:
+User: No.
+AI: Please repeat what you need help with.
+
+Exchange 3:
+User: Hi, I need help.
+AI: I heard: 'Hi, I need help.'. Is this correct?
+
+Exchange 4:
+User: Uh-huh.
+AI: Please say yes if that's correct, or no to repeat.
+
+Exchange 5:
+User: Yes.
+AI: I heard: 'Yes.'. Is this correct?

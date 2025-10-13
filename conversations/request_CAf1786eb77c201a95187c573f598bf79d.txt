@@ -1,0 +1,10 @@
+Call SID: CAf1786eb77c201a95187c573f598bf79d
+Timestamp: 2025-10-13:00-52-45
+User Request: Hi, I need help.
+--------------------------------------------------
+CONVERSATION HISTORY:
+--------------------------------------------------
+
+Exchange 1:
+User: Hi, I need help.
+AI: I heard: 'Hi, I need help.'. Is this correct?
