@@ -18,6 +18,9 @@ def handle_incoming_call():
     response = VoiceResponse()
     call_sid = request.form.get('CallSid')
 
+    # Get the current base URL dynamically
+    base_url = request.url_root.rstrip('/')
+
     print(f"Incoming call received: {call_sid}")
 
     # Start new conversation
@@ -26,19 +29,18 @@ def handle_incoming_call():
     # Initial greeting
     response.say("Hi, I'm an AI assistant. What do you need help with today?", voice='alice', language='en-US')
     
-    # Record user's response
+    # Record user's response - dynamic URL
     response.record(
-        action=f'/twilio/process-recording/{call_sid}',
+        action=f'{base_url}/twilio/process-recording/{call_sid}',
         method='POST',
         max_length=10, # 10 seconds max
         finish_on_key='#',
-        play_beep=True
+        play_beep=True,
+        transcribe=False
     )
     
     # If no recording, say goodbye
     response.say("I didn't hear anything. Goodbye!", voice='alice')
-    
-    print(f"Sent greeting and started recording for: {call_sid}")
     return str(response)
 
 @call_bp.route('/process-recording/<call_sid>', methods=['POST'])
