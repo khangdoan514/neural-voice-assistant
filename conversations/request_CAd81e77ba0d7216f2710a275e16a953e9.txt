@@ -1,0 +1,14 @@
+Call SID: CAd81e77ba0d7216f2710a275e16a953e9
+Timestamp: 2025-10-15:00-27-59
+User Request: Hi.
+--------------------------------------------------
+CONVERSATION HISTORY:
+--------------------------------------------------
+
+Exchange 1:
+User: Hi.
+AI: Oh, hi there! Did you say "Hi"?
+
+Exchange 2:
+User: Yes, I did.
+AI: Okay, is that all you need help with?
