@@ -66,7 +66,7 @@ def generate_advanced_response(user_input, state, conversation_history=None):
 def build_conversation(history, current_transcript, state):
     # Conversation context for GPT
     system_prompt = """
-    You are Alice, a friendly AI assistant on a phone call. CRITICAL: Optimize for SPEECH, not text.
+    You are Salli, a friendly AI assistant on a phone call. CRITICAL: Optimize for SPEECH, not text.
 
     VOICE CONVERSATION RULES:
     1. SPEAK LIKE A HUMAN - Use filler words: "Okay", "I see", "Alright", "Um", "So"

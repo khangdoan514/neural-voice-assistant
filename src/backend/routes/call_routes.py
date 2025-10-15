@@ -25,7 +25,7 @@ def handle_incoming_call():
 
     if not call_sid:
         print("ERROR: No CallSid received from Twilio.")
-        response.say("System error. Please try again later.", voice='Polly.Joanna')
+        response.say("System error. Please try again later.", voice='Polly.Salli')
         return str(response)
 
     # Start new conversation
@@ -35,8 +35,8 @@ def handle_incoming_call():
     state = conversation_manager.get_conversation_state(call_sid)
     
     # Initial greeting
-    response.say("Hi, I'm Joanna, an artificial intelligence assistant. What do you need help with today?", voice='Polly.Joanna')
-    print("AI response: Hi, I'm Joanna, an artificial intelligence assistant. What do you need help with today?")
+    response.say("Hi, I'm Salli, an artificial intelligence assistant. What do you need help with today?", voice='Polly.Salli')
+    print("AI response: Hi, I'm Salli, an artificial intelligence assistant. What do you need help with today?")
     print(f"Current conversation state: {state}\n")
     
     # Record user's response
@@ -82,7 +82,7 @@ def process_recording(call_sid):
         conversation_manager.set_user_request(call_sid, transcript)
         conversation_manager.update_conversation(call_sid, transcript, ai_response, 'confirmation')
         
-        response.say(f'<speak>{ai_response}</speak>', voice='Polly.Joanna')
+        response.say(f'<speak>{ai_response}</speak>', voice='Polly.Salli')
         response.record(
             action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
             method='POST',
@@ -102,7 +102,7 @@ def process_recording(call_sid):
                 save_conversation(call_sid, user_request, conversation_history)
                 
                 # End call
-                response.say("Thank you! Your request has been recorded. Goodbye!", voice='Polly.Joanna')
+                response.say("Thank you! Your request has been recorded. Goodbye!", voice='Polly.Salli')
                 print("AI response: Thank you! Your request has been recorded. Goodbye!")
                 conversation_manager.end_conversation(call_sid)
                 
@@ -110,7 +110,7 @@ def process_recording(call_sid):
                 # Ask user what else they need help with
                 conversation_manager.update_conversation(call_sid, transcript, ai_response, 'greeting')
                 
-                response.say("How can I assist you further?", voice='Polly.Joanna')
+                response.say("How can I assist you further?", voice='Polly.Salli')
                 response.record(
                     action=f'{request.url_root.rstrip("/")}/twilio/process-recording/{call_sid}',
                     method='POST',
@@ -121,7 +121,7 @@ def process_recording(call_sid):
             else:
                 # Ask user to repeat final confirmation
                 conversation_manager.update_conversation(call_sid, transcript, ai_response, 'confirmation')
-                response.say(f'<speak>{ai_response}</speak>', voice='Polly.Joanna')
+                response.say(f'<speak>{ai_response}</speak>', voice='Polly.Salli')
                 response.record(
                     action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
                     method='POST',
@@ -134,7 +134,7 @@ def process_recording(call_sid):
             if any(word in transcript.lower() for word in ['yes', 'correct', 'right', 'yeah', 'yep', 'uh-huh', 'ok', 'okay']):
                 # Ask if that's all they need
                 conversation_manager.update_conversation(call_sid, transcript, ai_response, 'confirmation')
-                response.say(f'<speak>{ai_response}</speak>', voice='Polly.Joanna')
+                response.say(f'<speak>{ai_response}</speak>', voice='Polly.Salli')
                 response.record(
                     action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
                     method='POST',
@@ -145,7 +145,7 @@ def process_recording(call_sid):
             elif any(word in transcript.lower() for word in ['no', 'wrong', 'incorrect', 'nope', 'nah']):
                 # Ask user to repeat - go back to greeting
                 conversation_manager.update_conversation(call_sid, transcript, ai_response, 'greeting')
-                response.say(f'<speak>{ai_response}</speak>', voice='Polly.Joanna')
+                response.say(f'<speak>{ai_response}</speak>', voice='Polly.Salli')
                 response.record(
                     action=f'{request.url_root.rstrip("/")}/twilio/process-recording/{call_sid}',
                     method='POST',
@@ -156,7 +156,7 @@ def process_recording(call_sid):
             else:
                 # Ask user to repeat
                 conversation_manager.update_conversation(call_sid, transcript, ai_response, 'confirmation')
-                response.say(f'<speak>{ai_response}</speak>', voice='Polly.Joanna')
+                response.say(f'<speak>{ai_response}</speak>', voice='Polly.Salli')
                 response.record(
                     action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
                     method='POST',
