@@ -5,41 +5,11 @@ from config import Config
 # Initialize OpenAI client
 client = OpenAI(api_key=Config.OPENAI_API_KEY)
 
-# Prevent stuttering
-def smooth_response(response):
-    # Remove words that commonly cause stuttering in TTS
-    stuttering_triggers = {
-        "the the": "the",
-        "and and": "and",
-        "to to": "to",
-        "a a": "a",
-        "is is": "is",
-        "that that": "that",
-        "it it": "it"
-    }
-    
-    for trigger, replacement in stuttering_triggers.items():
-        response = response.replace(trigger, replacement)
-    
-    # Simplify complex words
-    simplifications = {
-        "approximately": "about",
-        "utilize": "use",
-        "assistance": "help",
-        "require": "need",
-        "additional": "more"
-    }
-    
-    for complex, simple in simplifications.items():
-        response = response.replace(complex, simple)
-    
-    return response
-
 def generate_advanced_response(user_input, state, conversation_history=None):
     try:
         # For confirmation state with "yes", use custom response
         if state == 'confirmation' and any(word in user_input.lower() for word in ['yes', 'correct', 'right', 'yeah', 'yep', 'uh-huh', 'ok', 'okay']):
-            return smooth_response("Okay, is that all you need help with?")
+            return "Okay, is that all you need help with?"
         
         # Conversation context for GPT
         messages = build_conversation(conversation_history or [], user_input, state)
@@ -53,8 +23,8 @@ def generate_advanced_response(user_input, state, conversation_history=None):
             presence_penalty=0.1,
             frequency_penalty=0.1
         )
-        
-        ai_response = smooth_response(response.choices[0].message.content.strip())
+
+        ai_response = response.choices[0].message.content.strip()
         print(f"AI response: '{ai_response}'")
         return ai_response
         
