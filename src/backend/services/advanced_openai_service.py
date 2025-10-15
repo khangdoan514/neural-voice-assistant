@@ -14,37 +14,42 @@ def generate_advanced_response(user_input, state, conversation_history=None):
         # Conversation context for GPT
         messages = build_conversation(conversation_history or [], user_input, state)
         
-        # Call GPT-3.5 Turbo
+        # Call GPT-4o
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o",
             messages=messages,
             max_tokens=500,
-            temperature=0.7
+            temperature=0.8
         )
         
         ai_response = response.choices[0].message.content.strip()
         print(f"AI response: '{ai_response}'")
         return ai_response
         
-    except Exception as e:
-        print(f"GPT Error: {e}")
+    except Exception:
+        print(f"ERROR: GPT-4o failed.")
         # Use generate_response from openai_service.py
         return generate_response(user_input, state)
 
 def build_conversation(history, current_transcript, state):
     # Conversation context for GPT
     system_prompt = """
-    You are a helpful AI assistant that handles phone calls. 
-    Your role is to confirm user requests and provide helpful responses.
+    You are Alice, a friendly and professional AI assistant handling phone calls.
     
-    Conversation flow:
-    1. Greeting: User states their need, you confirm what you heard
-    2. Confirmation: User confirms or denies your understanding
+    CONVERSATION GOALS:
+    1. Be natural, conversational, and warm
+    2. Keep responses concise (1-2 sentences max) for phone conversations
+    3. Sound human-like - use casual language, occasional "um", "okay", "I see"
+    4. Maintain smooth flow - acknowledge then respond naturally
     
-    Keep responses natural, conversational, and concise (1-2 sentences max).
-    Speak like a friendly customer service agent.
+    VOICE OPTIMIZATION:
+    - Use contractions: "I'm", "you're", "that's"
+    - Avoid complex sentences
+    - Sound empathetic and engaged
+    - Pause naturally between thoughts
     
-    IMPORTANT: When user confirms their request is correct, ask "Is that all you need help with?"
+    Example good response: "Okay, I understand you need help with your account. Let me get that sorted for you."
+    Example bad response: "I have processed your request for account assistance. Please proceed with the following steps."
     """
     
     messages = [{"role": "system", "content": system_prompt}]
@@ -59,11 +64,11 @@ def build_conversation(history, current_transcript, state):
     
     # Add current user input with state context
     state_context = {
-        'greeting': f"User is stating their initial request: '{current_transcript}'. Confirm what you heard and ask if it's correct.",
-        'confirmation': f"User is responding to your confirmation request: '{current_transcript}'. Process their yes/no response and ask if that's all they need help with."
+        'greeting': f"User just said: '{current_transcript}'. Confirm what you heard in a natural, conversational way and ask if it's correct.",
+        'confirmation': f"User is responding to your confirmation: '{current_transcript}'. Respond naturally and continue the conversation flow."
     }
     
-    current_message = state_context.get(state, f"User said: '{current_transcript}'")
+    current_message = state_context.get(state, f"User said: '{current_transcript}'. Respond in a natural, conversational way.")
     messages.append({"role": "user", "content": current_message})
     
     return messages
