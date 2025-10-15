@@ -5,11 +5,45 @@ from config import Config
 # Initialize OpenAI client
 client = OpenAI(api_key=Config.OPENAI_API_KEY)
 
+# Prevent stuttering
+def smooth_response(response):
+    # Remove words that commonly cause stuttering in TTS
+    stuttering_triggers = {
+        "the the": "the",
+        "and and": "and",
+        "to to": "to",
+        "a a": "a",
+        "is is": "is",
+        "that that": "that",
+        "it it": "it"
+    }
+    
+    for trigger, replacement in stuttering_triggers.items():
+        response = response.replace(trigger, replacement)
+    
+    # Slight pauses for better pacing
+    response = response.replace(',', ',<break time="200ms"/>')
+    response = response.replace('.', '.<break time="300ms"/>')
+    
+    # Simplify complex words
+    simplifications = {
+        "approximately": "about",
+        "utilize": "use",
+        "assistance": "help",
+        "require": "need",
+        "additional": "more"
+    }
+    
+    for complex, simple in simplifications.items():
+        response = response.replace(complex, simple)
+    
+    return response
+
 def generate_advanced_response(user_input, state, conversation_history=None):
     try:
         # For confirmation state with "yes", use custom response
         if state == 'confirmation' and any(word in user_input.lower() for word in ['yes', 'correct', 'right', 'yeah', 'yep', 'uh-huh', 'ok', 'okay']):
-            return "Is that all you need help with?"
+            return smooth_response("Okay, is that all you need help with?")
         
         # Conversation context for GPT
         messages = build_conversation(conversation_history or [], user_input, state)
@@ -18,11 +52,13 @@ def generate_advanced_response(user_input, state, conversation_history=None):
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=messages,
-            max_tokens=500,
-            temperature=0.8
+            max_tokens=150,
+            temperature=0.9,
+            presence_penalty=0.1,
+            frequency_penalty=0.1
         )
         
-        ai_response = response.choices[0].message.content.strip()
+        ai_response = smooth_response(response.choices[0].message.content.strip())
         print(f"AI response: '{ai_response}'")
         return ai_response
         
@@ -34,22 +70,22 @@ def generate_advanced_response(user_input, state, conversation_history=None):
 def build_conversation(history, current_transcript, state):
     # Conversation context for GPT
     system_prompt = """
-    You are Alice, a friendly and professional AI assistant handling phone calls.
-    
-    CONVERSATION GOALS:
-    1. Be natural, conversational, and warm
-    2. Keep responses concise (1-2 sentences max) for phone conversations
-    3. Sound human-like - use casual language, occasional "um", "okay", "I see"
-    4. Maintain smooth flow - acknowledge then respond naturally
-    
-    VOICE OPTIMIZATION:
-    - Use contractions: "I'm", "you're", "that's"
-    - Avoid complex sentences
-    - Sound empathetic and engaged
-    - Pause naturally between thoughts
-    
-    Example good response: "Okay, I understand you need help with your account. Let me get that sorted for you."
-    Example bad response: "I have processed your request for account assistance. Please proceed with the following steps."
+    You are Alice, a friendly AI assistant on a phone call. CRITICAL: Optimize for SPEECH, not text.
+
+    VOICE CONVERSATION RULES:
+    1. SPEAK LIKE A HUMAN - Use filler words: "Okay", "I see", "Alright", "Um", "So"
+    2. KEEP IT SHORT - 1 sentence max, 2 only if absolutely necessary
+    3. SOUND WARM - Use "you", "your", "we", "let's"
+    4. NATURAL PACING - Acknowledge then respond
+    5. AVOID ROBOTIC LANGUAGE - No "processing", "analyzing", "according to my database"
+
+    BAD (robotic): "I have processed your request for account assistance. The system indicates this requires manual review."
+    GOOD (human): "Okay, I understand you're having account issues. Let me look into that for you."
+
+    BAD (formal): "Please confirm if this information is correct so I may proceed."
+    GOOD (natural): "Got it - is that right?"
+
+    CURRENT CONTEXT: Phone call with a user who needs help.
     """
     
     messages = [{"role": "system", "content": system_prompt}]
