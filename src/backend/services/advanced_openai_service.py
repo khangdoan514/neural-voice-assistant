@@ -5,46 +5,87 @@ from config import Config
 # Initialize OpenAI client
 client = OpenAI(api_key=Config.OPENAI_API_KEY)
 
+# Prevent stuttering
+def smooth_response(response):
+    # Remove words that commonly cause stuttering in TTS
+    stuttering_triggers = {
+        "the the": "the",
+        "and and": "and",
+        "to to": "to",
+        "a a": "a",
+        "is is": "is",
+        "that that": "that",
+        "it it": "it"
+    }
+    
+    for trigger, replacement in stuttering_triggers.items():
+        response = response.replace(trigger, replacement)
+    
+    # Slight pauses for better pacing
+    response = response.replace(',', ',<break time="200ms"/>')
+    response = response.replace('.', '.<break time="300ms"/>')
+    
+    # Simplify complex words
+    simplifications = {
+        "approximately": "about",
+        "utilize": "use",
+        "assistance": "help",
+        "require": "need",
+        "additional": "more"
+    }
+    
+    for complex, simple in simplifications.items():
+        response = response.replace(complex, simple)
+    
+    return response
+
 def generate_advanced_response(user_input, state, conversation_history=None):
     try:
         # For confirmation state with "yes", use custom response
         if state == 'confirmation' and any(word in user_input.lower() for word in ['yes', 'correct', 'right', 'yeah', 'yep', 'uh-huh', 'ok', 'okay']):
-            return "Is that all you need help with?"
+            return smooth_response("Okay, is that all you need help with?")
         
         # Conversation context for GPT
         messages = build_conversation(conversation_history or [], user_input, state)
         
-        # Call GPT-3.5 Turbo
+        # Call GPT-4o
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o",
             messages=messages,
-            max_tokens=500,
-            temperature=0.7
+            max_tokens=150,
+            temperature=0.9,
+            presence_penalty=0.1,
+            frequency_penalty=0.1
         )
         
-        ai_response = response.choices[0].message.content.strip()
+        ai_response = smooth_response(response.choices[0].message.content.strip())
         print(f"AI response: '{ai_response}'")
         return ai_response
         
-    except Exception as e:
-        print(f"GPT Error: {e}")
+    except Exception:
+        print(f"ERROR: GPT-4o failed.")
         # Use generate_response from openai_service.py
         return generate_response(user_input, state)
 
 def build_conversation(history, current_transcript, state):
     # Conversation context for GPT
     system_prompt = """
-    You are a helpful AI assistant that handles phone calls. 
-    Your role is to confirm user requests and provide helpful responses.
-    
-    Conversation flow:
-    1. Greeting: User states their need, you confirm what you heard
-    2. Confirmation: User confirms or denies your understanding
-    
-    Keep responses natural, conversational, and concise (1-2 sentences max).
-    Speak like a friendly customer service agent.
-    
-    IMPORTANT: When user confirms their request is correct, ask "Is that all you need help with?"
+    You are Alice, a friendly AI assistant on a phone call. CRITICAL: Optimize for SPEECH, not text.
+
+    VOICE CONVERSATION RULES:
+    1. SPEAK LIKE A HUMAN - Use filler words: "Okay", "I see", "Alright", "Um", "So"
+    2. KEEP IT SHORT - 1 sentence max, 2 only if absolutely necessary
+    3. SOUND WARM - Use "you", "your", "we", "let's"
+    4. NATURAL PACING - Acknowledge then respond
+    5. AVOID ROBOTIC LANGUAGE - No "processing", "analyzing", "according to my database"
+
+    BAD (robotic): "I have processed your request for account assistance. The system indicates this requires manual review."
+    GOOD (human): "Okay, I understand you're having account issues. Let me look into that for you."
+
+    BAD (formal): "Please confirm if this information is correct so I may proceed."
+    GOOD (natural): "Got it - is that right?"
+
+    CURRENT CONTEXT: Phone call with a user who needs help.
     """
     
     messages = [{"role": "system", "content": system_prompt}]
@@ -59,11 +100,11 @@ def build_conversation(history, current_transcript, state):
     
     # Add current user input with state context
     state_context = {
-        'greeting': f"User is stating their initial request: '{current_transcript}'. Confirm what you heard and ask if it's correct.",
-        'confirmation': f"User is responding to your confirmation request: '{current_transcript}'. Process their yes/no response and ask if that's all they need help with."
+        'greeting': f"User just said: '{current_transcript}'. Confirm what you heard in a natural, conversational way and ask if it's correct.",
+        'confirmation': f"User is responding to your confirmation: '{current_transcript}'. Respond naturally and continue the conversation flow."
     }
     
-    current_message = state_context.get(state, f"User said: '{current_transcript}'")
+    current_message = state_context.get(state, f"User said: '{current_transcript}'. Respond in a natural, conversational way.")
     messages.append({"role": "user", "content": current_message})
     
     return messages
