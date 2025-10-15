@@ -1,0 +1,14 @@
+Call SID: CAb344ac3a7a4e782719edba8d926866b2
+Timestamp: 2025-10-14:23-07-18
+User Request: Hello, I'm calling today because I've been experiencing persistent issues with my home internet service for about the past two weeks. The connection drops intermittently throughout the day, particularly during video conferences for work. I've already tried the basic troubleshooting steps, have power cycled the router multiple times, checked all the physical connections, and even moved the router to a more central location in my house. The signal strength appears strong according to the indicator light, but I keep losing connectivity at critical moments. This is becoming quite problematic since I work from home and rely on stable internet for my job.
+--------------------------------------------------
+CONVERSATION HISTORY:
+--------------------------------------------------
+
+Exchange 1:
+User: Hello, I'm calling today because I've been experiencing persistent issues with my home internet service for about the past two weeks. The connection drops intermittently throughout the day, particularly during video conferences for work. I've already tried the basic troubleshooting steps, have power cycled the router multiple times, checked all the physical connections, and even moved the router to a more central location in my house. The signal strength appears strong according to the indicator light, but I keep losing connectivity at critical moments. This is becoming quite problematic since I work from home and rely on stable internet for my job.
+AI: I understand that you've been having ongoing issues with your home internet for the past two weeks, despite trying various troubleshooting steps. Is that correct?
+
+Exchange 2:
+User: Yes.
+AI: Is that all you need help with?
