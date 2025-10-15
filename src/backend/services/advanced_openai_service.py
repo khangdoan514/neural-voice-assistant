@@ -18,7 +18,7 @@ def generate_advanced_response(user_input, state, conversation_history=None):
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=messages,
-            max_tokens=1000,
+            max_tokens=500,
             temperature=0.7
         )
         
