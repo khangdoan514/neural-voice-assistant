@@ -14,14 +14,12 @@ def generate_advanced_response(user_input, state, conversation_history=None):
         # Conversation context for GPT
         messages = build_conversation(conversation_history or [], user_input, state)
         
-        # Call GPT-4o
+        # Call GPT-3.5 Turbo
         response = client.chat.completions.create(
-            model="gpt-4o",
+            model="gpt-3.5-turbo",
             messages=messages,
             max_tokens=150,
             temperature=0.9,
-            presence_penalty=0.1,
-            frequency_penalty=0.1
         )
 
         ai_response = response.choices[0].message.content.strip()
@@ -29,7 +27,7 @@ def generate_advanced_response(user_input, state, conversation_history=None):
         return ai_response
         
     except Exception:
-        print(f"ERROR: GPT-4o failed.")
+        print(f"ERROR: GPT-3.5-turbo failed.")
         # Use generate_response from openai_service.py
         return generate_response(user_input, state)
 

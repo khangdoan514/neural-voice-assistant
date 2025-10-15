@@ -102,8 +102,8 @@ def process_recording(call_sid):
                 save_conversation(call_sid, user_request, conversation_history)
                 
                 # End call
-                response.say("Thank you! Your request has been recorded. Goodbye!", voice='Polly.Salli')
-                print("AI response: Thank you! Your request has been recorded. Goodbye!")
+                response.say("Thank you, your request has been submitted. We'll make sure to help you as quickly as possible. Goodbye!", voice='Polly.Salli')
+                print("AI response: Thank you, your request has been submitted. We'll make sure to help you as quickly as possible. Goodbye!")
                 conversation_manager.end_conversation(call_sid)
                 
             elif any(word in transcript.lower() for word in ['no', 'wrong', 'incorrect', 'nope', 'nah']):
