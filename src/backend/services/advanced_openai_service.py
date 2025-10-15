@@ -21,10 +21,6 @@ def smooth_response(response):
     for trigger, replacement in stuttering_triggers.items():
         response = response.replace(trigger, replacement)
     
-    # Slight pauses for better pacing
-    response = response.replace(',', ',<break time="200ms"/>')
-    response = response.replace('.', '.<break time="300ms"/>')
-    
     # Simplify complex words
     simplifications = {
         "approximately": "about",
