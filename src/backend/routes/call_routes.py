@@ -45,10 +45,54 @@ def handle_incoming_call():
         method='POST',
         timeout=4, # 4 seconds wait
         finish_on_key='#',
-        play_beep=True,
+        # play_beep=True,
         transcribe=False
     )
 
+    return str(response)
+
+@call_bp.route('/process-language-choice/<call_sid>', methods=['POST'])
+def process_language_choice(call_sid):
+    # User's language preference
+    response = VoiceResponse()
+    recording_url = request.form.get('RecordingUrl')
+    
+    if not recording_url:
+        print("ERROR: No RecordingUrl found for language choice.")
+        response.say("Sorry, I didn't get that. Please call back again.", voice='Polly.Salli')
+        return str(response)
+    
+    # Transcribe the language choice
+    transcript = transcribe_audio(recording_url)
+    print(f"User response: '{transcript}'")
+    
+    # Determine language preference
+    if any(word in transcript.lower() for word in ['vietnamese', 'tiếng việt', 'việt nam', 'việt']):
+        language = 'vi'
+        greeting = "Xin chào, tôi là Alice, trợ lý ảo. Hôm nay bạn cần giúp gì?"
+    
+    else:
+        # Default to English
+        language = 'en' 
+        greeting = "Hi, I'm Alice. What do you need help with today?"
+    
+    # Store language preference in conversation manager
+    conversation_manager.set_language(call_sid, language)
+    
+    # Ask the main question in the chosen language
+    response.say(greeting, voice='Polly.Salli')
+    print(f"AI response: {greeting}")
+    
+    # Record user's main request
+    response.record(
+        action=f'{request.url_root.rstrip("/")}/twilio/process-recording/{call_sid}',
+        method='POST',
+        timeout=4, # 4 seconds wait
+        finish_on_key='#',
+        # play_beep=True,
+        transcribe=False
+    )
+    
     return str(response)
 
 @call_bp.route('/process-recording/<call_sid>', methods=['GET', 'POST'])
