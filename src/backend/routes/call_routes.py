@@ -35,15 +35,15 @@ def handle_incoming_call():
     state = conversation_manager.get_conversation_state(call_sid)
     
     # Initial greeting
-    response.say("Hi, I'm Salli, an artificial intelligence assistant. What do you need help with today?", voice='Polly.Salli')
-    print("AI response: Hi, I'm Salli, an artificial intelligence assistant. What do you need help with today?")
+    response.say("Hi, I'm Elena, an artificial intelligence assistant. Would you prefer English or Vietnamese?", voice='Polly.Salli')
+    print("AI response: Hi, I'm Elena, an artificial intelligence assistant. Would you prefer English or Vietnamese?")
     print(f"Current conversation state: {state}\n")
     
     # Record user's response
     response.record(
         action=f'{base_url}/twilio/process-recording/{call_sid}',
         method='POST',
-        timeout=5, # 5 seconds wait
+        timeout=4, # 4 seconds wait
         finish_on_key='#',
         play_beep=True,
         transcribe=False
@@ -86,7 +86,7 @@ def process_recording(call_sid):
         response.record(
             action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
             method='POST',
-            timeout=5, # 5 seconds wait
+            timeout=4, # 4 seconds wait
             finish_on_key='#'
         )
         
@@ -114,7 +114,7 @@ def process_recording(call_sid):
                 response.record(
                     action=f'{request.url_root.rstrip("/")}/twilio/process-recording/{call_sid}',
                     method='POST',
-                    timeout=5, # 5 seconds wait
+                    timeout=4, # 4 seconds wait
                     finish_on_key='#'
                 )
 
@@ -125,7 +125,7 @@ def process_recording(call_sid):
                 response.record(
                     action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
                     method='POST',
-                    timeout=5, # 5 seconds wait
+                    timeout=4, # 4 seconds wait
                     finish_on_key='#'
                 )
 
@@ -138,7 +138,7 @@ def process_recording(call_sid):
                 response.record(
                     action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
                     method='POST',
-                    timeout=5, # 5 seconds wait
+                    timeout=4, # 4 seconds wait
                     finish_on_key='#'
                 )
 
@@ -149,7 +149,7 @@ def process_recording(call_sid):
                 response.record(
                     action=f'{request.url_root.rstrip("/")}/twilio/process-recording/{call_sid}',
                     method='POST',
-                    timeout=5, # 5 seconds wait
+                    timeout=4, # 4 seconds wait
                     finish_on_key='#'
                 )
 
@@ -160,7 +160,7 @@ def process_recording(call_sid):
                 response.record(
                     action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
                     method='POST',
-                    timeout=5, # 5 seconds wait
+                    timeout=4, # 4 seconds wait
                     finish_on_key='#'
                 )
     

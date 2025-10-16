@@ -1,0 +1,14 @@
+Call SID: CA7f296ff8d83fc854cebe24f1eafe2a78
+Timestamp: 2025-10-16:00-25-30
+User Request: Hello, I'm calling today because I've been experiencing persistent issues with my home internet service for about the past two weeks. A connection drops intermittently throughout the day, particularly during video conferences for work. I've already tried the basic troubleshooting step, have power cycled the router multiple times, checked all the physical connections, and even moved the router to a more central location in my house.
+--------------------------------------------------
+CONVERSATION HISTORY:
+--------------------------------------------------
+
+Exchange 1:
+User: Hello, I'm calling today because I've been experiencing persistent issues with my home internet service for about the past two weeks. A connection drops intermittently throughout the day, particularly during video conferences for work. I've already tried the basic troubleshooting step, have power cycled the router multiple times, checked all the physical connections, and even moved the router to a more central location in my house.
+AI: Alright, I hear you've been dealing with ongoing internet problems at home for the last couple of weeks, especially during work video calls. You've already done some troubleshooting like restarting the router and checking connections, right?
+
+Exchange 2:
+User: Yes.
+AI: Okay, is that all you need help with?
