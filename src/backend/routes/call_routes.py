@@ -35,20 +35,64 @@ def handle_incoming_call():
     state = conversation_manager.get_conversation_state(call_sid)
     
     # Initial greeting
-    response.say("Hi, I'm Salli, an artificial intelligence assistant. What do you need help with today?", voice='Polly.Salli')
-    print("AI response: Hi, I'm Salli, an artificial intelligence assistant. What do you need help with today?")
+    response.say("Hi, I'm Elena, an artificial intelligence assistant. Would you prefer English or Vietnamese?", voice='Polly.Salli')
+    print("AI response: Hi, I'm Elena, an artificial intelligence assistant. Would you prefer English or Vietnamese?")
     print(f"Current conversation state: {state}\n")
     
     # Record user's response
     response.record(
         action=f'{base_url}/twilio/process-recording/{call_sid}',
         method='POST',
-        timeout=5, # 5 seconds wait
+        timeout=4, # 4 seconds wait
         finish_on_key='#',
-        play_beep=True,
+        # play_beep=True,
         transcribe=False
     )
 
+    return str(response)
+
+@call_bp.route('/process-language-choice/<call_sid>', methods=['POST'])
+def process_language_choice(call_sid):
+    # User's language preference
+    response = VoiceResponse()
+    recording_url = request.form.get('RecordingUrl')
+    
+    if not recording_url:
+        print("ERROR: No RecordingUrl found for language choice.")
+        response.say("Sorry, I didn't get that. Please call back again.", voice='Polly.Salli')
+        return str(response)
+    
+    # Transcribe the language choice
+    transcript = transcribe_audio(recording_url)
+    print(f"User response: '{transcript}'")
+    
+    # Determine language preference
+    if any(word in transcript.lower() for word in ['vietnamese', 'tiếng việt', 'việt nam', 'việt']):
+        language = 'vi'
+        greeting = "Xin chào, tôi là Alice, trợ lý ảo. Hôm nay bạn cần giúp gì?"
+    
+    else:
+        # Default to English
+        language = 'en' 
+        greeting = "Hi, I'm Alice. What do you need help with today?"
+    
+    # Store language preference in conversation manager
+    conversation_manager.set_language(call_sid, language)
+    
+    # Ask the main question in the chosen language
+    response.say(greeting, voice='Polly.Salli')
+    print(f"AI response: {greeting}")
+    
+    # Record user's main request
+    response.record(
+        action=f'{request.url_root.rstrip("/")}/twilio/process-recording/{call_sid}',
+        method='POST',
+        timeout=4, # 4 seconds wait
+        finish_on_key='#',
+        # play_beep=True,
+        transcribe=False
+    )
+    
     return str(response)
 
 @call_bp.route('/process-recording/<call_sid>', methods=['GET', 'POST'])
@@ -86,7 +130,7 @@ def process_recording(call_sid):
         response.record(
             action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
             method='POST',
-            timeout=5, # 5 seconds wait
+            timeout=4, # 4 seconds wait
             finish_on_key='#'
         )
         
@@ -114,7 +158,7 @@ def process_recording(call_sid):
                 response.record(
                     action=f'{request.url_root.rstrip("/")}/twilio/process-recording/{call_sid}',
                     method='POST',
-                    timeout=5, # 5 seconds wait
+                    timeout=4, # 4 seconds wait
                     finish_on_key='#'
                 )
 
@@ -125,7 +169,7 @@ def process_recording(call_sid):
                 response.record(
                     action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
                     method='POST',
-                    timeout=5, # 5 seconds wait
+                    timeout=4, # 4 seconds wait
                     finish_on_key='#'
                 )
 
@@ -138,7 +182,7 @@ def process_recording(call_sid):
                 response.record(
                     action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
                     method='POST',
-                    timeout=5, # 5 seconds wait
+                    timeout=4, # 4 seconds wait
                     finish_on_key='#'
                 )
 
@@ -149,7 +193,7 @@ def process_recording(call_sid):
                 response.record(
                     action=f'{request.url_root.rstrip("/")}/twilio/process-recording/{call_sid}',
                     method='POST',
-                    timeout=5, # 5 seconds wait
+                    timeout=4, # 4 seconds wait
                     finish_on_key='#'
                 )
 
@@ -160,7 +204,7 @@ def process_recording(call_sid):
                 response.record(
                     action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
                     method='POST',
-                    timeout=5, # 5 seconds wait
+                    timeout=4, # 4 seconds wait
                     finish_on_key='#'
                 )
     
