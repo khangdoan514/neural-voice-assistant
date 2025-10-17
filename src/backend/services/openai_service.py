@@ -27,8 +27,8 @@ def download_audio(audio_url):
         print(f"ERROR: Failed to download audio.")
         return None
 
-def transcribe_audio(audio_url):
-    # Transcription using OpenAI Whisper API
+def transcribe_audio(audio_url, language='en'):
+    # OpenAI Whisper API
     try:        
         # Download the audio file
         audio_path = download_audio(audio_url)
@@ -37,12 +37,17 @@ def transcribe_audio(audio_url):
             print("ERROR: Could not download audio file.")
             return "I couldn't process the audio. Please try again."
         
-        # Transcribe with OpenAI Whisper
+        transcript_language = 'en'  # default
+        if language == 'vi':
+            transcript_language = 'vi'
+
+        # Transcribe
         with open(audio_path, 'rb') as audio_file:
             transcript = client.audio.transcriptions.create(
                 model="whisper-1",
                 file=audio_file,
-                language='en'
+                language='en',
+                language=transcript_language
             )
         
         transcription_text = transcript.text.strip()
@@ -51,13 +56,21 @@ def transcribe_audio(audio_url):
         os.unlink(audio_path)
         
         if not transcription_text:
-            return "I couldn't understand what you said. Please try again."
+            if language == 'vi':
+                return "Tôi không nghe rõ bạn nói gì. Hãy thử lại nhé."
+            
+            else:
+                return "I couldn't understand what you said. Please try again."
             
         return transcription_text
     
     except Exception as e:
-        print(f"Transcription error: {e}")
-        return "I encountered an error. Please repeat what you said."
+        print(f"ERROR: Failed transcription.")
+        if language == 'vi':
+            return "Có lỗi xảy ra. Hãy lặp lại những gì bạn đã nói."
+        
+        else:
+            return "I encountered an error. Please repeat what you said."
 
 # Used by the call_routes.py
 def generate_response(user_input, state):
