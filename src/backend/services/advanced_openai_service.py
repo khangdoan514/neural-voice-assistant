@@ -7,9 +7,15 @@ client = OpenAI(api_key=Config.OPENAI_API_KEY)
 
 def generate_advanced_response(user_input, state, conversation_history=None, language='en'):
     try:
-        # For confirmation state with "yes", use custom response
-        if state == 'confirmation' and any(word in user_input.lower() for word in ['yes', 'correct', 'right', 'yeah', 'yep', 'uh-huh', 'ok', 'okay']):
-            return "Okay, is that all you need help with?"
+        # Users say "yes"
+        if state == 'confirmation' and users_say_yes(user_input):
+            print(f"DEBUG: users_say_yes returned True for: '{user_input}'")
+            if language == 'vi':
+                # return "Có phải đó là tất cả những gì bạn cần giúp không?"
+                return "Is that all you need help with?"
+            
+            else:
+                return "Is that all you need help with?"
         
         # Conversation context for GPT
         messages = build_conversation(conversation_history or [], user_input, state, language)
@@ -35,22 +41,13 @@ def build_conversation(history, current_transcript, state, language='en'):
     # Conversation context
     if language == 'vi':
         system_prompt = """
-            Bạn là Salli, một trợ lý AI thân thiện trong cuộc gọi điện thoại. QUAN TRỌNG: Tối ưu cho GIỌNG NÓI, không phải văn bản.
-
-            QUY TẮC HỘI THOẠI BẰNG GIỌNG NÓI:
-            1. NÓI CHUYỆN NHƯ CON NGƯỜI - Dùng từ đệm: "Vâng", "Tôi hiểu", "Được rồi", "Ừm", "Vậy thì"
-            2. GIỮ CHO NGẮN GỌN - Tối đa 1 câu, chỉ 2 câu nếu thật sự cần thiết
-            3. ÂM ĐIỆU ẤM ÁP - Dùng "bạn", "của bạn", "chúng ta", "hãy"
-            4. NHỊP ĐỘ TỰ NHIÊN - Thừa nhận rồi mới phản hồi
-            5. TRÁNH NGÔN NGỮ ROBOT - Không dùng "đang xử lý", "đang phân tích", "theo cơ sở dữ liệu"
-
-            XẤU (robot): "Tôi đã xử lý yêu cầu hỗ trợ tài khoản của bạn. Hệ thống cho thấy điều này cần xem xét thủ công."
-            TỐT (con người): "Vâng, tôi hiểu bạn đang gặp vấn đề với tài khoản. Để tôi xem xét giúp bạn."
-
-            XẤU (trang trọng): "Vui lòng xác nhận thông tin này có chính xác không để tôi có thể tiếp tục."
-            TỐT (tự nhiên): "Hiểu rồi - như vậy có đúng không?"
-
-            NGỮ CẢNH HIỆN TẠI: Cuộc gọi điện thoại với người dùng cần giúp đỡ.
+            QUAN TRỌNG: Chỉ trả lời 1 câu ngắn gọn và LUÔN hỏi xác nhận.
+    
+            LUỒNG HỘI THOẠI:
+            1. Khi người dùng nói yêu cầu: Xác nhận yêu cầu và hỏi "Như vậy có đúng không?"
+            2. Khi người dùng xác nhận: Hỏi "Có phải đó là tất cả những gì bạn cần giúp không?"
+            
+            LUÔN giữ câu trả lời NGẮN GỌN (1 câu).
         """
     
     else:
@@ -100,3 +97,8 @@ def build_conversation(history, current_transcript, state, language='en'):
     messages.append({"role": "user", "content": current_message})
     
     return messages
+
+def users_say_yes(transcript):
+    en = ['yes', 'correct', 'right', 'yeah', 'yep', 'uh-huh', 'ok', 'okay']
+    vi = ['có', 'đúng', 'phải', 'ừ', 'vâng', 'dạ', 'đồng ý', 'chính xác', 'được']
+    return any(word in transcript.lower() for word in en) or any(word in transcript.lower() for word in vi)

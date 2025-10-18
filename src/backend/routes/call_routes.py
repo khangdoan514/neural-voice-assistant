@@ -120,8 +120,6 @@ def process_language_choice(call_sid):
     # Store language preference
     conversation_manager.set_language(call_sid, language)
     conversation_manager.update_conversation(call_sid, transcript, greeting, 'greeting')
-
-    print(f"DEBUG: Language set to {language}, state updated to greeting")
     
     # Main question
     generate_audio_response(response, call_sid, greeting, language)
@@ -185,7 +183,9 @@ def process_recording(call_sid):
         ai_confirmation_response = conversation_history[-1]['ai'] if conversation_history else ""
         final_confirmation = [
             "Is that all you need help with?",
-            "Có phải đó là tất cả những gì bạn cần giúp không?"
+            "Okay, is that all you need help with?",
+            "Có phải đó là tất cả những gì bạn cần giúp không?",
+            "Được rồi, có phải đó là tất cả những gì bạn cần giúp không?"
         ]
 
         # Final confirmation
@@ -231,12 +231,7 @@ def process_recording(call_sid):
             else:
                 # Ask user to repeat final confirmation
                 conversation_manager.update_conversation(call_sid, transcript, ai_response, 'confirmation')
-                #response.say(ai_response, voice='Polly.Thi')
-                current_language = conversation_manager.get_language(call_sid)
-                if current_language == 'vi':
-                    response.say(ai_response, voice='alice', language='vi-VN')
-                else:
-                    response.say(ai_response, voice='alice', language='en-US')
+                generate_audio_response(response, call_sid, ai_response, language)
 
                 response.record(
                     action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
