@@ -18,7 +18,7 @@ def handle_incoming_call():
     response = VoiceResponse()
     call_sid = request.form.get('CallSid')
 
-    # Get the current base URL dynamically
+    # Get the current base URL
     base_url = request.url_root.rstrip('/')
 
     print(f"Incoming call received: {call_sid}\n")
@@ -28,7 +28,7 @@ def handle_incoming_call():
         response.say("System error. Please try again later.", voice='Polly.Salli')
         return str(response)
 
-    # Start new conversation
+    # New conversation
     conversation_manager.start_conversation(call_sid)
 
     # Current conversation state
@@ -39,9 +39,9 @@ def handle_incoming_call():
     print("AI response: Hi, I'm Salli, an artificial intelligence assistant. Would you prefer English or Vietnamese?")
     print(f"Current conversation state: {state}\n")
     
-    # Record user's response
+    # User's response
     response.record(
-        action=f'{base_url}/twilio/process-recording/{call_sid}',
+        action=f'{base_url}/twilio/process-language-choice/{call_sid}',
         method='POST',
         timeout=4, # 4 seconds wait
         finish_on_key='#',
@@ -51,18 +51,18 @@ def handle_incoming_call():
 
     return str(response)
 
-@call_bp.route('/process-language-choice/<call_sid>', methods=['POST'])
+@call_bp.route('/process-language-choice/<call_sid>', methods=['GET', 'POST'])
 def process_language_choice(call_sid):
-    # User's language preference
+    # Language preference
     response = VoiceResponse()
-    recording_url = request.form.get('RecordingUrl')
+    recording_url = request.form.get('RecordingUrl') or request.args.get('RecordingUrl')
     
     if not recording_url:
         print("ERROR: No RecordingUrl found for language choice.")
         response.say("Sorry, I didn't get that. Please call back again.", voice='Polly.Salli')
         return str(response)
     
-    # Transcribe the language choice
+    # Transcribe the language preference
     transcript = transcribe_audio(recording_url)
     print(f"User response: '{transcript}'")
     
@@ -76,17 +76,17 @@ def process_language_choice(call_sid):
         language = 'en' 
         greeting = "Hi, I'm Salli. What do you need help with today?"
     
-    # Store language preference in conversation manager
+    # Store language preference
     conversation_manager.set_language(call_sid, language)
+    conversation_manager.update_conversation(call_sid, transcript, greeting, 'greeting')
 
-    # Update conversation state
-    conversation_manager.update_conversation_state(call_sid, 'greeting')
+    print(f"DEBUG: Language set to {language}, state updated to greeting")
     
-    # Ask the main question in the chosen language
+    # Main question
     response.say(greeting, voice='Polly.Salli')
     print(f"AI response: {greeting}")
     
-    # Record user's main request
+    # User's request
     response.record(
         action=f'{request.url_root.rstrip("/")}/twilio/process-recording/{call_sid}',
         method='POST',
@@ -102,13 +102,7 @@ def process_language_choice(call_sid):
 def process_recording(call_sid):
     # Process the recording after user speaks
     response = VoiceResponse()
-    
-    # Extract based on request method
-    if request.method == 'POST':
-        recording_url = request.form.get('RecordingUrl')
-    
-    else:
-        recording_url = request.args.get('RecordingUrl')
+    recording_url = request.form.get('RecordingUrl') or request.args.get('RecordingUrl')
 
     if not recording_url:
         print("ERROR: No RecordingUrl found in request.")
@@ -126,7 +120,7 @@ def process_recording(call_sid):
     state = conversation_manager.get_conversation_state(call_sid)
     print(f"Conversation state: {state}\n")
 
-    # Conversation history for context
+    # Conversation history
     conversation_history = conversation_manager.get_conversation_history(call_sid)
     
     # Generate AI response based on state
@@ -245,13 +239,12 @@ def process_recording(call_sid):
 
 @call_bp.route('/process-confirmation/<call_sid>', methods=['GET', 'POST'])
 def process_confirmation(call_sid):
-    # Handle the confirmation response (yes/no)
     return process_recording(call_sid)
 
 def users_say_yes(transcript):
-    arr = ['yes', 'correct', 'right', 'yeah', 'yep', 'uh-huh', 'ok', 'okay', 'có', 'đúng', 'phải', 'ừ', 'vâng']
+    arr = ['yes', 'correct', 'right', 'yeah', 'yep', 'uh-huh', 'ok', 'okay', 'có', 'đúng', 'phải', 'ừ', 'vâng', 'dạ', 'đồng ý', 'chính xác']
     return any(word in transcript.lower() for word in arr)
 
 def users_say_no(transcript):
-    arr = ['no', 'wrong', 'incorrect', 'nope', 'nah', 'không', 'sai', 'không phải']
+    arr = ['no', 'wrong', 'incorrect', 'nope', 'nah', 'không', 'sai', 'không phải', 'không đúng']
     return any(word in transcript.lower() for word in arr)
