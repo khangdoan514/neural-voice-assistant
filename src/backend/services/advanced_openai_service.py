@@ -1,6 +1,8 @@
+from ..utils.intent_detector import users_say_yes
 from .openai_service import generate_response
-from openai import OpenAI # type: ignore
+
 from config import Config
+from openai import OpenAI # type: ignore
 
 # Initialize OpenAI client
 client = OpenAI(api_key=Config.OPENAI_API_KEY)
@@ -21,10 +23,10 @@ def generate_advanced_response(user_input, state, conversation_history=None, lan
         
         # Call GPT-3.5 Turbo
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model=Config.GPT_MODEL,
             messages=messages,
-            max_tokens=150,
-            temperature=0.9,
+            max_tokens=Config.MAX_TOKENS,
+            temperature=Config.TEMPERATURE,
         )
 
         ai_response = response.choices[0].message.content.strip()
@@ -95,8 +97,3 @@ def build_conversation(history, current_transcript, state, language='en'):
     messages.append({"role": "user", "content": current_message})
     
     return messages
-
-def users_say_yes(transcript):
-    en = ['yes', 'correct', 'right', 'yeah', 'yep', 'uh-huh', 'ok', 'okay']
-    vi = ['có', 'đúng', 'phải', 'ừ', 'vâng', 'dạ', 'đồng ý', 'chính xác', 'được']
-    return any(word in transcript.lower() for word in en) or any(word in transcript.lower() for word in vi)

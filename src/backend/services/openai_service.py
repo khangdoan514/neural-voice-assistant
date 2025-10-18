@@ -1,5 +1,6 @@
-from openai import OpenAI # type: ignore
 from config import Config
+from openai import OpenAI # type: ignore
+
 import os
 import requests # type: ignore
 import tempfile
@@ -40,7 +41,7 @@ def transcribe_audio(audio_url, language='en'):
         # Transcribe
         with open(audio_path, 'rb') as audio_file:
             transcript = client.audio.transcriptions.create(
-                model="whisper-1",
+                model=Config.WHISPER_MODEL,
                 file=audio_file,
                 language=transcript_language
             )
@@ -93,7 +94,7 @@ def generate_speech(text, voice="alloy"):
     # OpenAI TTS-1 API
     try:
         response = client.audio.speech.create(
-            model="tts-1",
+            model=Config.TTS_MODEL,
             voice=voice,  # alloy, echo, fable, onyx, nova, shimmer
             input=text,
         )

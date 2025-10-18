@@ -1,11 +1,15 @@
 from ..utils.conversation_manager import ConversationManager
 from ..utils.file_handler import save_conversation
+from ..utils.intent_detector import users_say_yes, users_say_no
 from ..services.openai_service import transcribe_audio, generate_speech
 from ..services.advanced_openai_service import generate_advanced_response
+from ..services.twilio_service import validate_twilio_signature
+
+from config import Config
 from flask import Blueprint, request, send_file # type: ignore
 from twilio.twiml.voice_response import VoiceResponse # type: ignore
+
 import os
-import tempfile
 import uuid
 
 # Create blueprint
@@ -55,6 +59,10 @@ def generate_audio_response(response, call_sid, text, language='en'):
 
 @call_bp.route('/voice', methods=['POST'])
 def handle_incoming_call():
+    # Validate Twilio
+    if not validate_twilio_signature(request):
+        return "Invalid signature", 403
+
     # Handle incoming call to Twilio number
     response = VoiceResponse()
     call_sid = request.form.get('CallSid')
@@ -84,7 +92,7 @@ def handle_incoming_call():
     response.record(
         action=f'{base_url}/twilio/process-language-choice/{call_sid}',
         method='POST',
-        timeout=4, # 4 seconds wait
+        timeout=Config.RECORDING_TIMEOUT,
         finish_on_key='#',
         play_beep=False,
         transcribe=False
@@ -94,6 +102,10 @@ def handle_incoming_call():
 
 @call_bp.route('/process-language-choice/<call_sid>', methods=['GET', 'POST'])
 def process_language_choice(call_sid):
+    # Validate Twilio
+    if not validate_twilio_signature(request):
+        return "Invalid signature", 403
+    
     # Language preference
     response = VoiceResponse()
     recording_url = request.form.get('RecordingUrl') or request.args.get('RecordingUrl')
@@ -129,7 +141,7 @@ def process_language_choice(call_sid):
     response.record(
         action=f'{request.url_root.rstrip("/")}/twilio/process-recording/{call_sid}',
         method='POST',
-        timeout=4, # 4 seconds wait
+        timeout=Config.RECORDING_TIMEOUT,
         finish_on_key='#',
         play_beep=False,
         transcribe=False
@@ -193,7 +205,7 @@ def process_recording(call_sid):
             response.record(
                 action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
                 method='POST',
-                timeout=4, # 4 seconds wait
+                timeout=Config.RECORDING_TIMEOUT,
                 finish_on_key='#',
                 play_beep=False,
                 transcribe=False
@@ -234,7 +246,7 @@ def process_recording(call_sid):
                     response.record(
                         action=f'{request.url_root.rstrip("/")}/twilio/process-recording/{call_sid}',
                         method='POST',
-                        timeout=4, # 4 seconds wait
+                        timeout=Config.RECORDING_TIMEOUT,
                         finish_on_key='#',
                         play_beep=False,
                         transcribe=False
@@ -249,7 +261,7 @@ def process_recording(call_sid):
                     response.record(
                         action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
                         method='POST',
-                        timeout=4, # 4 seconds wait
+                        timeout=Config.RECORDING_TIMEOUT,
                         finish_on_key='#',
                         play_beep=False,
                         transcribe=False
@@ -266,7 +278,7 @@ def process_recording(call_sid):
                     response.record(
                         action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
                         method='POST',
-                        timeout=4, # 4 seconds wait
+                        timeout=Config.RECORDING_TIMEOUT,
                         finish_on_key='#',
                         play_beep=False,
                         transcribe=False
@@ -281,7 +293,7 @@ def process_recording(call_sid):
                     response.record(
                         action=f'{request.url_root.rstrip("/")}/twilio/process-recording/{call_sid}',
                         method='POST',
-                        timeout=4, # 4 seconds wait
+                        timeout=Config.RECORDING_TIMEOUT,
                         finish_on_key='#',
                         play_beep=False,
                         transcribe=False
@@ -296,7 +308,7 @@ def process_recording(call_sid):
                     response.record(
                         action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
                         method='POST',
-                        timeout=4, # 4 seconds wait
+                        timeout=Config.RECORDING_TIMEOUT,
                         finish_on_key='#',
                         play_beep=False,
                         transcribe=False
@@ -307,13 +319,3 @@ def process_recording(call_sid):
 @call_bp.route('/process-confirmation/<call_sid>', methods=['GET', 'POST'])
 def process_confirmation(call_sid):
     return process_recording(call_sid)
-
-def users_say_yes(transcript):
-    en = ['yes', 'correct', 'right', 'yeah', 'yep', 'uh-huh', 'ok', 'okay']
-    vi = ['có', 'đúng', 'phải', 'ừ', 'vâng', 'dạ', 'đồng ý', 'chính xác', 'được']
-    return any(word in transcript.lower() for word in en) or any(word in transcript.lower() for word in vi)
-
-def users_say_no(transcript):
-    en = ['no', 'wrong', 'incorrect', 'nope', 'nah']
-    vi = ['không', 'sai', 'không phải', 'không đúng']
-    return any(word in transcript.lower() for word in en) or any(word in transcript.lower() for word in vi)
