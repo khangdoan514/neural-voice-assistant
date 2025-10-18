@@ -25,7 +25,7 @@ def handle_incoming_call():
 
     if not call_sid:
         print("ERROR: No CallSid received from Twilio.")
-        response.say("System error. Please try again later.", voice='Polly.Salli')
+        response.say("System error. Please try again later.", voice='alice')
         return str(response)
 
     # New conversation
@@ -35,8 +35,8 @@ def handle_incoming_call():
     state = conversation_manager.get_conversation_state(call_sid)
     
     # Initial greeting
-    response.say("Hi, I'm Salli, an artificial intelligence assistant. Would you prefer English or Vietnamese?", voice='Polly.Salli')
-    print("AI response: Hi, I'm Salli, an artificial intelligence assistant. Would you prefer English or Vietnamese?")
+    response.say("Hi, I'm Alice, an artificial intelligence assistant. Would you prefer English or Vietnamese?", voice='alice')
+    print("AI response: Hi, I'm Alice, an artificial intelligence assistant. Would you prefer English or Vietnamese?")
     print(f"Current conversation state: {state}\n")
     
     # User's response
@@ -59,7 +59,7 @@ def process_language_choice(call_sid):
     
     if not recording_url:
         print("ERROR: No RecordingUrl found for language choice.")
-        response.say("Sorry, I didn't get that. Please call back again.", voice='Polly.Salli')
+        response.say("Sorry, I didn't get that. Please call back again.", voice='alice')
         return str(response)
     
     # Transcribe the language preference
@@ -83,7 +83,15 @@ def process_language_choice(call_sid):
     print(f"DEBUG: Language set to {language}, state updated to greeting")
     
     # Main question
-    response.say(greeting, voice='Polly.Salli')
+    #response.say(greeting, voice='Polly.Thi')
+    current_language = conversation_manager.get_language(call_sid)
+
+    if current_language == 'vi':
+        response.say(greeting, voice='alice', language='vi-VN')
+    
+    else:
+        response.say(greeting, voice='alice', language='en-US')
+
     print(f"AI response: {greeting}")
     
     # User's request
@@ -106,7 +114,7 @@ def process_recording(call_sid):
 
     if not recording_url:
         print("ERROR: No RecordingUrl found in request.")
-        response.say("Sorry, I didn't get that. Please try again.", voice='Polly.Salli')
+        response.say("Sorry, I didn't get that. Please try again.", voice='alice')
         return str(response)
 
     # Get language preference
@@ -131,7 +139,14 @@ def process_recording(call_sid):
         conversation_manager.set_user_request(call_sid, transcript)
         conversation_manager.update_conversation(call_sid, transcript, ai_response, 'confirmation')
         
-        response.say(ai_response, voice='Polly.Salli')
+        #response.say(ai_response, voice='Polly.Thi')
+        current_language = conversation_manager.get_language(call_sid)
+        if current_language == 'vi':
+            response.say(ai_response, voice='alice', language='vi-VN')
+        
+        else:
+            response.say(ai_response, voice='alice', language='en-US')
+
         response.record(
             action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
             method='POST',
@@ -156,11 +171,13 @@ def process_recording(call_sid):
                 
                 # Goodbye
                 if language == 'vi':
-                    response.say("Cảm ơn, yêu cầu của bạn đã được gửi. Chúng tôi sẽ hỗ trợ bạn sớm nhất có thể. Tạm biệt!", voice='Polly.Salli')
+                    #response.say("Cảm ơn, yêu cầu của bạn đã được gửi. Chúng tôi sẽ hỗ trợ bạn sớm nhất có thể. Tạm biệt!", voice='Polly.Thi')
+                    response.say("Cảm ơn, yêu cầu của bạn đã được gửi. Chúng tôi sẽ hỗ trợ bạn sớm nhất có thể. Tạm biệt!", voice='alice', language='vi-VN')
                     print("Cảm ơn, yêu cầu của bạn đã được gửi. Chúng tôi sẽ hỗ trợ bạn sớm nhất có thể. Tạm biệt!")
                 
                 else:
-                    response.say("Thank you, your request has been submitted. We'll make sure to help you as quickly as possible. Goodbye!", voice='Polly.Salli')
+                    #response.say("Thank you, your request has been submitted. We'll make sure to help you as quickly as possible. Goodbye!", voice='Polly.Thi')
+                    response.say("Thank you, your request has been submitted. We'll make sure to help you as quickly as possible. Goodbye!", voice='alice', language='en-US')
                     print("AI response: Thank you, your request has been submitted. We'll make sure to help you as quickly as possible. Goodbye!")
                 
                 # End call
@@ -173,10 +190,12 @@ def process_recording(call_sid):
                 
                 # Follow-up
                 if language == 'vi':
-                    response.say("Tôi có thể giúp gì thêm cho bạn?", voice='Polly.Salli')
+                    #response.say("Tôi có thể giúp gì thêm cho bạn?", voice='Polly.Thi')
+                    response.say("Tôi có thể giúp gì thêm cho bạn?", voice='alice', language='vi-VN')
                 
                 else:
-                    response.say("How can I assist you further?", voice='Polly.Salli')
+                    #response.say("How can I assist you further?", voice='Polly.Thi')
+                    response.say("How can I assist you further?", voice='alice', language='en-US')
 
                 response.record(
                     action=f'{request.url_root.rstrip("/")}/twilio/process-recording/{call_sid}',
@@ -189,7 +208,13 @@ def process_recording(call_sid):
             else:
                 # Ask user to repeat final confirmation
                 conversation_manager.update_conversation(call_sid, transcript, ai_response, 'confirmation')
-                response.say(ai_response, voice='Polly.Salli')
+                #response.say(ai_response, voice='Polly.Thi')
+                current_language = conversation_manager.get_language(call_sid)
+                if current_language == 'vi':
+                    response.say(ai_response, voice='alice', language='vi-VN')
+                else:
+                    response.say(ai_response, voice='alice', language='en-US')
+
                 response.record(
                     action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
                     method='POST',
@@ -203,7 +228,13 @@ def process_recording(call_sid):
             if users_say_yes(transcript.lower()):
                 # Ask if that's all they need
                 conversation_manager.update_conversation(call_sid, transcript, ai_response, 'confirmation')
-                response.say(ai_response, voice='Polly.Salli')
+                #response.say(ai_response, voice='Polly.Thi')
+                current_language = conversation_manager.get_language(call_sid)
+                if current_language == 'vi':
+                    response.say(ai_response, voice='alice', language='vi-VN')
+                else:
+                    response.say(ai_response, voice='alice', language='en-US')
+
                 response.record(
                     action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
                     method='POST',
@@ -215,7 +246,13 @@ def process_recording(call_sid):
             elif users_say_no(transcript.lower()):
                 # Ask user to repeat - go back to greeting
                 conversation_manager.update_conversation(call_sid, transcript, ai_response, 'greeting')
-                response.say(ai_response, voice='Polly.Salli')
+                #response.say(ai_response, voice='Polly.Thi')
+                current_language = conversation_manager.get_language(call_sid)
+                if current_language == 'vi':
+                    response.say(ai_response, voice='alice', language='vi-VN')
+                else:
+                    response.say(ai_response, voice='alice', language='en-US')
+
                 response.record(
                     action=f'{request.url_root.rstrip("/")}/twilio/process-recording/{call_sid}',
                     method='POST',
@@ -227,7 +264,13 @@ def process_recording(call_sid):
             else:
                 # Ask user to repeat
                 conversation_manager.update_conversation(call_sid, transcript, ai_response, 'confirmation')
-                response.say(ai_response, voice='Polly.Salli')
+                #response.say(ai_response, voice='Polly.Thi')
+                current_language = conversation_manager.get_language(call_sid)
+                if current_language == 'vi':
+                    response.say(ai_response, voice='alice', language='vi-VN')
+                else:
+                    response.say(ai_response, voice='alice', language='en-US')
+
                 response.record(
                     action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
                     method='POST',
