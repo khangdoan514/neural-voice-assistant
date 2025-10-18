@@ -1,4 +1,5 @@
 from datetime import datetime
+
 import os
 
 def save_conversation(call_sid, user_request, conversation_history):
@@ -6,7 +7,7 @@ def save_conversation(call_sid, user_request, conversation_history):
     os.makedirs('conversations', exist_ok=True)
     
     timestamp = datetime.now().strftime("%Y-%m-%d:%H-%M-%S")
-    filename = f"conversations/request_{call_sid}.txt"
+    filename = f"../conversations/request_{call_sid}.txt"
     
     try:
         with open(filename, 'w', encoding='utf-8') as f:

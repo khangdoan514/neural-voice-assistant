@@ -1,25 +1,32 @@
+from ..utils.intent_detector import users_say_yes
 from .openai_service import generate_response
-from openai import OpenAI # type: ignore
+
 from config import Config
+from openai import OpenAI # type: ignore
 
 # Initialize OpenAI client
 client = OpenAI(api_key=Config.OPENAI_API_KEY)
 
+# process_recording() in call_routes.py
 def generate_advanced_response(user_input, state, conversation_history=None, language='en'):
-    try:
-        # For confirmation state with "yes", use custom response
-        if state == 'confirmation' and any(word in user_input.lower() for word in ['yes', 'correct', 'right', 'yeah', 'yep', 'uh-huh', 'ok', 'okay']):
-            return "Okay, is that all you need help with?"
-        
-        # Conversation context for GPT
+    try:        
+        # Users say "yes"
+        if state == 'confirmation' and users_say_yes(user_input):
+            if language == 'vi':
+                return "Có phải đó là tất cả những gì bạn cần giúp không?"
+            
+            else:
+                return "Is that all you need help with?"
+                    
+        # Conversation context
         messages = build_conversation(conversation_history or [], user_input, state, language)
         
         # Call GPT-3.5 Turbo
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model=Config.GPT_MODEL,
             messages=messages,
-            max_tokens=150,
-            temperature=0.9,
+            max_tokens=Config.MAX_TOKENS,
+            temperature=Config.TEMPERATURE,
         )
 
         ai_response = response.choices[0].message.content.strip()
@@ -27,50 +34,33 @@ def generate_advanced_response(user_input, state, conversation_history=None, lan
         return ai_response
         
     except Exception:
-        # Use generate_response()
-        print(f"ERROR: GPT-3.5-turbo failed.")
+        print(f"ERROR: GPT-3.5-turbo failed in generate_advanced_response()")
         return generate_response(user_input, state)
 
 def build_conversation(history, current_transcript, state, language='en'):
     # Conversation context
-    if language == 'vi':
+    if language == 'en':
         system_prompt = """
-            Bạn là Salli, một trợ lý AI thân thiện trong cuộc gọi điện thoại. QUAN TRỌNG: Tối ưu cho GIỌNG NÓI, không phải văn bản.
+            You are Salli, a professional AI assistant handling phone calls. Maintain a balance between friendly and professional.
 
-            QUY TẮC HỘI THOẠI BẰNG GIỌNG NÓI:
-            1. NÓI CHUYỆN NHƯ CON NGƯỜI - Dùng từ đệm: "Vâng", "Tôi hiểu", "Được rồi", "Ừm", "Vậy thì"
-            2. GIỮ CHO NGẮN GỌN - Tối đa 1 câu, chỉ 2 câu nếu thật sự cần thiết
-            3. ÂM ĐIỆU ẤM ÁP - Dùng "bạn", "của bạn", "chúng ta", "hãy"
-            4. NHỊP ĐỘ TỰ NHIÊN - Thừa nhận rồi mới phản hồi
-            5. TRÁNH NGÔN NGỮ ROBOT - Không dùng "đang xử lý", "đang phân tích", "theo cơ sở dữ liệu"
+            CONVERSATION GUIDELINES:
+            1. BE CLEAR AND PROFESSIONAL - Use complete sentences, avoid excessive filler words
+            2. BE CONCISE - Keep responses brief but complete (1-2 sentences)
+            3. BE HELPFUL - Focus on understanding and assisting the user
+            4. USE NATURAL LANGUAGE - Sound human but maintain professionalism
+            5. CONFIRM CLEARLY - Ensure accurate understanding of user requests
 
-            XẤU (robot): "Tôi đã xử lý yêu cầu hỗ trợ tài khoản của bạn. Hệ thống cho thấy điều này cần xem xét thủ công."
-            TỐT (con người): "Vâng, tôi hiểu bạn đang gặp vấn đề với tài khoản. Để tôi xem xét giúp bạn."
+            PROFESSIONAL EXAMPLES:
+            "I understand you need help with your internet connection. Is that correct?"
+            "Thank you for confirming. I'll make sure your request is properly documented."
+            "Could you please clarify what specific assistance you need?"
 
-            XẤU (trang trọng): "Vui lòng xác nhận thông tin này có chính xác không để tôi có thể tiếp tục."
-            TỐT (tự nhiên): "Hiểu rồi - như vậy có đúng không?"
+            AVOID:
+            - Overly casual language: "Yeah", "Uh-huh", "No problemo"
+            - Robotic terminology: "Processing", "System indicates", "Database query"
+            - Vague responses: "Okay", "Got it", "I see"
 
-            NGỮ CẢNH HIỆN TẠI: Cuộc gọi điện thoại với người dùng cần giúp đỡ.
-        """
-    
-    else:
-        system_prompt = """
-            You are Salli, a friendly AI assistant on a phone call. CRITICAL: Optimize for SPEECH, not text.
-
-            VOICE CONVERSATION RULES:
-            1. SPEAK LIKE A HUMAN - Use filler words: "Okay", "I see", "Alright", "Um", "So"
-            2. KEEP IT SHORT - 1 sentence max, 2 only if absolutely necessary
-            3. SOUND WARM - Use "you", "your", "we", "let's"
-            4. NATURAL PACING - Acknowledge then respond
-            5. AVOID ROBOTIC LANGUAGE - No "processing", "analyzing", "according to my database"
-
-            BAD (robotic): "I have processed your request for account assistance. The system indicates this requires manual review."
-            GOOD (human): "Okay, I understand you're having account issues. Let me look into that for you."
-
-            BAD (formal): "Please confirm if this information is correct so I may proceed."
-            GOOD (natural): "Got it - is that right?"
-
-            CURRENT CONTEXT: Phone call with a user who needs help.
+            CURRENT CONTEXT: Professional customer service call where users need technical assistance.
         """
     
     messages = [{"role": "system", "content": system_prompt}]
