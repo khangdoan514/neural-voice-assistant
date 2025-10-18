@@ -2,8 +2,8 @@ from ..utils.conversation_manager import ConversationManager
 from ..utils.file_handler import save_conversation
 from ..services.openai_service import transcribe_audio
 from ..services.advanced_openai_service import generate_advanced_response
-from flask import Blueprint, request, Response
-from twilio.twiml.voice_response import VoiceResponse
+from flask import Blueprint, request # type: ignore
+from twilio.twiml.voice_response import VoiceResponse # type: ignore
 import random
 
 # Create blueprint
@@ -35,8 +35,8 @@ def handle_incoming_call():
     state = conversation_manager.get_conversation_state(call_sid)
     
     # Initial greeting
-    response.say("Hi, I'm Elena, an artificial intelligence assistant. Would you prefer English or Vietnamese?", voice='Polly.Salli')
-    print("AI response: Hi, I'm Elena, an artificial intelligence assistant. Would you prefer English or Vietnamese?")
+    response.say("Hi, I'm Salli, an artificial intelligence assistant. Would you prefer English or Vietnamese?", voice='Polly.Salli')
+    print("AI response: Hi, I'm Salli, an artificial intelligence assistant. Would you prefer English or Vietnamese?")
     print(f"Current conversation state: {state}\n")
     
     # Record user's response

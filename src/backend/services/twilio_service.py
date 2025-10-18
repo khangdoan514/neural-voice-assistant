@@ -1,5 +1,5 @@
 from config import Config
-from twilio.rest import Client
+from twilio.rest import Client # type: ignore
 
 client = Client(Config.TWILIO_ACCOUNT_SID, Config.TWILIO_AUTH_TOKEN)
 

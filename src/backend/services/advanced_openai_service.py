@@ -1,5 +1,5 @@
 from .openai_service import generate_response
-from openai import OpenAI
+from openai import OpenAI # type: ignore
 from config import Config
 
 # Initialize OpenAI client

@@ -1,7 +1,7 @@
-from openai import OpenAI
+from openai import OpenAI # type: ignore
 from config import Config
 import os
-import requests
+import requests # type: ignore
 import tempfile
 
 # Initialize OpenAI
