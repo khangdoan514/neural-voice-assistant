@@ -100,15 +100,23 @@ def process_recording(call_sid):
     # Process the recording after user speaks
     response = VoiceResponse()
     
-    # Extract RecordingUrl based on request method
+    # Extract based on request method
     if request.method == 'POST':
         recording_url = request.form.get('RecordingUrl')
     
     else:
         recording_url = request.args.get('RecordingUrl')
 
+    if not recording_url:
+        print("ERROR: No RecordingUrl found in request.")
+        response.say("Sorry, I didn't get that. Please try again.", voice='Polly.Salli')
+        return str(response)
+
+    # Get language preference
+    language = conversation_manager.get_language(call_sid)
+
     # Use transcription
-    transcript = transcribe_audio(recording_url)
+    transcript = transcribe_audio(recording_url, language)
     print(f"User response: '{transcript}'")
 
     # Current conversation state
@@ -119,7 +127,7 @@ def process_recording(call_sid):
     conversation_history = conversation_manager.get_conversation_history(call_sid)
     
     # Generate AI response based on state
-    ai_response = generate_advanced_response(transcript, state, conversation_history)
+    ai_response = generate_advanced_response(transcript, state, conversation_history, language)
     
     if state == 'greeting':
         # Confirm user response
@@ -135,26 +143,44 @@ def process_recording(call_sid):
         )
         
     elif state == 'confirmation':
-        # Check if this is the final confirmation ("Is that all you need help with?")
         ai_confirmation_response = conversation_history[-1]['ai'] if conversation_history else ""
+        final_confirmation = [
+            "Is that all you need help with?",
+            "Có phải đó là tất cả những gì bạn cần giúp không?"
+        ]
 
-        if "Is that all you need help with?".lower() in ai_confirmation_response:
-            # Process confirmation response
-            if any(word in transcript.lower() for word in ['yes', 'correct', 'right', 'yeah', 'yep', 'uh-huh', 'ok', 'okay']):
+        # Final confirmation
+        if any(phrase in ai_confirmation_response for phrase in final_confirmation):
+            # Users say "yes"
+            if users_say_yes(transcript.lower()):
                 # Save conversation
                 user_request = conversation_manager.get_user_request(call_sid)
                 save_conversation(call_sid, user_request, conversation_history)
                 
-                # End call
-                response.say("Thank you, your request has been submitted. We'll make sure to help you as quickly as possible. Goodbye!", voice='Polly.Salli')
-                print("AI response: Thank you, your request has been submitted. We'll make sure to help you as quickly as possible. Goodbye!")
-                conversation_manager.end_conversation(call_sid)
+                # Goodbye
+                if language == 'vi':
+                    response.say("Cảm ơn, yêu cầu của bạn đã được gửi. Chúng tôi sẽ hỗ trợ bạn sớm nhất có thể. Tạm biệt!", voice='Polly.Salli')
+                    print("Cảm ơn, yêu cầu của bạn đã được gửi. Chúng tôi sẽ hỗ trợ bạn sớm nhất có thể. Tạm biệt!")
                 
-            elif any(word in transcript.lower() for word in ['no', 'wrong', 'incorrect', 'nope', 'nah']):
-                # Ask user what else they need help with
+                else:
+                    response.say("Thank you, your request has been submitted. We'll make sure to help you as quickly as possible. Goodbye!", voice='Polly.Salli')
+                    print("AI response: Thank you, your request has been submitted. We'll make sure to help you as quickly as possible. Goodbye!")
+                
+                # End call
+                conversation_manager.end_conversation(call_sid)
+            
+            # User say "no"
+            elif users_say_no(transcript.lower()):
+                # Ask what else they need help with
                 conversation_manager.update_conversation(call_sid, transcript, ai_response, 'greeting')
                 
-                response.say("How can I assist you further?", voice='Polly.Salli')
+                # Follow-up
+                if language == 'vi':
+                    response.say("Tôi có thể giúp gì thêm cho bạn?", voice='Polly.Salli')
+                
+                else:
+                    response.say("How can I assist you further?", voice='Polly.Salli')
+
                 response.record(
                     action=f'{request.url_root.rstrip("/")}/twilio/process-recording/{call_sid}',
                     method='POST',
@@ -162,6 +188,7 @@ def process_recording(call_sid):
                     finish_on_key='#'
                 )
 
+            # User say something else
             else:
                 # Ask user to repeat final confirmation
                 conversation_manager.update_conversation(call_sid, transcript, ai_response, 'confirmation')
@@ -173,9 +200,10 @@ def process_recording(call_sid):
                     finish_on_key='#'
                 )
 
+        # Confirm what users say
         else:
-            # Regular confirmation flow (first confirmation)
-            if any(word in transcript.lower() for word in ['yes', 'correct', 'right', 'yeah', 'yep', 'uh-huh', 'ok', 'okay']):
+            # Users say "yes"
+            if users_say_yes(transcript.lower()):
                 # Ask if that's all they need
                 conversation_manager.update_conversation(call_sid, transcript, ai_response, 'confirmation')
                 response.say(ai_response, voice='Polly.Salli')
@@ -186,7 +214,8 @@ def process_recording(call_sid):
                     finish_on_key='#'
                 )
 
-            elif any(word in transcript.lower() for word in ['no', 'wrong', 'incorrect', 'nope', 'nah']):
+            # Users say "no"
+            elif users_say_no(transcript.lower()):
                 # Ask user to repeat - go back to greeting
                 conversation_manager.update_conversation(call_sid, transcript, ai_response, 'greeting')
                 response.say(ai_response, voice='Polly.Salli')
@@ -197,6 +226,7 @@ def process_recording(call_sid):
                     finish_on_key='#'
                 )
 
+            # Users say something else
             else:
                 # Ask user to repeat
                 conversation_manager.update_conversation(call_sid, transcript, ai_response, 'confirmation')
@@ -214,3 +244,11 @@ def process_recording(call_sid):
 def process_confirmation(call_sid):
     # Handle the confirmation response (yes/no)
     return process_recording(call_sid)
+
+def users_say_yes(transcript):
+    arr = ['yes', 'correct', 'right', 'yeah', 'yep', 'uh-huh', 'ok', 'okay', 'có', 'đúng', 'phải', 'ừ', 'vâng']
+    return any(word in transcript.lower() for word in arr)
+
+def users_say_no(transcript):
+    arr = ['no', 'wrong', 'incorrect', 'nope', 'nah', 'không', 'sai', 'không phải']
+    return any(word in transcript.lower() for word in arr)
