@@ -1,5 +1,5 @@
 from backend.routes.call_routes import call_bp
-from flask import Flask
+from flask import Flask # type: ignore
 import sys
 import os
 import logging

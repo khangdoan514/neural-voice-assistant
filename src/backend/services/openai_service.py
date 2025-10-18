@@ -1,7 +1,7 @@
-from openai import OpenAI
+from openai import OpenAI # type: ignore
 from config import Config
 import os
-import requests
+import requests # type: ignore
 import tempfile
 
 # Initialize OpenAI
@@ -10,11 +10,11 @@ client = OpenAI(api_key=Config.OPENAI_API_KEY)
 def download_audio(audio_url):
     # Download audio file from Twilio recording URL
     try:        
-        # Twilio recordings are in .wav format
+        # .wav format
         response = requests.get(audio_url, auth=(Config.TWILIO_ACCOUNT_SID, Config.TWILIO_AUTH_TOKEN))
         
         if response.status_code == 200:
-            # Create temporary file
+            # Create temporary .wav file
             with tempfile.NamedTemporaryFile(delete=False, suffix='.wav') as temp_audio:
                 temp_audio.write(response.content)
                 return temp_audio.name
