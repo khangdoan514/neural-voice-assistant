@@ -69,15 +69,18 @@ def process_language_choice(call_sid):
     # Determine language preference
     if any(word in transcript.lower() for word in ['vietnamese', 'tiếng việt', 'việt nam', 'việt']):
         language = 'vi'
-        greeting = "Xin chào, tôi là Alice, trợ lý ảo. Hôm nay bạn cần giúp gì?"
+        greeting = "Xin chào, tôi là Salli, trợ lý ảo. Hôm nay bạn cần giúp gì?"
     
     else:
         # Default to English
         language = 'en' 
-        greeting = "Hi, I'm Alice. What do you need help with today?"
+        greeting = "Hi, I'm Salli. What do you need help with today?"
     
     # Store language preference in conversation manager
     conversation_manager.set_language(call_sid, language)
+
+    # Update conversation state
+    conversation_manager.update_conversation_state(call_sid, 'greeting')
     
     # Ask the main question in the chosen language
     response.say(greeting, voice='Polly.Salli')

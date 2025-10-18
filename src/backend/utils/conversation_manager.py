@@ -18,7 +18,12 @@ class ConversationManager:
             })
 
             self.active_conversations[call_sid]['state'] = state
-            print(f"Current conversation state: {state}\n")
+            print(f"Conversation state: {state}\n")
+
+    def update_conversation_state(self, call_sid, state):
+        if call_sid in self.active_conversations:
+            self.active_conversations[call_sid]['state'] = state
+            print(f"Conversation state: {state}")
     
     def set_user_request(self, call_sid, request):
         if call_sid in self.active_conversations:
