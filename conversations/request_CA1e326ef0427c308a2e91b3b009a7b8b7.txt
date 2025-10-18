@@ -1,0 +1,18 @@
+Call SID: CA1e326ef0427c308a2e91b3b009a7b8b7
+Timestamp: 2025-10-18:16-50-58
+User Request: Hi, I need help with my internet connection. The connection is very unstable.
+--------------------------------------------------
+CONVERSATION HISTORY:
+--------------------------------------------------
+
+Exchange 1:
+User: Thank you.
+AI: Hi, what do you need help with today?
+
+Exchange 2:
+User: Hi, I need help with my internet connection. The connection is very unstable.
+AI: I understand you need help with your internet connection because it's unstable. Is that correct?
+
+Exchange 3:
+User: Yes.
+AI: Is that all you need help with?

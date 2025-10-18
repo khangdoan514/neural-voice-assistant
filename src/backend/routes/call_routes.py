@@ -84,8 +84,8 @@ def handle_incoming_call():
     state = conversation_manager.get_conversation_state(call_sid)
     
     # Initial greeting
-    generate_audio_response(response, call_sid, "Hi, I'm Alice, an artificial intelligence assistant. Would you prefer English or Vietnamese?", 'en')
-    print("AI response: Hi, I'm Alice, an artificial intelligence assistant. Would you prefer English or Vietnamese?")
+    generate_audio_response(response, call_sid, "Hi, I'm Salli, an artificial intelligence assistant. Would you prefer English or Vietnamese?", 'en')
+    print("AI response: Hi, I'm Salli, an artificial intelligence assistant. Would you prefer English or Vietnamese?")
     print(f"Current conversation state: {state}\n")
     
     # User's response
@@ -213,6 +213,8 @@ def process_recording(call_sid):
             
         elif state == 'confirmation':
             ai_confirmation_response = conversation_history[-1]['ai'] if conversation_history else ""
+            print(f"AI response: '{ai_confirmation_response}'")
+            
             final_confirmation = [
                 "Is that all you need help with?",
                 "Okay, is that all you need help with?",
