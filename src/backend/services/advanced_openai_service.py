@@ -5,19 +5,18 @@ from config import Config
 # Initialize OpenAI client
 client = OpenAI(api_key=Config.OPENAI_API_KEY)
 
+# process_recording() in call_routes.py
 def generate_advanced_response(user_input, state, conversation_history=None, language='en'):
-    try:
+    try:        
         # Users say "yes"
         if state == 'confirmation' and users_say_yes(user_input):
-            print(f"DEBUG: users_say_yes returned True for: '{user_input}'")
             if language == 'vi':
-                # return "Có phải đó là tất cả những gì bạn cần giúp không?"
-                return "Is that all you need help with?"
+                return "Có phải đó là tất cả những gì bạn cần giúp không?"
             
             else:
                 return "Is that all you need help with?"
-        
-        # Conversation context for GPT
+                    
+        # Conversation context
         messages = build_conversation(conversation_history or [], user_input, state, language)
         
         # Call GPT-3.5 Turbo
@@ -33,8 +32,7 @@ def generate_advanced_response(user_input, state, conversation_history=None, lan
         return ai_response
         
     except Exception:
-        # Use generate_response()
-        print(f"ERROR: GPT-3.5-turbo failed.")
+        print(f"ERROR: GPT-3.5-turbo failed in generate_advanced_response()")
         return generate_response(user_input, state)
 
 def build_conversation(history, current_transcript, state, language='en'):
