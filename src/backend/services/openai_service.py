@@ -64,14 +64,14 @@ def transcribe_audio(audio_url, language='en'):
         return transcription_text
     
     except Exception as e:
-        print(f"ERROR: Failed transcription.")
+        print(f"ERROR: OpenAI Whisper API failed.")
         if language == 'vi':
             return "Có lỗi xảy ra. Hãy lặp lại những gì bạn đã nói."
         
         else:
             return "I encountered an error. Please repeat what you said."
 
-# Used by the call_routes.py
+# advanced_openai_service.py
 def generate_response(user_input, state):
     if state == 'greeting':
         if not user_input or len(user_input.strip()) < 2:
@@ -91,3 +91,21 @@ def generate_response(user_input, state):
     
     else:
         return "How can I help you today?"
+    
+def generate_speech(text, voice="alloy"):
+    # OpenAI TTS-1 API
+    try:
+        response = client.audio.speech.create(
+            model="tts-1",
+            voice=voice,  # alloy, echo, fable, onyx, nova, shimmer
+            input=text,
+        )
+        
+        # Create temporary .mp3 file
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.mp3') as temp_audio:
+            response.stream_to_file(temp_audio.name)
+            return temp_audio.name
+            
+    except Exception as e:
+        print(f"ERROR: OpenAI TTS-1 API failed.")
+        return None
