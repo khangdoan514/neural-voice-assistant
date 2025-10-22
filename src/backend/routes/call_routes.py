@@ -171,37 +171,63 @@ def process_user_info(call_sid):
     
     # Process questions
     if state == 'asking_name':
-        conversation_manager.set_user_info(call_sid, 'name', transcript)
-        print(f"User response: {transcript}")
-        
-        # Location
-        if language == 'vi':
-            generate_audio_response(response, call_sid, "Cảm ơn. Bạn có thể cho biết địa chỉ của bạn được không?", 'vi')
-        
-        else:
-            generate_audio_response(response, call_sid, "Thank you. Could you please provide your address?", 'en')
+        # Get user's name
+        if transcript.strip():
+            conversation_manager.set_user_info(call_sid, 'name', transcript)
+            print(f"User response: {transcript}")
             
-        conversation_manager.update_conversation(call_sid, transcript, "Asking for location", 'asking_location')
+            # Ask for location
+            if language == 'vi':
+                generate_audio_response(response, call_sid, "Cảm ơn. Bạn có thể cho biết địa chỉ của bạn được không?", 'vi')
+            
+            else:
+                generate_audio_response(response, call_sid, "Thank you. Could you please provide your address?", 'en')
+                
+            conversation_manager.update_conversation(call_sid, transcript, "Asking for location", 'asking_location')
         
-    elif state == 'asking_location':
-        conversation_manager.set_user_info(call_sid, 'location', transcript)
-        print(f"User response: {transcript}")
-        
-        # Save conversation
-        user_request = conversation_manager.get_user_request(call_sid)
-        conversation_history = conversation_manager.get_conversation_history(call_sid)
-        save_conversation(call_sid, user_request, conversation_history)
-
-        if language == 'vi':
-            generate_audio_response(response, call_sid, "Cảm ơn, yêu cầu của bạn đã được gửi đầy đủ. Chúng tôi sẽ hỗ trợ bạn sớm nhất có thể. Tạm biệt!", 'vi')
-        
+        # Did not get user's name
         else:
-            generate_audio_response(response, call_sid, "Thank you, your request has been submitted with all your information. We'll make sure to help you as quickly as possible. Goodbye!", 'en')
-        
-        # Goodbye
-        generate_audio_response(response, call_sid, "Cảm ơn, yêu cầu của bạn đã được gửi đầy đủ. Chúng tôi sẽ hỗ trợ bạn sớm nhất có thể. Tạm biệt!", 'vi')
-        conversation_manager.end_conversation(call_sid)
-        return str(response)
+            if language == 'vi':
+                generate_audio_response(response, call_sid, "Xin vui lòng cho biết tên của bạn để chúng tôi có thể hỗ trợ bạn.", 'vi')
+            
+            else:
+                generate_audio_response(response, call_sid, "Please provide your name so we can assist you.", 'en')
+                
+            conversation_manager.update_conversation(call_sid, transcript, "Asking for name again", 'asking_name')
+
+    elif state == 'asking_location':
+        # Get user's location
+        if transcript.strip():
+            conversation_manager.set_user_info(call_sid, 'location', transcript)
+            print(f"User response: {transcript}")
+            
+            # Save conversation
+            user_info = conversation_manager.get_user_info(call_sid)
+            user_request = conversation_manager.get_user_request(call_sid)
+            conversation_history = conversation_manager.get_conversation_history(call_sid)
+            save_conversation(call_sid, user_info, user_request, conversation_history)
+
+            if language == 'vi':
+                generate_audio_response(response, call_sid, "Cảm ơn, yêu cầu của bạn đã được gửi đầy đủ. Chúng tôi sẽ hỗ trợ bạn sớm nhất có thể. Tạm biệt!", 'vi')
+            
+            else:
+                generate_audio_response(response, call_sid, "Thank you, your request has been submitted with all your information. We'll make sure to help you as quickly as possible. Goodbye!", 'en')
+            
+            # Goodbye
+            generate_audio_response(response, call_sid, "Cảm ơn, yêu cầu của bạn đã được gửi đầy đủ. Chúng tôi sẽ hỗ trợ bạn sớm nhất có thể. Tạm biệt!", 'vi')
+            conversation_manager.end_conversation(call_sid)
+
+            return str(response)
+
+        # Did not get user's location
+        else:
+            if language == 'vi':
+                generate_audio_response(response, call_sid, "Xin vui lòng cho biết địa chỉ của bạn để chúng tôi có thể cử nhân viên đến hỗ trợ.", 'vi')
+            
+            else:
+                generate_audio_response(response, call_sid, "Please provide your address so we can send someone to assist you.", 'en')
+                
+            conversation_manager.update_conversation(call_sid, transcript, "Asking for location again", 'asking_location')
     
     # Continue collecting information
     response.record(
