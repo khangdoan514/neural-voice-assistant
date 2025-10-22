@@ -269,18 +269,6 @@ def process_recording(call_sid):
                 play_beep=False,
                 transcribe=False
             )
-        
-        else:
-            # Save conversation
-            conversation_history = conversation_manager.get_conversation_history(call_sid)
-            save_conversation(call_sid, transcript, conversation_history)
-
-            # Goodbye
-            generate_audio_response(response, call_sid, "Cảm ơn, yêu cầu của bạn đã được gửi. Chúng tôi sẽ hỗ trợ bạn sớm nhất có thể. Tạm biệt!", 'vi')
-            print("AI response: Cảm ơn, yêu cầu của bạn đã được gửi. Chúng tôi sẽ hỗ trợ bạn sớm nhất có thể. Tạm biệt!")
-        
-            # End call
-            conversation_manager.end_conversation(call_sid)
 
         return str(response)
     
@@ -353,18 +341,6 @@ def process_recording(call_sid):
                             play_beep=False,
                             transcribe=False
                         )
-                    
-                    else:
-                        # Save conversation
-                        user_request = conversation_manager.get_user_request(call_sid)
-                        save_conversation(call_sid, user_request, conversation_history)
-                        
-                        # Goodbye
-                        generate_audio_response(response, call_sid, "Thank you, your request has been submitted. We'll make sure to help you as quickly as possible. Goodbye!", 'en')
-                        print("AI response: Thank you, your request has been submitted. We'll make sure to help you as quickly as possible. Goodbye!")
-                        
-                        # End call
-                        conversation_manager.end_conversation(call_sid)
                 
                 # User say "no"
                 elif users_say_no(transcript.lower()):
