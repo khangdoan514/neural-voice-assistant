@@ -175,18 +175,30 @@ def process_user_info(call_sid):
         print(f"User response: {transcript}")
         
         # Location
-        generate_audio_response(response, call_sid, "Cảm ơn. Bạn có thể cho biết địa chỉ của bạn được không?", 'vi')
-        conversation_manager.update_conversation(call_sid, transcript, "Đang hỏi địa chỉ", 'asking_location')
+        if language == 'vi':
+            generate_audio_response(response, call_sid, "Cảm ơn. Bạn có thể cho biết địa chỉ của bạn được không?", 'vi')
+        
+        else:
+            generate_audio_response(response, call_sid, "Thank you. Could you please provide your address?", 'en')
+            
+        conversation_manager.update_conversation(call_sid, transcript, "Asking for location", 'asking_location')
         
     elif state == 'asking_location':
         conversation_manager.set_user_info(call_sid, 'location', transcript)
         print(f"User response: {transcript}")
         
-        # Goodbye
+        # Save conversation
         user_request = conversation_manager.get_user_request(call_sid)
         conversation_history = conversation_manager.get_conversation_history(call_sid)
         save_conversation(call_sid, user_request, conversation_history)
+
+        if language == 'vi':
+            generate_audio_response(response, call_sid, "Cảm ơn, yêu cầu của bạn đã được gửi đầy đủ. Chúng tôi sẽ hỗ trợ bạn sớm nhất có thể. Tạm biệt!", 'vi')
         
+        else:
+            generate_audio_response(response, call_sid, "Thank you, your request has been submitted with all your information. We'll make sure to help you as quickly as possible. Goodbye!", 'en')
+        
+        # Goodbye
         generate_audio_response(response, call_sid, "Cảm ơn, yêu cầu của bạn đã được gửi đầy đủ. Chúng tôi sẽ hỗ trợ bạn sớm nhất có thể. Tạm biệt!", 'vi')
         conversation_manager.end_conversation(call_sid)
         return str(response)
@@ -341,17 +353,18 @@ def process_recording(call_sid):
                             play_beep=False,
                             transcribe=False
                         )
-
-                    # Save conversation
-                    user_request = conversation_manager.get_user_request(call_sid)
-                    save_conversation(call_sid, user_request, conversation_history)
                     
-                    # Goodbye
-                    generate_audio_response(response, call_sid, "Thank you, your request has been submitted. We'll make sure to help you as quickly as possible. Goodbye!", 'en')
-                    print("AI response: Thank you, your request has been submitted. We'll make sure to help you as quickly as possible. Goodbye!")
-                    
-                    # End call
-                    conversation_manager.end_conversation(call_sid)
+                    else:
+                        # Save conversation
+                        user_request = conversation_manager.get_user_request(call_sid)
+                        save_conversation(call_sid, user_request, conversation_history)
+                        
+                        # Goodbye
+                        generate_audio_response(response, call_sid, "Thank you, your request has been submitted. We'll make sure to help you as quickly as possible. Goodbye!", 'en')
+                        print("AI response: Thank you, your request has been submitted. We'll make sure to help you as quickly as possible. Goodbye!")
+                        
+                        # End call
+                        conversation_manager.end_conversation(call_sid)
                 
                 # User say "no"
                 elif users_say_no(transcript.lower()):
