@@ -66,11 +66,13 @@ def handle_incoming_call():
     # Handle incoming call to Twilio number
     response = VoiceResponse()
     call_sid = request.form.get('CallSid')
+    phone_number = request.form.get('Caller')
 
     # Get the current base URL
     base_url = request.url_root.rstrip('/')
 
     print(f"Incoming call received: {call_sid}\n")
+    print(f"User phone number: {phone_number}")
 
     if not call_sid:
         print("ERROR: No CallSid received in handle_incoming_call()")
@@ -78,7 +80,7 @@ def handle_incoming_call():
         return str(response)
 
     # New conversation
-    conversation_manager.start_conversation(call_sid)
+    conversation_manager.start_conversation(call_sid, phone_number)
 
     # Current conversation state
     state = conversation_manager.get_conversation_state(call_sid)
