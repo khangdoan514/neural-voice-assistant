@@ -188,9 +188,10 @@ def process_user_info(call_sid):
         print(f"User response: {transcript}")
         
         # Save conversation
+        user_info = conversation_manager.get_user_info(call_sid)
         user_request = conversation_manager.get_user_request(call_sid)
         conversation_history = conversation_manager.get_conversation_history(call_sid)
-        save_conversation(call_sid, user_request, conversation_history)
+        save_conversation(call_sid, user_info, user_request, conversation_history)
 
         if language == 'vi':
             generate_audio_response(response, call_sid, "Cảm ơn, yêu cầu của bạn đã được gửi đầy đủ. Chúng tôi sẽ hỗ trợ bạn sớm nhất có thể. Tạm biệt!", 'vi')
