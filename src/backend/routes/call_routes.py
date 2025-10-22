@@ -175,17 +175,48 @@ def process_recording(call_sid):
 
     # Vietnamese flow 
     if language == 'vi':
-        # Save conversation
+        # Get user's info
         conversation_manager.set_user_request(call_sid, transcript)
-        conversation_history = conversation_manager.get_conversation_history(call_sid)
-        save_conversation(call_sid, transcript, conversation_history)
+        user_info = conversation_manager.get_user_info(call_sid)
+        if user_info.get('name') is None:
+            # Ask for name
+            generate_audio_response(response, call_sid, "Để chúng tôi hỗ trợ tốt hơn, xin vui lòng cho biết tên của bạn?", 'vi')
+            conversation_manager.update_conversation(call_sid, transcript, "Đang hỏi tên", 'asking_name')
 
-        # Goodbye
-        generate_audio_response(response, call_sid, "Cảm ơn, yêu cầu của bạn đã được gửi. Chúng tôi sẽ hỗ trợ bạn sớm nhất có thể. Tạm biệt!", 'vi')
-        print("AI response: Cảm ơn, yêu cầu của bạn đã được gửi. Chúng tôi sẽ hỗ trợ bạn sớm nhất có thể. Tạm biệt!")
-    
-        # End call
-        conversation_manager.end_conversation(call_sid)
+            response.record(
+                action=f'{request.url_root.rstrip("/")}/twilio/process-user-info/{call_sid}',
+                method='POST',
+                timeout=Config.RECORDING_TIMEOUT,
+                finish_on_key='#',
+                play_beep=False,
+                transcribe=False
+            )
+
+        elif user_info.get('location') is None:
+            # Ask for location
+            generate_audio_response(response, call_sid, "Cảm ơn. Bạn có thể cho biết địa chỉ của bạn được không?", 'vi')
+            conversation_manager.update_conversation(call_sid, transcript, "Đang hỏi địa chỉ", 'asking_location')
+            
+            response.record(
+                action=f'{request.url_root.rstrip("/")}/twilio/process-user-info/{call_sid}',
+                method='POST',
+                timeout=Config.RECORDING_TIMEOUT,
+                finish_on_key='#',
+                play_beep=False,
+                transcribe=False
+            )
+        
+        else:
+            # Save conversation
+            conversation_history = conversation_manager.get_conversation_history(call_sid)
+            save_conversation(call_sid, transcript, conversation_history)
+
+            # Goodbye
+            generate_audio_response(response, call_sid, "Cảm ơn, yêu cầu của bạn đã được gửi. Chúng tôi sẽ hỗ trợ bạn sớm nhất có thể. Tạm biệt!", 'vi')
+            print("AI response: Cảm ơn, yêu cầu của bạn đã được gửi. Chúng tôi sẽ hỗ trợ bạn sớm nhất có thể. Tạm biệt!")
+        
+            # End call
+            conversation_manager.end_conversation(call_sid)
 
         return str(response)
     
