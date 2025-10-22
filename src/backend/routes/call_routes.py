@@ -151,6 +151,58 @@ def process_language_choice(call_sid):
     
     return str(response)
 
+@call_bp.route('/process-user-info/<call_sid>', methods=['GET', 'POST'])
+def process_user_info(call_sid):
+    # User's name and location
+    response = VoiceResponse()
+    recording_url = request.form.get('RecordingUrl') or request.args.get('RecordingUrl')
+
+    if not recording_url:
+        print("ERROR: No RecordingUrl found in process_user_info()")
+        return str(response)
+
+    # Current language and conversation state
+    language = conversation_manager.get_language(call_sid)
+    state = conversation_manager.get_conversation_state(call_sid)
+    
+    # Use transcription
+    transcript = transcribe_audio(recording_url, language)
+    print(f"User response: '{transcript}'")
+    
+    # Process questions
+    if state == 'asking_name':
+        conversation_manager.set_user_info(call_sid, 'name', transcript)
+        print(f"User response: {transcript}")
+        
+        # Location
+        generate_audio_response(response, call_sid, "Cảm ơn. Bạn có thể cho biết địa chỉ của bạn được không?", 'vi')
+        conversation_manager.update_conversation(call_sid, transcript, "Đang hỏi địa chỉ", 'asking_location')
+        
+    elif state == 'asking_location':
+        conversation_manager.set_user_info(call_sid, 'location', transcript)
+        print(f"User response: {transcript}")
+        
+        # Goodbye
+        user_request = conversation_manager.get_user_request(call_sid)
+        conversation_history = conversation_manager.get_conversation_history(call_sid)
+        save_conversation(call_sid, user_request, conversation_history)
+        
+        generate_audio_response(response, call_sid, "Cảm ơn, yêu cầu của bạn đã được gửi đầy đủ. Chúng tôi sẽ hỗ trợ bạn sớm nhất có thể. Tạm biệt!", 'vi')
+        conversation_manager.end_conversation(call_sid)
+        return str(response)
+    
+    # Continue collecting information
+    response.record(
+        action=f'{request.url_root.rstrip("/")}/twilio/process-user-info/{call_sid}',
+        method='POST',
+        timeout=Config.RECORDING_TIMEOUT,
+        finish_on_key='#',
+        play_beep=False,
+        transcribe=False
+    )
+    
+    return str(response)
+
 @call_bp.route('/process-recording/<call_sid>', methods=['GET', 'POST'])
 def process_recording(call_sid):
     # Process the recording after user speaks
