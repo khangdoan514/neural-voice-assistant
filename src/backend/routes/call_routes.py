@@ -228,8 +228,8 @@ def process_recording(call_sid):
     # Vietnamese flow 
     if language == 'vi':
         # Get user's info
-        conversation_manager.set_user_request(call_sid, transcript)
         user_info = conversation_manager.get_user_info(call_sid)
+        conversation_manager.set_user_request(call_sid, transcript)
         if user_info.get('name') is None:
             # Ask for name
             generate_audio_response(response, call_sid, "Để chúng tôi hỗ trợ tốt hơn, xin vui lòng cho biết tên của bạn?", 'vi')
@@ -311,6 +311,37 @@ def process_recording(call_sid):
             if any(phrase in ai_confirmation_response for phrase in final_confirmation):
                 # Users say "yes"
                 if users_say_yes(transcript.lower()):
+                    # Get user's info
+                    user_info = conversation_manager.get_user_info(call_sid)
+
+                    if user_info.get('name') is None:
+                        # Ask for name
+                        generate_audio_response(response, call_sid, "To better assist you, could you please tell me your name?", 'en')
+                        conversation_manager.update_conversation(call_sid, transcript, "Asking for name", 'asking_name')
+                        
+                        response.record(
+                            action=f'{request.url_root.rstrip("/")}/twilio/process-user-info/{call_sid}',
+                            method='POST',
+                            timeout=Config.RECORDING_TIMEOUT,
+                            finish_on_key='#',
+                            play_beep=False,
+                            transcribe=False
+                        )
+                    
+                    elif user_info.get('location') is None:
+                        # Ask for location
+                        generate_audio_response(response, call_sid, "Thank you. Could you please provide your address?", 'en')
+                        conversation_manager.update_conversation(call_sid, transcript, "Asking for location", 'asking_location')
+                        
+                        response.record(
+                            action=f'{request.url_root.rstrip("/")}/twilio/process-user-info/{call_sid}',
+                            method='POST',
+                            timeout=Config.RECORDING_TIMEOUT,
+                            finish_on_key='#',
+                            play_beep=False,
+                            transcribe=False
+                        )
+
                     # Save conversation
                     user_request = conversation_manager.get_user_request(call_sid)
                     save_conversation(call_sid, user_request, conversation_history)
