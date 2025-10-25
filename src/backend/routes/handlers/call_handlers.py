@@ -1,9 +1,9 @@
 from ..utils.conversation_manager import ConversationManager # type: ignore
 from ..services.twilio_service import validate_twilio_signature # type: ignore
 from .audio_handlers import generate_audio_response
+from config import Config
 from flask import request # type: ignore
 from twilio.twiml.voice_response import VoiceResponse # type: ignore
-from config import Config
 
 # Initialize conversation manager
 conversation_manager = ConversationManager()
