@@ -34,213 +34,212 @@ def process_recording(call_sid):
 
     # Vietnamese flow 
     if language == 'vi':
-        # Get user's info
-        user_info = conversation_manager.get_user_info(call_sid)
-        conversation_manager.set_user_request(call_sid, transcript)
-        if user_info.get('name') is None:
-            # Ask for name
-            generate_audio_response(response, call_sid, "Để chúng tôi hỗ trợ tốt hơn, xin vui lòng cho biết tên của bạn?", 'vi')
-            conversation_manager.update_conversation(call_sid, transcript, "Đang hỏi tên", 'asking_name')
-
-            response.record(
-                action=f'{request.url_root.rstrip("/")}/twilio/process-user-info/{call_sid}',
-                method='POST',
-                timeout=Config.RECORDING_TIMEOUT,
-                finish_on_key='#',
-                play_beep=False,
-                transcribe=False
-            )
-
-        elif user_info.get('location') is None:
-            # Ask for location
-            generate_audio_response(response, call_sid, "Cảm ơn. Bạn có thể cho biết địa chỉ của bạn được không?", 'vi')
-            conversation_manager.update_conversation(call_sid, transcript, "Đang hỏi địa chỉ", 'asking_location')
-            
-            response.record(
-                action=f'{request.url_root.rstrip("/")}/twilio/process-user-info/{call_sid}',
-                method='POST',
-                timeout=Config.RECORDING_TIMEOUT,
-                finish_on_key='#',
-                play_beep=False,
-                transcribe=False
-            )
-
-        return str(response)
+        return vietnamese_flow(response, call_sid, transcript)
     
     # English flow
     else:
-        # Conversation history
-        conversation_history = conversation_manager.get_conversation_history(call_sid)
-        
-        # Generate AI response based on state
-        ai_response = generate_advanced_response(transcript, state, conversation_history, language)
-        
-        if state == 'greeting':
-            # Confirm user response
-            conversation_manager.set_user_request(call_sid, transcript)
-            conversation_manager.update_conversation(call_sid, transcript, ai_response, 'confirmation')
-            
-            generate_audio_response(response, call_sid, ai_response, language)
-
-            response.record(
-                action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
-                method='POST',
-                timeout=Config.RECORDING_TIMEOUT,
-                finish_on_key='#',
-                play_beep=False,
-                transcribe=False
-            )
-            
-        elif state == 'confirmation':
-            ai_confirmation_response = conversation_history[-1]['ai'] if conversation_history else ""
-            print(f"AI response: '{ai_confirmation_response}'")
-            
-            final_confirmation = [
-                "Is that all you need help with?",
-                "Okay, is that all you need help with?",
-                "Có phải đó là tất cả những gì bạn cần giúp không?",
-                "Được rồi, có phải đó là tất cả những gì bạn cần giúp không?"
-            ]
-
-            # Final confirmation
-            if any(phrase in ai_confirmation_response for phrase in final_confirmation):
-                # Users say "yes"
-                if users_say_yes(transcript.lower()):
-                    # Get user's info
-                    user_info = conversation_manager.get_user_info(call_sid)
-
-                    if user_info.get('name') is None:
-                        # Ask for name
-                        generate_audio_response(response, call_sid, "To better assist you, could you please tell me your name?", 'en')
-                        conversation_manager.update_conversation(call_sid, transcript, "Asking for name", 'asking_name')
-                        
-                        response.record(
-                            action=f'{request.url_root.rstrip("/")}/twilio/process-user-info/{call_sid}',
-                            method='POST',
-                            timeout=Config.RECORDING_TIMEOUT,
-                            finish_on_key='#',
-                            play_beep=False,
-                            transcribe=False
-                        )
-                    
-                    elif user_info.get('location') is None:
-                        # Ask for location
-                        generate_audio_response(response, call_sid, "Thank you. Could you please provide your address?", 'en')
-                        conversation_manager.update_conversation(call_sid, transcript, "Asking for location", 'asking_location')
-                        
-                        response.record(
-                            action=f'{request.url_root.rstrip("/")}/twilio/process-user-info/{call_sid}',
-                            method='POST',
-                            timeout=Config.RECORDING_TIMEOUT,
-                            finish_on_key='#',
-                            play_beep=False,
-                            transcribe=False
-                        )
-                
-                # User say "no"
-                elif users_say_no(transcript.lower()):
-                    # Ask what else they need help with
-                    conversation_manager.update_conversation(call_sid, transcript, ai_response, 'greeting')
-                    
-                    # Follow-up
-                    generate_audio_response(response, call_sid, "How can I assist you further?", 'en')
-
-                    response.record(
-                        action=f'{request.url_root.rstrip("/")}/twilio/process-recording/{call_sid}',
-                        method='POST',
-                        timeout=Config.RECORDING_TIMEOUT,
-                        finish_on_key='#',
-                        play_beep=False,
-                        transcribe=False
-                    )
-
-                # User say something else
-                else:
-                    # Ask user to repeat final confirmation
-                    conversation_manager.update_conversation(call_sid, transcript, ai_response, 'confirmation')
-                    generate_audio_response(response, call_sid, ai_response, language)
-
-                    response.record(
-                        action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
-                        method='POST',
-                        timeout=Config.RECORDING_TIMEOUT,
-                        finish_on_key='#',
-                        play_beep=False,
-                        transcribe=False
-                    )
-
-            # Confirm what users say
-            else:
-                # Users say "yes"
-                if users_say_yes(transcript.lower()):
-                    # Ask if that's all they need
-                    conversation_manager.update_conversation(call_sid, transcript, ai_response, 'confirmation')
-                    generate_audio_response(response, call_sid, ai_response, language)
-
-                    response.record(
-                        action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
-                        method='POST',
-                        timeout=Config.RECORDING_TIMEOUT,
-                        finish_on_key='#',
-                        play_beep=False,
-                        transcribe=False
-                    )
-
-                # Users say "no"
-                elif users_say_no(transcript.lower()):
-                    # Ask user to repeat - go back to greeting
-                    conversation_manager.update_conversation(call_sid, transcript, ai_response, 'greeting')
-                    generate_audio_response(response, call_sid, ai_response, language)
-
-                    response.record(
-                        action=f'{request.url_root.rstrip("/")}/twilio/process-recording/{call_sid}',
-                        method='POST',
-                        timeout=Config.RECORDING_TIMEOUT,
-                        finish_on_key='#',
-                        play_beep=False,
-                        transcribe=False
-                    )
-
-                # Users say something else
-                else:
-                    # Ask user to repeat
-                    conversation_manager.update_conversation(call_sid, transcript, ai_response, 'confirmation')
-                    generate_audio_response(response, call_sid, ai_response, language)
-
-                    response.record(
-                        action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
-                        method='POST',
-                        timeout=Config.RECORDING_TIMEOUT,
-                        finish_on_key='#',
-                        play_beep=False,
-                        transcribe=False
-                    )
-        
-        return str(response)
+        return english_flow(response, call_sid, transcript, state)
     
 def process_confirmation(call_sid):
+    # Process confirmation responses
     return process_recording(call_sid)
 
 def vietnamese_flow(response, call_sid, transcript):
-    pass
+    # Get user's info
+    user_info = conversation_manager.get_user_info(call_sid)
+    conversation_manager.set_user_request(call_sid, transcript)
+    
+    # Ask for name
+    if user_info.get('name') is None:
+        generate_audio_response(response, call_sid, "Để chúng tôi hỗ trợ tốt hơn, xin vui lòng cho biết tên của bạn?", 'vi')
+        conversation_manager.update_conversation(call_sid, transcript, "Đang hỏi tên", 'asking_name')
+
+    # Ask for location
+    elif user_info.get('location') is None:
+        generate_audio_response(response, call_sid, "Cảm ơn. Bạn có thể cho biết địa chỉ của bạn được không?", 'vi')
+        conversation_manager.update_conversation(call_sid, transcript, "Đang hỏi địa chỉ", 'asking_location')
+
+    recording_instruction(response, call_sid)
+    return str(response)
 
 def english_flow(response, call_sid, transcript, state):
-    pass
+    # Conversation history
+    conversation_history = conversation_manager.get_conversation_history(call_sid)
+    
+    if state == 'greeting':
+        return greeting_state(response, call_sid, transcript, conversation_history)
+        
+    elif state == 'confirmation':
+        return confirmation_state(response, call_sid, transcript, conversation_history)
+    
+    return str(response)
 
+# Greeting state in English flow
 def greeting_state(response, call_sid, transcript, conversation_history):
-    pass
+    # AI response
+    ai_response = generate_advanced_response(transcript, 'greeting', conversation_history, 'en')
+    
+    # Confirm user response
+    conversation_manager.set_user_request(call_sid, transcript)
+    conversation_manager.update_conversation(call_sid, transcript, ai_response, 'confirmation')
+    
+    generate_audio_response(response, call_sid, ai_response, 'en')
 
+    response.record(
+        action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
+        method='POST',
+        timeout=Config.RECORDING_TIMEOUT,
+        finish_on_key='#',
+        play_beep=False,
+        transcribe=False
+    )
+
+    return str(response)
+
+# Confirmation state in English flow
 def confirmation_state(response, call_sid, transcript, conversation_history):
-    pass
+    ai_confirmation_response = conversation_history[-1]['ai'] if conversation_history else ""
+    print(f"AI response: '{ai_confirmation_response}'")
+    
+    confirmation = [
+        "Is that all you need help with?",
+        "Okay, is that all you need help with?",
+        "Có phải đó là tất cả những gì bạn cần giúp không?",
+        "Được rồi, có phải đó là tất cả những gì bạn cần giúp không?"
+    ]
 
+    # Final confirmation
+    if any(phrase in ai_confirmation_response for phrase in confirmation):
+        return final_confirmation(response, call_sid, transcript, conversation_history)
+
+    # Confirm what users say
+    else:
+        return standard_confirmation(response, call_sid, transcript, conversation_history)
+
+# Final confirmation in English flow
 def final_confirmation(response, call_sid, transcript, conversation_history):
-    pass
+    # Users say "yes"
+    if users_say_yes(transcript.lower()):
+        return user_info_collection(response, call_sid, transcript)
+    
+    # User say "no"
+    elif users_say_no(transcript.lower()):
+        # Follow-up
+        conversation_manager.update_conversation(call_sid, transcript, "How can I assist you further?", 'greeting')
+        generate_audio_response(response, call_sid, "How can I assist you further?", 'en')
+
+        response.record(
+            action=f'{request.url_root.rstrip("/")}/twilio/process-recording/{call_sid}',
+            method='POST',
+            timeout=Config.RECORDING_TIMEOUT,
+            finish_on_key='#',
+            play_beep=False,
+            transcribe=False
+        )
+
+    # User say something else
+    else:
+        # Ask user to repeat final confirmation
+        ai_response = generate_advanced_response(transcript, 'confirmation', conversation_history, 'en')
+        conversation_manager.update_conversation(call_sid, transcript, ai_response, 'confirmation')
+        generate_audio_response(response, call_sid, ai_response, 'en')
+
+        response.record(
+            action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
+            method='POST',
+            timeout=Config.RECORDING_TIMEOUT,
+            finish_on_key='#',
+            play_beep=False,
+            transcribe=False
+        )
+
+    return str(response)
 
 def standard_confirmation(response, call_sid, transcript, conversation_history):
-    pass
+    # Standard confirmation in English flow
+    ai_response = generate_advanced_response(transcript, 'confirmation', conversation_history, 'en')
+    print(f"AI response: '{ai_response}'")
+
+    # Users say "yes"
+    if users_say_yes(transcript.lower()):
+        # Ask if that's all they need
+        conversation_manager.update_conversation(call_sid, transcript, ai_response, 'confirmation')
+        generate_audio_response(response, call_sid, ai_response, 'en')
+
+        response.record(
+            action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
+            method='POST',
+            timeout=Config.RECORDING_TIMEOUT,
+            finish_on_key='#',
+            play_beep=False,
+            transcribe=False
+        )
+
+    # Users say "no"
+    elif users_say_no(transcript.lower()):
+        # Ask user to repeat - go back to greeting
+        conversation_manager.update_conversation(call_sid, transcript, ai_response, 'greeting')
+        generate_audio_response(response, call_sid, ai_response, 'en')
+
+        response.record(
+            action=f'{request.url_root.rstrip("/")}/twilio/process-recording/{call_sid}',
+            method='POST',
+            timeout=Config.RECORDING_TIMEOUT,
+            finish_on_key='#',
+            play_beep=False,
+            transcribe=False
+        )
+
+    # Users say something else
+    else:
+        # Ask user to repeat
+        conversation_manager.update_conversation(call_sid, transcript, ai_response, 'confirmation')
+        generate_audio_response(response, call_sid, ai_response, 'en')
+
+        response.record(
+            action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
+            method='POST',
+            timeout=Config.RECORDING_TIMEOUT,
+            finish_on_key='#',
+            play_beep=False,
+            transcribe=False
+        )
+    
+    return str(response)
 
 def user_info_collection(response, call_sid, transcript):
-    pass
+    # Get user's info
+    user_info = conversation_manager.get_user_info(call_sid)
+
+    if user_info.get('name') is None:
+        # Ask for name
+        generate_audio_response(response, call_sid, "To better assist you, could you please tell me your name?", 'en')
+        conversation_manager.update_conversation(call_sid, transcript, "Asking for name", 'asking_name')
+        
+        response.record(
+            action=f'{request.url_root.rstrip("/")}/twilio/process-user-info/{call_sid}',
+            method='POST',
+            timeout=Config.RECORDING_TIMEOUT,
+            finish_on_key='#',
+            play_beep=False,
+            transcribe=False
+        )
+    
+    elif user_info.get('location') is None:
+        # Ask for location
+        generate_audio_response(response, call_sid, "Thank you. Could you please provide your address?", 'en')
+        conversation_manager.update_conversation(call_sid, transcript, "Asking for location", 'asking_location')
+        
+        response.record(
+            action=f'{request.url_root.rstrip("/")}/twilio/process-user-info/{call_sid}',
+            method='POST',
+            timeout=Config.RECORDING_TIMEOUT,
+            finish_on_key='#',
+            play_beep=False,
+            transcribe=False
+        )
+    
+    return str(response)
 
 def recording_instruction(response, call_sid):
     response.record(
