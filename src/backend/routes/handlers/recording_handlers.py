@@ -11,8 +11,8 @@ from twilio.twiml.voice_response import VoiceResponse # type: ignore
 # Use the existing conversation
 conversation_manager = ConversationManager()
 
+# Process the recording after user speaks
 def process_recording(call_sid):
-    # Process the recording after user speaks
     response = VoiceResponse()
     recording_url = request.form.get('RecordingUrl') or request.args.get('RecordingUrl')
 
@@ -40,10 +40,11 @@ def process_recording(call_sid):
     else:
         return english_flow(response, call_sid, transcript, state)
     
+# Process confirmation responses
 def process_confirmation(call_sid):
-    # Process confirmation responses
     return process_recording(call_sid)
 
+# Vietnamese flow
 def vietnamese_flow(response, call_sid, transcript):
     # Get user's info
     user_info = conversation_manager.get_user_info(call_sid)
@@ -59,9 +60,18 @@ def vietnamese_flow(response, call_sid, transcript):
         generate_audio_response(response, call_sid, "Cảm ơn. Bạn có thể cho biết địa chỉ của bạn được không?", 'vi')
         conversation_manager.update_conversation(call_sid, transcript, "Đang hỏi địa chỉ", 'asking_location')
 
-    recording_instruction(response, call_sid)
+    response.record(
+        action=f'{request.url_root.rstrip("/")}/twilio/process-user-info/{call_sid}',
+        method='POST',
+        timeout=Config.RECORDING_TIMEOUT,
+        finish_on_key='#',
+        play_beep=False,
+        transcribe=False
+    )
+
     return str(response)
 
+# English flow
 def english_flow(response, call_sid, transcript, state):
     # Conversation history
     conversation_history = conversation_manager.get_conversation_history(call_sid)
@@ -72,8 +82,6 @@ def english_flow(response, call_sid, transcript, state):
     elif state == 'confirmation':
         return confirmation_state(response, call_sid, transcript, conversation_history)
     
-    return str(response)
-
 # Greeting state in English flow
 def greeting_state(response, call_sid, transcript, conversation_history):
     # AI response
@@ -240,13 +248,3 @@ def user_info_collection(response, call_sid, transcript):
         )
     
     return str(response)
-
-def recording_instruction(response, call_sid):
-    response.record(
-        action=f'{request.url_root.rstrip("/")}/twilio/process-user-info/{call_sid}',
-        method='POST',
-        timeout=Config.RECORDING_TIMEOUT,
-        finish_on_key='#',
-        play_beep=False,
-        transcribe=False
-    )
