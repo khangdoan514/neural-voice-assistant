@@ -118,5 +118,3 @@ def recording_instruction(response, call_sid):
         play_beep=False,
         transcribe=False
     )
-    
-    return str(response)
