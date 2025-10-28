@@ -1,12 +1,12 @@
+from flask import request # type: ignore
+from twilio.twiml.voice_response import VoiceResponse # type: ignore
 from ..services.twilio_service import validate_twilio_signature # type: ignore
 from ..services.openai_service import transcribe_audio # type: ignore
 from ..services.advanced_openai_service import generate_advanced_response # type: ignore
 from ..utils.conversation_manager import ConversationManager # type: ignore
 from ..utils.intent_detector import users_say_yes, users_say_no # type: ignore
 from .audio_handlers import generate_audio_response
-from config import Config
-from flask import request # type: ignore
-from twilio.twiml.voice_response import VoiceResponse # type: ignore
+from .recording_utils import add_recording_processing, add_confirmation_recording, add_user_info_recording
 
 # Use the existing conversation
 conversation_manager = ConversationManager()
@@ -60,15 +60,8 @@ def vietnamese_flow(response, call_sid, transcript):
         generate_audio_response(response, call_sid, "Cảm ơn. Bạn có thể cho biết địa chỉ của bạn được không?", 'vi')
         conversation_manager.update_conversation(call_sid, transcript, "Đang hỏi địa chỉ", 'asking_location')
 
-    response.record(
-        action=f'{request.url_root.rstrip("/")}/twilio/process-user-info/{call_sid}',
-        method='POST',
-        timeout=Config.RECORDING_TIMEOUT,
-        finish_on_key='#',
-        play_beep=False,
-        transcribe=False
-    )
-
+    # Recording utils
+    add_user_info_recording(response, call_sid)
     return str(response)
 
 # English flow
@@ -93,15 +86,8 @@ def greeting_state(response, call_sid, transcript, conversation_history):
     
     generate_audio_response(response, call_sid, ai_response, 'en')
 
-    response.record(
-        action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
-        method='POST',
-        timeout=Config.RECORDING_TIMEOUT,
-        finish_on_key='#',
-        play_beep=False,
-        transcribe=False
-    )
-
+    # Recording utils
+    add_confirmation_recording(response, call_sid)
     return str(response)
 
 # Confirmation state in English flow
@@ -135,15 +121,9 @@ def final_confirmation(response, call_sid, transcript, conversation_history):
         # Follow-up
         conversation_manager.update_conversation(call_sid, transcript, "How can I assist you further?", 'greeting')
         generate_audio_response(response, call_sid, "How can I assist you further?", 'en')
-
-        response.record(
-            action=f'{request.url_root.rstrip("/")}/twilio/process-recording/{call_sid}',
-            method='POST',
-            timeout=Config.RECORDING_TIMEOUT,
-            finish_on_key='#',
-            play_beep=False,
-            transcribe=False
-        )
+        
+        # Recording utils
+        add_recording_processing(response, call_sid)
 
     # User say something else
     else:
@@ -152,14 +132,8 @@ def final_confirmation(response, call_sid, transcript, conversation_history):
         conversation_manager.update_conversation(call_sid, transcript, ai_response, 'confirmation')
         generate_audio_response(response, call_sid, ai_response, 'en')
 
-        response.record(
-            action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
-            method='POST',
-            timeout=Config.RECORDING_TIMEOUT,
-            finish_on_key='#',
-            play_beep=False,
-            transcribe=False
-        )
+        # Recording utils
+        add_confirmation_recording(response, call_sid)
 
     return str(response)
 
@@ -174,14 +148,8 @@ def standard_confirmation(response, call_sid, transcript, conversation_history):
         conversation_manager.update_conversation(call_sid, transcript, ai_response, 'confirmation')
         generate_audio_response(response, call_sid, ai_response, 'en')
 
-        response.record(
-            action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
-            method='POST',
-            timeout=Config.RECORDING_TIMEOUT,
-            finish_on_key='#',
-            play_beep=False,
-            transcribe=False
-        )
+        # Recording utils
+        add_confirmation_recording(response, call_sid)
 
     # Users say "no"
     elif users_say_no(transcript.lower()):
@@ -189,14 +157,8 @@ def standard_confirmation(response, call_sid, transcript, conversation_history):
         conversation_manager.update_conversation(call_sid, transcript, ai_response, 'greeting')
         generate_audio_response(response, call_sid, ai_response, 'en')
 
-        response.record(
-            action=f'{request.url_root.rstrip("/")}/twilio/process-recording/{call_sid}',
-            method='POST',
-            timeout=Config.RECORDING_TIMEOUT,
-            finish_on_key='#',
-            play_beep=False,
-            transcribe=False
-        )
+        # Recording utils
+        add_recording_processing(response, call_sid)
 
     # Users say something else
     else:
@@ -204,14 +166,8 @@ def standard_confirmation(response, call_sid, transcript, conversation_history):
         conversation_manager.update_conversation(call_sid, transcript, ai_response, 'confirmation')
         generate_audio_response(response, call_sid, ai_response, 'en')
 
-        response.record(
-            action=f'{request.url_root.rstrip("/")}/twilio/process-confirmation/{call_sid}',
-            method='POST',
-            timeout=Config.RECORDING_TIMEOUT,
-            finish_on_key='#',
-            play_beep=False,
-            transcribe=False
-        )
+        # Recording utils
+        add_confirmation_recording(response, call_sid)
     
     return str(response)
 
@@ -224,27 +180,15 @@ def user_info_collection(response, call_sid, transcript):
         generate_audio_response(response, call_sid, "To better assist you, could you please tell me your name?", 'en')
         conversation_manager.update_conversation(call_sid, transcript, "Asking for name", 'asking_name')
         
-        response.record(
-            action=f'{request.url_root.rstrip("/")}/twilio/process-user-info/{call_sid}',
-            method='POST',
-            timeout=Config.RECORDING_TIMEOUT,
-            finish_on_key='#',
-            play_beep=False,
-            transcribe=False
-        )
+        # Recording utils
+        add_user_info_recording(response, call_sid)
     
     elif user_info.get('location') is None:
         # Ask for location
         generate_audio_response(response, call_sid, "Thank you. Could you please provide your address?", 'en')
         conversation_manager.update_conversation(call_sid, transcript, "Asking for location", 'asking_location')
         
-        response.record(
-            action=f'{request.url_root.rstrip("/")}/twilio/process-user-info/{call_sid}',
-            method='POST',
-            timeout=Config.RECORDING_TIMEOUT,
-            finish_on_key='#',
-            play_beep=False,
-            transcribe=False
-        )
+        # Recording utils
+        add_user_info_recording(response, call_sid)
     
     return str(response)
