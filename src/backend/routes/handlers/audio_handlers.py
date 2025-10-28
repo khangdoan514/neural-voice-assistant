@@ -1,6 +1,6 @@
-from ..services.openai_service import generate_speech # type: ignore
 from flask import request, send_file # type: ignore
 from twilio.twiml.voice_response import VoiceResponse # type: ignore
+from ..services.openai_service import generate_speech # type: ignore
 import os
 import uuid
 

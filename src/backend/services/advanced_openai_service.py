@@ -1,8 +1,7 @@
-from ..utils.intent_detector import users_say_yes
-from .openai_service import generate_response
-
 from config import Config
 from openai import OpenAI # type: ignore
+from ..utils.intent_detector import users_say_yes
+from .openai_service import generate_response
 
 # Initialize OpenAI client
 client = OpenAI(api_key=Config.OPENAI_API_KEY)
