@@ -1,7 +1,7 @@
 from ..utils.conversation_manager import ConversationManager # type: ignore
 from ..services.twilio_service import validate_twilio_signature # type: ignore
 from .audio_handlers import generate_audio_response
-from config import Config
+from .recording_utils import add_language_choice_recording
 from flask import request # type: ignore
 from twilio.twiml.voice_response import VoiceResponse # type: ignore
 
@@ -41,13 +41,6 @@ def handle_incoming_call():
     print(f"Current conversation state: {state}\n")
     
     # User's response
-    response.record(
-        action=f'{base_url}/twilio/process-language-choice/{call_sid}',
-        method='POST',
-        timeout=Config.RECORDING_TIMEOUT,
-        finish_on_key='#',
-        play_beep=False,
-        transcribe=False
-    )
+    add_language_choice_recording(response, call_sid)
 
     return str(response)
