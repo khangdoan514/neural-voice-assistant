@@ -1,11 +1,11 @@
+from flask import request # type: ignore
+from twilio.twiml.voice_response import VoiceResponse # type: ignore
 from ..services.twilio_service import validate_twilio_signature # type: ignore
 from ..services.openai_service import transcribe_audio # type: ignore
 from ..utils.conversation_manager import ConversationManager # type: ignore
 from ..utils.file_handler import save_conversation # type: ignore
 from .audio_handlers import generate_audio_response
-from config import Config
-from flask import request # type: ignore
-from twilio.twiml.voice_response import VoiceResponse # type: ignore
+from .recording_utils import add_user_info_recording
 
 # Use the existing conversation
 conversation_manager = ConversationManager()
@@ -67,7 +67,7 @@ def get_name(response, call_sid, language, transcript):
         # Continue collecting information
         conversation_manager.update_conversation(call_sid, transcript, "Asking for name again", 'asking_name')
 
-    recording_instruction(response, call_sid)
+    add_user_info_recording(response, call_sid)
     return str(response)
 
 def get_location(response, call_sid, language, transcript):
@@ -106,15 +106,5 @@ def get_location(response, call_sid, language, transcript):
         # Continue collecting information
         conversation_manager.update_conversation(call_sid, transcript, "Asking for location again", 'asking_location')
     
-    recording_instruction(response, call_sid)
+    add_user_info_recording(response, call_sid)
     return str(response)
-
-def recording_instruction(response, call_sid):
-    response.record(
-        action=f'{request.url_root.rstrip("/")}/twilio/process-user-info/{call_sid}',
-        method='POST',
-        timeout=Config.RECORDING_TIMEOUT,
-        finish_on_key='#',
-        play_beep=False,
-        transcribe=False
-    )
