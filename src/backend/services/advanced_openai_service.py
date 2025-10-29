@@ -1,6 +1,6 @@
 from config import Config
 from openai import OpenAI # type: ignore
-from ..utils.intent_detector import users_say_yes
+from ..utils.intent_detector import is_yes
 from .openai_service import generate_response
 
 # Initialize OpenAI client
@@ -10,7 +10,7 @@ client = OpenAI(api_key=Config.OPENAI_API_KEY)
 def generate_ai_response(user_input, state, conversation_history=None, language='en'):
     try:        
         # Users say "yes"
-        if state == 'confirmation' and users_say_yes(user_input):
+        if state == 'confirmation' and is_yes(user_input):
             if language == 'vi':
                 return "Có phải đó là tất cả những gì bạn cần giúp không?"
             
