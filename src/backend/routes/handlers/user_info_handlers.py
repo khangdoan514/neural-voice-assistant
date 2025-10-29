@@ -1,10 +1,10 @@
 from flask import request # type: ignore
 from twilio.twiml.voice_response import VoiceResponse # type: ignore
-from ..services.openai_service import transcribe # type: ignore
-from ..utils.conversation_manager import ConversationManager # type: ignore
-from ..utils.file_handler import save_conversation # type: ignore
-from .audio_handlers import generate_audio
-from .recording_utils import add_user_info_recording
+from backend.services.openai_service import transcribe
+from backend.utils.conversation_manager import ConversationManager
+from backend.utils.file_handler import save_conversation
+from backend.routes.handlers.audio_handlers import generate_audio
+from backend.routes.handlers.recording_utils import user_info_recording
 
 # Use the existing conversation
 conversation = ConversationManager()
@@ -66,7 +66,7 @@ def get_name(response, call_sid, language, transcript):
         # Continue collecting information
         conversation.update(call_sid, transcript, "Asking for name again", 'asking_name')
 
-    add_user_info_recording(response, call_sid)
+    user_info_recording(response, call_sid)
     return str(response)
 
 def get_location(response, call_sid, language, transcript):
@@ -105,5 +105,5 @@ def get_location(response, call_sid, language, transcript):
         # Continue collecting information
         conversation.update(call_sid, transcript, "Asking for location again", 'asking_location')
     
-    add_user_info_recording(response, call_sid)
+    user_info_recording(response, call_sid)
     return str(response)

@@ -2,9 +2,6 @@ from backend.routes.call_routes import call_bp
 from flask import Flask # type: ignore
 import logging
 
-# Add the current directory to Python path so imports work
-sys.path.insert(0, os.path.dirname(__file__))
-
 # Disable loggings
 logging.getLogger('werkzeug').disabled = True
 logging.getLogger('flask.app').disabled = True

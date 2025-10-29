@@ -1,10 +1,10 @@
 from flask import request # type: ignore
 from twilio.twiml.voice_response import VoiceResponse # type: ignore
-from ..services.twilio_service import validate_twilio # type: ignore
-from ..services.openai_service import transcribe # type: ignore
-from ..utils.conversation_manager import ConversationManager # type: ignore
-from .audio_handlers import generate_audio
-from .recording_utils import recording_processing
+from backend.services.twilio_service import validate_twilio
+from backend.services.openai_service import transcribe
+from backend.utils.conversation_manager import ConversationManager
+from backend.routes.handlers.audio_handlers import generate_audio
+from backend.routes.handlers.recording_utils import recording_processing
 
 # Use the existing conversation
 conversation = ConversationManager()

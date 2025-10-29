@@ -1,9 +1,9 @@
 from flask import Blueprint # type: ignore
-from .handlers.audio_handlers import serve_audio
-from .handlers.call_handlers import handle_call
-from .handlers.language_handlers import handle_language
-from .handlers.user_info_handlers import handle_user_info
-from .handlers.recording_handlers import handle_record, handle_confirm
+from backend.routes.handlers.audio_handlers import serve_audio
+from backend.routes.handlers.call_handlers import handle_call
+from backend.routes.handlers.language_handlers import handle_language
+from backend.routes.handlers.user_info_handlers import handle_user_info
+from backend.routes.handlers.recording_handlers import handle_record, handle_confirm
 
 # Create blueprint
 call_bp = Blueprint('call_routes', __name__)

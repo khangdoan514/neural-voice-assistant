@@ -1,11 +1,11 @@
 from flask import request # type: ignore
 from twilio.twiml.voice_response import VoiceResponse # type: ignore
-from ..services.openai_service import transcribe # type: ignore
-from ..services.advanced_openai_service import generate_ai_response # type: ignore
-from ..utils.conversation_manager import ConversationManager # type: ignore
-from ..utils.intent_detector import is_yes, is_no # type: ignore
-from .audio_handlers import generate_audio
-from .recording_utils import recording_processing, confirmation_recording, user_info_recording
+from backend.services.openai_service import transcribe # type: ignore
+from backend.services.advanced_openai_service import generate_ai_response # type: ignore
+from backend.utils.conversation_manager import ConversationManager # type: ignore
+from backend.utils.intent_detector import is_yes, is_no # type: ignore
+from backend.routes.handlers.audio_handlers import generate_audio
+from backend.routes.handlers.recording_utils import recording_processing, confirmation_recording, user_info_recording
 
 # Use the existing conversation
 conversation = ConversationManager()
