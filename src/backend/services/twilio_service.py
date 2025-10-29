@@ -4,7 +4,7 @@ from twilio.request_validator import RequestValidator # type: ignore
 
 client = Client(Config.TWILIO_ACCOUNT_SID, Config.TWILIO_AUTH_TOKEN)
 
-def validate_twilio_signature(request):
+def validate_twilio(request):
     try:
         validator = RequestValidator(Config.TWILIO_AUTH_TOKEN)
         

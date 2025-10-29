@@ -9,7 +9,7 @@ import tempfile
 client = OpenAI(api_key=Config.OPENAI_API_KEY)
 
 # process_recording() in call_routes.py
-def transcribe_audio(audio_url, language='en'):
+def transcribe(audio_url, language='en'):
     # OpenAI Whisper API
     try:        
         # Download the audio file

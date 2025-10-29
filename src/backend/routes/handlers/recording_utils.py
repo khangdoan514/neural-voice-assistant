@@ -21,22 +21,22 @@ def get_recording_instruction(action_path, call_sid=None):
     }
 
 # Recording instruction for Twilio
-def add_recording_instruction(response, action_path, call_sid=None):
+def recording_instruction(response, action_path, call_sid=None):
     config = get_recording_instruction(action_path, call_sid)
     response.record(**config)
 
 # User info collection
-def add_user_info_recording(response, call_sid):
-    add_recording_instruction(response, 'process-user-info', call_sid)
+def user_info_recording(response, call_sid):
+    recording_instruction(response, 'process-user-info', call_sid)
 
 # Language choice
-def add_language_choice_recording(response, call_sid):
-    add_recording_instruction(response, 'process-language-choice', call_sid)
+def language_choice_recording(response, call_sid):
+    recording_instruction(response, 'process-language-choice', call_sid)
 
 # General recording processing
-def add_recording_processing(response, call_sid):
-    add_recording_instruction(response, 'process-recording', call_sid)
+def recording_processing(response, call_sid):
+    recording_instruction(response, 'process-recording', call_sid)
 
 # Confirmation processin
-def add_confirmation_recording(response, call_sid):
-    add_recording_instruction(response, 'process-confirmation', call_sid)
+def confirmation_recording(response, call_sid):
+    recording_instruction(response, 'process-confirmation', call_sid)

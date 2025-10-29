@@ -7,7 +7,7 @@ from .openai_service import generate_response
 client = OpenAI(api_key=Config.OPENAI_API_KEY)
 
 # process_recording() in call_routes.py
-def generate_advanced_response(user_input, state, conversation_history=None, language='en'):
+def generate_ai_response(user_input, state, conversation_history=None, language='en'):
     try:        
         # Users say "yes"
         if state == 'confirmation' and users_say_yes(user_input):

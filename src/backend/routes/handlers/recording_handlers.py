@@ -1,35 +1,32 @@
 from flask import request # type: ignore
 from twilio.twiml.voice_response import VoiceResponse # type: ignore
-from ..services.twilio_service import validate_twilio_signature # type: ignore
-from ..services.openai_service import transcribe_audio # type: ignore
-from ..services.advanced_openai_service import generate_advanced_response # type: ignore
+from ..services.openai_service import transcribe # type: ignore
+from ..services.advanced_openai_service import generate_ai_response # type: ignore
 from ..utils.conversation_manager import ConversationManager # type: ignore
-from ..utils.intent_detector import users_say_yes, users_say_no # type: ignore
-from .audio_handlers import generate_audio_response
-from .recording_utils import add_recording_processing, add_confirmation_recording, add_user_info_recording
+from ..utils.intent_detector import is_yes, is_no # type: ignore
+from .audio_handlers import generate_audio
+from .recording_utils import recording_processing, confirmation_recording, user_info_recording
 
 # Use the existing conversation
-conversation_manager = ConversationManager()
+conversation = ConversationManager()
 
 # Process the recording after user speaks
-def process_recording(call_sid):
+def handle_record(call_sid):
     response = VoiceResponse()
     recording_url = request.form.get('RecordingUrl') or request.args.get('RecordingUrl')
 
     if not recording_url:
         print("ERROR: No RecordingUrl found in process_recording()")
-        generate_audio_response(response, call_sid, "Sorry, I didn't get that. Please try again.", 'en')
+        generate_audio(response, call_sid, "Sorry, I didn't get that. Please try again.", 'en')
         return str(response)
 
     # Get language preference
-    language = conversation_manager.get_language(call_sid)
-
-    # Use transcription
-    transcript = transcribe_audio(recording_url, language)
-    print(f"User response: '{transcript}'")
+    language = conversation.get_language(call_sid)
+    transcript = transcribe(recording_url, language)
+    print(f"User: '{transcript}'")
 
     # Current conversation state
-    state = conversation_manager.get_conversation_state(call_sid)
+    state = conversation.get_state(call_sid)
     print(f"Conversation state: {state}\n")
 
     # Vietnamese flow 
@@ -41,33 +38,33 @@ def process_recording(call_sid):
         return english_flow(response, call_sid, transcript, state)
     
 # Process confirmation responses
-def process_confirmation(call_sid):
-    return process_recording(call_sid)
+def handle_confirm(call_sid):
+    return handle_record(call_sid)
 
 # Vietnamese flow
 def vietnamese_flow(response, call_sid, transcript):
     # Get user's info
-    user_info = conversation_manager.get_user_info(call_sid)
-    conversation_manager.set_user_request(call_sid, transcript)
+    user_info = conversation.get_info(call_sid)
+    conversation.set_request(call_sid, transcript)
     
     # Ask for name
     if user_info.get('name') is None:
-        generate_audio_response(response, call_sid, "Để chúng tôi hỗ trợ tốt hơn, xin vui lòng cho biết tên của bạn?", 'vi')
-        conversation_manager.update_conversation(call_sid, transcript, "Đang hỏi tên", 'asking_name')
+        generate_audio(response, call_sid, "Để chúng tôi hỗ trợ tốt hơn, xin vui lòng cho biết tên của bạn?", 'vi')
+        conversation.update(call_sid, transcript, "Đang hỏi tên", 'asking_name')
 
     # Ask for location
     elif user_info.get('location') is None:
-        generate_audio_response(response, call_sid, "Cảm ơn. Bạn có thể cho biết địa chỉ của bạn được không?", 'vi')
-        conversation_manager.update_conversation(call_sid, transcript, "Đang hỏi địa chỉ", 'asking_location')
+        generate_audio(response, call_sid, "Cảm ơn. Bạn có thể cho biết địa chỉ của bạn được không?", 'vi')
+        conversation.update(call_sid, transcript, "Đang hỏi địa chỉ", 'asking_location')
 
     # Recording utils
-    add_user_info_recording(response, call_sid)
+    user_info_recording(response, call_sid)
     return str(response)
 
 # English flow
 def english_flow(response, call_sid, transcript, state):
     # Conversation history
-    conversation_history = conversation_manager.get_conversation_history(call_sid)
+    conversation_history = conversation.get_conversation_history(call_sid)
     
     if state == 'greeting':
         return greeting_state(response, call_sid, transcript, conversation_history)
@@ -78,22 +75,22 @@ def english_flow(response, call_sid, transcript, state):
 # Greeting state in English flow
 def greeting_state(response, call_sid, transcript, conversation_history):
     # AI response
-    ai_response = generate_advanced_response(transcript, 'greeting', conversation_history, 'en')
+    ai_response = generate_audio(transcript, 'greeting', conversation_history, 'en')
     
     # Confirm user response
-    conversation_manager.set_user_request(call_sid, transcript)
-    conversation_manager.update_conversation(call_sid, transcript, ai_response, 'confirmation')
+    conversation.set_request(call_sid, transcript)
+    conversation.update(call_sid, transcript, ai_response, 'confirmation')
     
-    generate_audio_response(response, call_sid, ai_response, 'en')
+    generate_audio(response, call_sid, ai_response, 'en')
 
     # Recording utils
-    add_confirmation_recording(response, call_sid)
+    confirmation_recording(response, call_sid)
     return str(response)
 
 # Confirmation state in English flow
 def confirmation_state(response, call_sid, transcript, conversation_history):
-    ai_confirmation_response = conversation_history[-1]['ai'] if conversation_history else ""
-    print(f"AI response: '{ai_confirmation_response}'")
+    ai_response = conversation_history[-1]['ai'] if conversation_history else ""
+    print(f"AI response: '{ai_response}'")
     
     confirmation = [
         "Is that all you need help with?",
@@ -103,7 +100,7 @@ def confirmation_state(response, call_sid, transcript, conversation_history):
     ]
 
     # Final confirmation
-    if any(phrase in ai_confirmation_response for phrase in confirmation):
+    if any(phrase in ai_response for phrase in confirmation):
         return final_confirmation(response, call_sid, transcript, conversation_history)
 
     # Confirm what users say
@@ -113,82 +110,82 @@ def confirmation_state(response, call_sid, transcript, conversation_history):
 # Final confirmation in English flow
 def final_confirmation(response, call_sid, transcript, conversation_history):
     # Users say "yes"
-    if users_say_yes(transcript.lower()):
+    if is_yes(transcript.lower()):
         return user_info_collection(response, call_sid, transcript)
     
     # User say "no"
-    elif users_say_no(transcript.lower()):
+    elif is_no(transcript.lower()):
         # Follow-up
-        conversation_manager.update_conversation(call_sid, transcript, "How can I assist you further?", 'greeting')
-        generate_audio_response(response, call_sid, "How can I assist you further?", 'en')
+        conversation.update(call_sid, transcript, "How can I assist you further?", 'greeting')
+        generate_audio(response, call_sid, "How can I assist you further?", 'en')
         
         # Recording utils
-        add_recording_processing(response, call_sid)
+        recording_processing(response, call_sid)
 
     # User say something else
     else:
         # Ask user to repeat final confirmation
-        ai_response = generate_advanced_response(transcript, 'confirmation', conversation_history, 'en')
-        conversation_manager.update_conversation(call_sid, transcript, ai_response, 'confirmation')
-        generate_audio_response(response, call_sid, ai_response, 'en')
+        ai_response = generate_ai_response(transcript, 'confirmation', conversation_history, 'en')
+        conversation.update(call_sid, transcript, ai_response, 'confirmation')
+        generate_audio(response, call_sid, ai_response, 'en')
 
         # Recording utils
-        add_confirmation_recording(response, call_sid)
+        confirmation_recording(response, call_sid)
 
     return str(response)
 
 def standard_confirmation(response, call_sid, transcript, conversation_history):
     # Standard confirmation in English flow
-    ai_response = generate_advanced_response(transcript, 'confirmation', conversation_history, 'en')
+    ai_response = generate_ai_response(transcript, 'confirmation', conversation_history, 'en')
     print(f"AI response: '{ai_response}'")
 
     # Users say "yes"
-    if users_say_yes(transcript.lower()):
+    if is_yes(transcript.lower()):
         # Ask if that's all they need
-        conversation_manager.update_conversation(call_sid, transcript, ai_response, 'confirmation')
-        generate_audio_response(response, call_sid, ai_response, 'en')
+        conversation.update(call_sid, transcript, ai_response, 'confirmation')
+        generate_audio(response, call_sid, ai_response, 'en')
 
         # Recording utils
-        add_confirmation_recording(response, call_sid)
+        confirmation_recording(response, call_sid)
 
     # Users say "no"
-    elif users_say_no(transcript.lower()):
+    elif is_no(transcript.lower()):
         # Ask user to repeat - go back to greeting
-        conversation_manager.update_conversation(call_sid, transcript, ai_response, 'greeting')
-        generate_audio_response(response, call_sid, ai_response, 'en')
+        conversation.update(call_sid, transcript, ai_response, 'greeting')
+        generate_audio(response, call_sid, ai_response, 'en')
 
         # Recording utils
-        add_recording_processing(response, call_sid)
+        recording_processing(response, call_sid)
 
     # Users say something else
     else:
         # Ask user to repeat
-        conversation_manager.update_conversation(call_sid, transcript, ai_response, 'confirmation')
-        generate_audio_response(response, call_sid, ai_response, 'en')
+        conversation.update(call_sid, transcript, ai_response, 'confirmation')
+        generate_audio(response, call_sid, ai_response, 'en')
 
         # Recording utils
-        add_confirmation_recording(response, call_sid)
+        confirmation_recording(response, call_sid)
     
     return str(response)
 
 def user_info_collection(response, call_sid, transcript):
     # Get user's info
-    user_info = conversation_manager.get_user_info(call_sid)
+    user_info = conversation.get_user_info(call_sid)
 
     if user_info.get('name') is None:
         # Ask for name
-        generate_audio_response(response, call_sid, "To better assist you, could you please tell me your name?", 'en')
-        conversation_manager.update_conversation(call_sid, transcript, "Asking for name", 'asking_name')
+        generate_audio(response, call_sid, "To better assist you, could you please tell me your name?", 'en')
+        conversation.update(call_sid, transcript, "Asking for name", 'asking_name')
         
         # Recording utils
-        add_user_info_recording(response, call_sid)
+        user_info_recording(response, call_sid)
     
     elif user_info.get('location') is None:
         # Ask for location
-        generate_audio_response(response, call_sid, "Thank you. Could you please provide your address?", 'en')
-        conversation_manager.update_conversation(call_sid, transcript, "Asking for location", 'asking_location')
+        generate_audio(response, call_sid, "Thank you. Could you please provide your address?", 'en')
+        conversation.update(call_sid, transcript, "Asking for location", 'asking_location')
         
         # Recording utils
-        add_user_info_recording(response, call_sid)
+        user_info_recording(response, call_sid)
     
     return str(response)
