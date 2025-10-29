@@ -1,22 +1,16 @@
 from backend.routes.call_routes import call_bp
 from flask import Flask # type: ignore
-import sys
-import os
 import logging
 
 # Add the current directory to Python path so imports work
 sys.path.insert(0, os.path.dirname(__file__))
 
-# Disable warning
-logging.getLogger('werkzeug').disabled = True
-
 # Disable loggings
+logging.getLogger('werkzeug').disabled = True
 logging.getLogger('flask.app').disabled = True
 
 # Initialize Flask app
 app = Flask(__name__)
-
-# Register blueprints
 app.register_blueprint(call_bp, url_prefix='/twilio')
 
 @app.route("/")
@@ -24,7 +18,7 @@ def home():
     return "VoiceFlow is running!", 200
 
 @app.route('/health')
-def health_check():
+def health():
     return "OK", 200
 
 @app.route('/ngrok-test')
