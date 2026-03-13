@@ -61,7 +61,7 @@ export default function Navbar() {
               </Link>
             ) : (
               <button
-                className={`flex items-center h-full px-5 bg-transparent border-none cursor-pointer font-label text-[13px] font-semibold tracking-[2px] uppercase transition-colors duration-200 ${
+                className={`flex items-center h-full px-5 bg-transparent border-none cursor-pointer font-label text-[15px] font-bold tracking-[2px] uppercase transition-colors duration-200 ${
                   openMenu === item.label ? "text-nav-hover" : "text-nav-text"
                 }`}
               >
