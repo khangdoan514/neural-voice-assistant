@@ -1,5 +1,7 @@
 from routes.call_routes import call_bp
-from flask import Flask # type: ignore
+from routes.conversation_routes import conversation_bp
+from flask import Flask
+from flask_cors import CORS
 import logging
 
 # Disable loggings
@@ -8,7 +10,13 @@ logging.getLogger('flask.app').disabled = True
 
 # Initialize Flask app
 app = Flask(__name__)
+
+# Enable CORS for all routes
+CORS(app, origins=["http://localhost:3000", "http://127.0.0.1:3000"])
+
+# Register blueprints
 app.register_blueprint(call_bp, url_prefix='/twilio')
+app.register_blueprint(conversation_bp)
 
 @app.route("/")
 def home():
