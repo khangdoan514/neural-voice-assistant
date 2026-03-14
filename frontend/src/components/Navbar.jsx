@@ -26,7 +26,8 @@ const NAV_LINKS = [
     ],
   },
   { to: "/pictures", label: "Pictures" },
-  { to: "/about", label: "About Us" },
+  { to: "/about", label: "About" },
+  { to: "/contact", label: "Contact" },
 ]
 
 export default function Navbar() {
@@ -55,13 +56,13 @@ export default function Navbar() {
             {item.to ? (
               <Link
                 to={item.to}
-                className="flex items-center h-full px-5 text-nav-text font-label text-[17px] font-semibold tracking-[2px] uppercase hover:text-nav-hover transition-colors duration-200"
+                className="flex items-center h-full px-5 text-nav-text font-label text-[15px] font-semibold tracking-[2px] uppercase hover:text-nav-hover transition-colors duration-200"
               >
                 {item.label}
               </Link>
             ) : (
               <button
-                className={`flex items-center h-full px-5 bg-transparent border-none cursor-pointer font-label text-[15px] font-bold tracking-[2px] uppercase transition-colors duration-200 ${
+                className={`flex items-center h-full px-5 bg-transparent border-none cursor-pointer font-label text-[15px] font-semibold tracking-[2px] uppercase transition-colors duration-200 ${
                   openMenu === item.label ? "text-nav-hover" : "text-nav-text"
                 }`}
               >
@@ -72,7 +73,7 @@ export default function Navbar() {
             {/* Dropdown */}
             {item.children && (
               <div
-                className={`absolute top-full left-0 min-w-48 transition-all duration-200 bg-dropdown-bg border border-rust/30 border-t-2 border-t-rust ${
+                className={`absolute top-full left-0 min-w-48 transition-all duration-200 bg-nav-bg border border-rust/30 border-t-2 border-t-rust ${
                   openMenu === item.label
                     ? "opacity-100 translate-y-0 pointer-events-auto"
                     : "opacity-0 -translate-y-2 pointer-events-none"
@@ -92,12 +93,12 @@ export default function Navbar() {
           </div>
         ))}
 
-        {/* Contact Us button */}
+        {/* Login Button */}
         <Link
-          to="/contact"
-          className="flex items-center h-auto ml-4 px-5 py-2 bg-rust text-white font-label text-[13px] font-bold tracking-[2px] uppercase hover:bg-rust-dark transition-colors duration-200"
+          to="/login"
+          className="flex items-center h-auto ml-4 px-5 py-2 bg-rust text-white font-label text-xs font-bold tracking-[2px] uppercase hover:bg-rust-dark transition-colors duration-200"
         >
-          Contact Us
+          Login
         </Link>
       </div>
     </nav>

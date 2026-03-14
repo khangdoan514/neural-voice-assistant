@@ -34,18 +34,10 @@
   box-sizing: border-box;
 }
 
-html {
-  font-size: 16px;
-}
-
-body {
-  font-family: var(--font-body);
-  background-color: var(--color-barn);
-  overflow-x: hidden;
-  line-height: 1.5;
+html, body {
+  height: 100%;
   margin: 0;
   padding: 0;
-  min-height: 100vh;
 }
 
 /* Animation keyframes */

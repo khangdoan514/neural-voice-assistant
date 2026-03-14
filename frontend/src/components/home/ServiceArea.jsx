@@ -149,7 +149,7 @@ export default function ServiceArea() {
         <div className="mb-4">
           <Eyebrow>Where We Operate</Eyebrow>
           <h2 className="font-display text-[clamp(36px,4vw,56px)] leading-none text-nav-text">
-            Two Locations. <span className="text-rust">One Team.</span>
+            Two <span className="text-rust">Locations</span>
           </h2>
         </div>
         <p className="text-md text-muted leading-relaxed mb-8 font-light">
