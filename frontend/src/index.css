@@ -1,31 +1,52 @@
 @import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap");
 @import "tailwindcss";
-
 @theme {
-  /* ── Brand Colors ── */
+  /* ========== Brand Colors ========== */
   --color-rust: #C4521A;
   --color-rust-dark: #A03F10;
   --color-rust-light: #E8693A;
   --color-straw: #D4B483;
   --color-cream: #F5F0E8;
 
-  /* ── Light Scale ── */
+  /* ========== Light Scale ========== */
   --color-barn: #F9F5F0;
   --color-charcoal: #FFFFFF;
   --color-mid: #E5D9CC;
   --color-muted: #5C4A3A;
 
-  /* ── Fonts ── */
+  /* ========== Fonts ========== */
   --font-display: "Bebas Neue", sans-serif;
   --font-label: "Barlow Condensed", sans-serif;
   --font-body: "Barlow", sans-serif;
 
-  /* ── Navbar ── */
+  /* ========== Navbar ========== */
   --color-nav-bg: #FFFFFF;
   --color-nav-text: #2C2420;
   --color-nav-hover: #C4521A;
   --color-dropdown-bg: #F5F0E8;
   --color-dropdown-border: rgba(92, 74, 58, 0.1);
+
+  /* ========== Fluid Typography Scale ========== */
+  --text-xs: clamp(0.65rem, 1.5vw, 0.75rem);
+  --text-sm: clamp(0.75rem, 1.8vw, 0.875rem);
+  --text-base: clamp(0.875rem, 2vw, 1rem);
+  --text-lg: clamp(1rem, 2.5vw, 1.125rem);
+  --text-xl: clamp(1.125rem, 3vw, 1.25rem);
+  --text-2xl: clamp(1.25rem, 3.5vw, 1.5rem);
+  --text-3xl: clamp(1.5rem, 4vw, 1.875rem);
+  --text-4xl: clamp(1.875rem, 5vw, 2.25rem);
+  --text-5xl: clamp(2.25rem, 6vw, 2.5rem);
+  --text-6xl: clamp(2.5rem, 7vw, 3rem);
+  --text-7xl: clamp(3rem, 8vw, 3.5rem);
+
+  /* ========== Semantic Typography Tokens ========== */
+  --text-hero: clamp(50px, 7vw, 70px);
+  --text-title: clamp(28px, 4vw, 42px);
+  --text-subtitle: clamp(16px, 2.5vw, 22px);
+  --text-section-label: clamp(12px, 1.5vw, 16px);
+  --text-body: clamp(13px, 1.8vw, 15px);
+  --text-small: clamp(11px, 1.5vw, 13px);
+  --text-tiny: clamp(10px, 1.2vw, 11px);
 }
 
 *,
@@ -38,9 +59,19 @@ html, body {
   height: 100%;
   margin: 0;
   padding: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  color: var(--color-muted);
+  background-color: var(--color-barn);
 }
 
-/* Animation keyframes */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 0.95;
+}
+
+/* ========== Animation keyframes ========== */
 @keyframes fade-up {
   from {
     opacity: 0;
@@ -67,4 +98,24 @@ html, body {
 
 .animate-marquee {
   animation: marquee 25s linear infinite;
+}
+
+/* ========== Component scaling ========== */
+.product-card {
+  container-type: inline-size;
+  container-name: product-card;
+}
+
+@container product-card (max-width: 200px) {
+  .product-card-title {
+    font-size: var(--text-sm);
+  }
+  .product-card-sub {
+    font-size: var(--text-xs);
+  }
+}
+
+/* ==========Responsive padding utilities ========== */
+.responsive-section {
+  padding: clamp(2rem, 6vw, 4rem) clamp(1rem, 4vw, 3rem);
 }
