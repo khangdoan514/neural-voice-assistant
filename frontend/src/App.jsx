@@ -13,18 +13,36 @@ import Heating from "./pages/products/Heating"
 import Cooling from "./pages/products/Cooling"
 
 import Pictures from "./pages/Pictures"
-import Contact from "./pages/Contact"
-import About from "./pages/About"
-import Privacy from "./pages/Privacy"
+
+import About from "./pages/support/About"
+import Contact from "./pages/support/Contact"
+import Request from "./pages/support/Request"
+import Privacy from "./pages/support/Privacy"
 
 import Login from "./pages/Login"
 import Admin from "./pages/Admin"
 
 import Navbar from "./components/Navbar"
 import Footer from "./components/Footer"
-import ScrollToTop from "./components/ScrollToTop"
+import { useEffect } from "react"
 import { Routes, Route, useLocation } from "react-router-dom"
 import './index.css'
+
+function ScrollToTop() {
+  const { pathname } = useLocation()
+
+  // Route change
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
+
+  // Page reload
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+
+  return null
+}
 
 export default function App() {
   const location = useLocation()
@@ -41,8 +59,6 @@ export default function App() {
           <Route path="/services" element={<Services />} />
           <Route path="/products" element={<Products />} />
           <Route path="/pictures" element={<Pictures />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/privacy" element={<Privacy />} />
           
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<Admin />} />
@@ -60,6 +76,11 @@ export default function App() {
           <Route path="/products/controllers" element={<Products />} />
           <Route path="/products/lighting" element={<Products />} />
           <Route path="/products/cleanout" element={<Products />} />
+
+          <Route path="/support/about" element={<About />} />
+          <Route path="/support/contact" element={<Contact />} />
+          <Route path="/support/request" element={<Request />} />
+          <Route path="/support/privacy" element={<Privacy />} />
         </Routes>
       </main>
       {!hideNavbarFooter && <Footer />}

@@ -307,41 +307,15 @@ function About() {
 }
 
 // ============================== Services ==============================
-function ServiceCard({ title, desc }) {
-  const [hovered, setHovered] = useState(false)
-
-  return (
-    <div
-      className={`relative overflow-hidden cursor-pointer transition-all duration-300 p-10 ${hovered ? "bg-white shadow-lg" : "bg-white"
-        }`}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      <div
-        className={`absolute top-0 left-0 right-0 h-0.5 bg-rust transition-transform duration-300 ${hovered ? "scale-x-100" : "scale-x-0"
-          }`}
-      />
-
-      <h3 className="font-label text-xl font-bold tracking-[1px] uppercase text-nav-text mb-3">{title}</h3>
-      <p className="text-body leading-relaxed text-muted font-light">{desc}</p>
-
-      <div
-        className={`transition-all duration-300 mt-6 font-label text-xs font-bold tracking-[2px] uppercase ${hovered ? "opacity-100 text-rust" : "opacity-30"
-          }`}
-      >
-        Learn More →
-      </div>
-    </div>
-  )
-}
-
 function Services() {
   const SERVICES = [
-    { title: "New Farm Construction", desc: "Full-service buildout for new poultry operations. From layout to final equipment installation, we handle every detail." },
-    { title: "Retro Older Houses", desc: "Modernize aging facilities with updated systems and equipment. Increase efficiency without a full rebuild." },
-    { title: "In-House Shop", desc: "Our busy repair shop handles motors, medication pumps, bearings, and all manner of poultry and farm equipment." },
-    { title: "On-Farm Repair", desc: "We come to you. Our trained team provides on-site diagnostics and repair to minimize your downtime." },
+    { to: "/services/construction", title: "New Farm Construction", desc: "Full-service buildout for new poultry operations. From layout to final equipment installation, we handle every detail." },
+    { to: "/services/retro", title: "Retro Older Houses", desc: "Modernize aging facilities with updated systems and equipment. Increase efficiency without a full rebuild." },
+    { to: "/services/shop", title: "In-House Shop", desc: "Our busy repair shop handles motors, medication pumps, bearings, and all manner of poultry and farm equipment." },
+    { to: "/services/repair", title: "On-Farm Repair", desc: "We come to you. Our trained team provides on-site diagnostics and repair to minimize your downtime." },
   ];
+
+  const [hovered, setHovered] = useState(false)
 
   return (
     <Section className="py-[clamp(3rem,8vw,6rem)] px-[clamp(1.5rem,5vw,5rem)] bg-barn">
@@ -352,13 +326,34 @@ function Services() {
         description="Lorem ipsum dolor sit amet consectetur, adipisicing elit. Corporis dolorum ea mollitia eum quas! Ipsum quia ducimus reiciendis unde!"
       />
       <motion.div
-        className="grid gap-6"
-        style={{ gridTemplateColumns: "repeat(4,1fr)" }}
+        className="grid grid-cols-4 gap-6"
         variants={contentStagger}
       >
-        {SERVICES.map((service) => (
+        {SERVICES.map((service, index) => (
           <motion.div key={service.title} variants={reveal}>
-            <ServiceCard {...service} />
+            <Link to={service.to}>
+              <div
+                className={`relative h-full overflow-hidden cursor-pointer transition-all duration-300 p-10 ${hovered === index ? "bg-white shadow-lg" : "bg-white"
+                  }`}
+                onMouseEnter={() => setHovered(index)}
+                onMouseLeave={() => setHovered(null)}
+              >
+                <div
+                  className={`absolute top-0 left-0 right-0 h-0.5 bg-rust transition-transform duration-300 ${hovered === index ? "scale-x-100" : "scale-x-0"
+                    }`}
+                />
+
+                <h3 className="font-label text-xl font-bold tracking-[1px] uppercase text-nav-text mb-3">{service.title}</h3>
+                <p className="text-body leading-relaxed text-muted font-light">{service.desc}</p>
+
+                <div
+                  className={`transition-all duration-300 mt-6 font-label text-sm font-bold tracking-[2px] uppercase ${hovered === index ? "opacity-100 text-rust" : "opacity-30"
+                    }`}
+                >
+                  Learn More →
+                </div>
+              </div>
+            </Link>
           </motion.div>
         ))}
       </motion.div>
@@ -367,43 +362,21 @@ function Services() {
 }
 
 // ============================== Products ==============================
-function ProductCard({ name, sub, tag }) {
-  const [hovered, setHovered] = useState(false)
-
-  return (
-    <div
-      className={`relative h-full cursor-pointer transition-all duration-200 p-7 bg-white ${hovered
-        ? "border border-rust -translate-y-1 shadow-lg"
-        : "border border-mid/20"
-        }`}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      {tag && (
-        <span className="absolute top-3 right-3 text-[12px] font-bold tracking-[1px] uppercase bg-rust text-white px-1.5 py-0.5">
-          {tag}
-        </span>
-      )}
-
-      <h4 className="font-label text-xl font-bold tracking-[1px] uppercase text-nav-text mb-2">{name}</h4>
-      <p className="text-body leading-relaxed text-muted font-light">{sub}</p>
-    </div>
-  )
-}
-
 function Products() {
   const PRODUCTS = [
-    { name: "Feeding Systems", sub: "Pan feeders, augers, controllers, full chain systems", tag: "Popular" },
-    { name: "Watering Systems", sub: "Nipple drinkers, pressure regulators, water tanks & pumps" },
-    { name: "Heating Systems", sub: "Infraconic brooders, radiant heaters, forced air units" },
-    { name: "Cooling Systems", sub: "Evaporative cooling pads, misters, tunnel ventilation" },
-    { name: "Fans", sub: "Box fans, tunnel fans, circulation and exhaust solutions" },
-    { name: "Controllers", sub: "Environmental controllers, tunnel timers, system automation", tag: "New" },
-    { name: "Roll Seal Doors", sub: "Insulated tunnel door systems for optimal airflow control" },
-    { name: "LED Lighting", sub: "Energy-efficient lighting designed for poultry environments" },
-    { name: "Cleanout Equipment", sub: "Litter windrowers, belt scrapers, wash-down systems" },
-    { name: "Motors & Belts", sub: "HVAC motors, capacitors, contactors, drive belts & bearings" },
+    { to: "/products/feeding", name: "Feeding Systems", sub: "Pan feeders, augers, controllers, full chain systems", tag: "Popular" },
+    { to: "/products/watering", name: "Watering Systems", sub: "Nipple drinkers, pressure regulators, water tanks & pumps" },
+    { to: "/products/heating", name: "Heating Systems", sub: "Infraconic brooders, radiant heaters, forced air units" },
+    { to: "/products/cooling", name: "Cooling Systems", sub: "Evaporative cooling pads, misters, tunnel ventilation" },
+    { to: "/products/fans", name: "Fans", sub: "Box fans, tunnel fans, circulation and exhaust solutions" },
+    { to: "/products/controllers", name: "Controllers", sub: "Environmental controllers, tunnel timers, system automation", tag: "New" },
+    { to: "", name: "Roll Seal Doors", sub: "Insulated tunnel door systems for optimal airflow control" },
+    { to: "/products/lighting", name: "LED Lighting", sub: "Energy-efficient lighting designed for poultry environments" },
+    { to: "/products/cleanout", name: "Cleanout Equipment", sub: "Litter windrowers, belt scrapers, wash-down systems" },
+    { to: "", name: "Motors & Belts", sub: "HVAC motors, capacitors, contactors, drive belts & bearings" },
   ];
+
+  const [hovered, setHovered] = useState(null)
 
   return (
     <Section className="bg-mid/5 py-[clamp(3rem,8vw,6rem)] px-[clamp(1.5rem,5vw,5rem)]">
@@ -414,13 +387,37 @@ function Products() {
         description="Lorem ipsum dolor sit amet consectetur, adipisicing elit. Corporis dolorum ea mollitia eum quas! Ipsum quia ducimus reiciendis unde!"
       />
       <motion.div
-        className="grid gap-6"
-        style={{ gridTemplateColumns: "repeat(5,1fr)" }}
+        className="grid grid-cols-5 gap-6"
         variants={contentStagger}
       >
-        {PRODUCTS.map((product) => (
+        {PRODUCTS.map((product, index) => (
           <motion.div key={product.name} variants={reveal}>
-            <ProductCard {...product} />
+            <Link to={product.to}>
+              <div
+                className={`relative h-full cursor-pointer transition-all duration-200 p-10 bg-white ${hovered === index
+                  ? "border border-rust -translate-y-1 shadow-lg"
+                  : "border border-mid/20"
+                  }`}
+                onMouseEnter={() => setHovered(index)}
+                onMouseLeave={() => setHovered(null)}
+              >
+                {product.tag && (
+                  <span className="absolute top-3 right-3 text-[12px] font-bold tracking-[1px] uppercase bg-rust text-white px-1.5 py-0.5">
+                    {product.tag}
+                  </span>
+                )}
+
+                <h3 className="font-label text-xl font-bold tracking-[1px] uppercase text-nav-text mb-2">{product.name}</h3>
+                <p className="text-body leading-relaxed text-muted font-light">{product.sub}</p>
+
+                <div
+                    className={`transition-all duration-300 mt-6 font-label text-sm font-bold tracking-[2px] uppercase ${hovered === index ? "opacity-100 text-rust" : "opacity-30"
+                      }`}
+                  >
+                    Learn More →
+                  </div>
+              </div>
+            </Link>
           </motion.div>
         ))}
       </motion.div>

@@ -23,12 +23,12 @@ export default function Footer() {
       ],
     },
     {
-      heading: "Company",
+      heading: "Support",
       links: [
-        { label: "About Us", to: "/about" },
-        { label: "Contact", to: "/contact" },
-        { label: "Hours of Operation", to: "/contact" },
-        { label: "Privacy Policy", to: "/privacy" },
+        { label: "About Us", to: "/support/about" },
+        { label: "Contact", to: "/support/contact" },
+        { label: "Submit a Request", to: "/support/request" },
+        { label: "Privacy Policy", to: "/support/privacy" },
       ],
     },
   ]

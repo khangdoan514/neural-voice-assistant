@@ -27,8 +27,15 @@ export default function Navbar() {
       ],
     },
     { to: "/pictures", label: "Pictures" },
-    { to: "/about", label: "About" },
-    { to: "/contact", label: "Contact" },
+    {
+      label: "Support",
+      children: [
+        { to: "/support/about", label: "About Us" },
+        { to: "/support/contact", label: "Contact" },
+        { to: "/support/request", label: "Submit a Request" },
+        { to: "/support/privacy", label: "Privacy Policy" },
+      ],
+    },
   ]
 
   const [openMenu, setOpenMenu] = useState(null)

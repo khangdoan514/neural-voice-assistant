@@ -119,14 +119,7 @@ export default function Privacy() {
 
       {/* ==================== Page Header ==================== */}
       <div className="bg-nav-text py-20 px-20 relative overflow-hidden">
-        <div
-          className="absolute inset-0 pointer-events-none opacity-[0.04]"
-          style={{
-            backgroundImage: "linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)",
-            backgroundSize: "40px 40px",
-          }}
-        />
-        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at 30% 50%, rgba(196,82,26,0.12) 0%, transparent 60%)" }} />
+        <div className="absolute inset-0 pointer-events-none opacity-[0.04] bg-[linear-gradient(rgba(255,255,255,1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,1)_1px,transparent_1px)] bg-[size:40px_40px]"/>
         <motion.div
           className="relative"
           variants={sectionStagger}
@@ -141,7 +134,7 @@ export default function Privacy() {
             Terms &amp; <span className="text-rust">Privacy</span>
           </motion.h1>
           <motion.p variants={reveal} className="font-label text-md tracking-[3px] uppercase text-white/40 mt-4">
-            Last updated: 2026 · East Texas Poultry Supply
+            Last updated: March, 2026 · East Texas Poultry Supply
           </motion.p>
         </motion.div>
       </div>
