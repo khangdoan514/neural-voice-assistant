@@ -26,7 +26,7 @@ import ScrollToTop from "./components/ScrollToTop"
 import { Routes, Route, useLocation } from "react-router-dom"
 import './index.css'
 
-function AppContent() {
+export default function App() {
   const location = useLocation()
   const hideNavbarFooter = ['/login', '/admin'].includes(location.pathname)
 
@@ -65,8 +65,4 @@ function AppContent() {
       {!hideNavbarFooter && <Footer />}
     </>
   )
-}
-
-export default function App() {
-  return <AppContent />
 }
