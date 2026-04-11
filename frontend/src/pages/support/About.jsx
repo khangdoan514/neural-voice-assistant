@@ -18,7 +18,7 @@ const contentStagger = {
   visible: { transition: { staggerChildren: 0.08 } },
 }
 
-// ============================== Functions ==============================
+/* ============================== Functions ============================== */
 function Section({ children, className = "" }) {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: "-6% 0px" })
@@ -43,11 +43,11 @@ function SectionHeader({ label, title, titleHighlight, description = "" }) {
           <span className="block w-8 h-0.5 bg-rust" />
           {label}
         </motion.div>
-        <motion.h2 variants={reveal} className="font-display text-title leading-none text-nav-text">
+        <motion.h2 variants={reveal} className="font-display text-title leading-none text-nav-text text-2xl sm:text-3xl md:text-4xl lg:text-5xl">
           {title} {titleHighlight && <span className="text-rust">{titleHighlight}</span>}
         </motion.h2>
       </motion.div>
-      <motion.p variants={reveal} className="text-md text-muted leading-relaxed mb-16 font-light">
+      <motion.p variants={reveal} className="text-sm sm:text-md text-muted leading-relaxed mb-8 sm:mb-12 md:mb-16 font-light">
         {description}
       </motion.p>
     </>
@@ -81,184 +81,178 @@ export default function About() {
   ]
 
   return (
-    <main className="bg-barn min-h-screen pt-16">
+    <main className="bg-barn min-h-screen pt-16 overflow-x-hidden">
+      <div className="max-w-full overflow-x-hidden">
 
-      {/* ==================== Header ==================== */}
-      <div className="bg-nav-text py-20 px-20 relative overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none opacity-[0.04]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
-        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at 30% 50%, rgba(196,82,26,0.12) 0%, transparent 60%)" }} />
-        <motion.div
-          className="relative"
-          variants={sectionStagger}
-          initial="hidden"
-          animate="visible"
-        >
-          <motion.div variants={reveal} className="flex items-center gap-3 mb-5 font-label text-section-label font-bold tracking-[4px] uppercase text-rust">
-            <span className="block w-8 h-0.5 bg-rust" />
-            Our Company
-          </motion.div>
-          <motion.h1 variants={reveal} className="font-display text-hero leading-[0.92] text-white mb-4">
-            About <span className="text-rust">East Texas</span> Poultry Supply
-          </motion.h1>
-          <motion.p variants={reveal} className="font-label text-md tracking-[3px] uppercase text-white/40 mt-4">
-            Est. 1958 · Center, Texas · Serving Growers for Over 65 Years
-          </motion.p>
-        </motion.div>
-      </div>
-
-      <div className="px-20 py-20">
-
-        {/* ==================== Our Story ==================== */}
-        <Section className="mb-24">
-          <SectionHeader
-            label="Who We Are"
-            title="Our "
-            titleHighlight="Story"
-            description="East Texas Poultry Supply has proven their ability to help poultry growers achieve success for over one-half century. Founded in Center, Texas in 1958, we have grown to serve growers across Texas, Louisiana, and worldwide."
-          />
-
-          {/* Two-column grid is a single child that then runs its own inner stagger */}
+        {/* ==================== Page Header ==================== */}
+        <div className="bg-nav-text py-14 sm:py-18 md:py-22 lg:py-24 px-6 sm:px-10 md:px-14 lg:px-24 relative overflow-hidden">
+          <div className="absolute inset-0 pointer-events-none opacity-[0.04] bg-[linear-gradient(rgba(255,255,255,1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,1)_1px,transparent_1px)] bg-[size:40px_40px]"/>
+          <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_30%_50%,rgba(196,82,26,0.12)_0%,transparent_60%)]" />
           <motion.div
-            variants={reveal}
-            className="grid gap-16 items-start"
-            style={{ gridTemplateColumns: "1fr 1fr" }}
+            className="relative"
+            variants={sectionStagger}
+            initial="hidden"
+            animate="visible"
           >
-            {/* ==================== Left - Narrative ==================== */}
-            <motion.div variants={contentStagger} className="flex flex-col gap-6">
-              <motion.p variants={reveal} className="text-lg leading-relaxed text-muted font-light m-0">
-                The part of our name <strong className="text-nav-text font-medium">"East Texas"</strong> simply
-                refers to the city, Center, Texas, where we were founded in 1958. Since that humble beginning,
-                we have expanded to include a separate location in Gonzales, Texas. Our primary service area now
-                includes south, central, and north Texas and over into Louisiana and most of that state.
-              </motion.p>
-              <motion.p variants={reveal} className="text-lg leading-relaxed text-muted font-light m-0">
-                The part of our name <strong className="text-nav-text font-medium">"Poultry"</strong> refers to
-                our primary business and does not reveal the entire scope of East Texas Poultry Supply. For example,
-                we ship feed storage bins to horse, cattle, and other farming operations and have a retail store
-                that is well stocked with a variety of items used at home or around the farm.
-              </motion.p>
-              <motion.p variants={reveal} className="text-lg leading-relaxed text-muted font-light m-0">
-                Today's poultry producers choose to invest millions of dollars, often their family land and their
-                time, in order to achieve their goal of self-employment in this great industry. That is why it is
-                so important for them to team up with a reliable and time-tested supplier for their housing,
-                equipment, and service needs.
-              </motion.p>
-              <motion.div variants={reveal} className="border-l-2 border-rust pl-6 py-2 mt-2">
-                <p className="font-label text-xs font-bold tracking-[3px] uppercase text-rust mb-2">Expanded Service Area</p>
-                <p className="text-lg leading-relaxed text-muted font-light m-0">
-                  While we only have one retail store located in Center, Texas, our warehouse in Gonzales, Texas
-                  gives us the base to offer full service to south and central Texas as well. Our ability to ship
-                  poultry equipment and supplies anywhere also expands our market area.
-                </p>
-              </motion.div>
+            <motion.div variants={reveal} className="flex items-center gap-3 mb-5 font-label text-section-label font-bold tracking-[4px] uppercase text-rust">
+              <span className="block w-8 h-0.5 bg-rust" />
+              Our Company
             </motion.div>
+            <motion.h1 variants={reveal} className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-hero leading-[1.1] sm:leading-[0.92] text-white mb-4">
+              About <span className="text-rust">East Texas</span> Poultry Supply
+            </motion.h1>
+            <motion.p variants={reveal} className="font-label text-xs sm:text-sm md:text-md tracking-[2px] sm:tracking-[3px] uppercase text-white/40 mt-4">
+              Est. 1958 · Center, Texas · Serving Growers for Over 75 Years
+            </motion.p>
+          </motion.div>
+        </div>
 
-            {/* ==================== Right - Timeline ==================== */}
-            <motion.div variants={contentStagger}>
-              {TIMELINE.map(({ year, title, desc }) => (
-                <motion.div
-                  key={year}
-                  variants={reveal}
-                  className="flex gap-8 py-10 border-t border-mid/15 last:border-b last:border-mid/15"
-                >
-                  <div className="flex-shrink-0 w-14">
-                    <span className="font-display text-2xl text-rust leading-none">{year}</span>
-                  </div>
-                  <div className="flex-1">
-                    <strong className="font-label text-sm font-bold tracking-[1px] uppercase text-nav-text block mb-1.5">{title}</strong>
-                    <p className="text-lg leading-relaxed text-muted font-light m-0">{desc}</p>
-                  </div>
+        <div className="px-6 sm:px-10 md:px-14 lg:px-24 py-14 sm:py-18 md:py-22 lg:py-24">
+
+          {/* ==================== Our Story ==================== */}
+          <Section className="mb-18 sm:mb-22 md:mb-26 lg:mb-28">
+            <SectionHeader
+              label="Who We Are"
+              title="Our "
+              titleHighlight="Story"
+              description="East Texas Poultry Supply has proven their ability to help poultry growers achieve success for over one-half century. Founded in Center, Texas in 1958, we have grown to serve growers across Texas, Louisiana, and worldwide."
+            />
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16">
+              {/* Narrative */}
+              <motion.div variants={contentStagger} className="flex flex-col gap-4 sm:gap-5 lg:gap-6">
+                <motion.p variants={reveal} className="text-base sm:text-lg leading-relaxed text-muted font-light m-0">
+                  The part of our name <strong className="text-nav-text font-medium">"East Texas"</strong> simply
+                  refers to the city, Center, Texas, where we were founded in 1958. Since that humble beginning,
+                  we have expanded to include a separate location in Gonzales, Texas. Our primary service area now
+                  includes south, central, and north Texas and over into Louisiana and most of that state.
+                </motion.p>
+                <motion.p variants={reveal} className="text-base sm:text-lg leading-relaxed text-muted font-light m-0">
+                  The part of our name <strong className="text-nav-text font-medium">"Poultry"</strong> refers to
+                  our primary business and does not reveal the entire scope of East Texas Poultry Supply. For example,
+                  we ship feed storage bins to horse, cattle, and other farming operations and have a retail store
+                  that is well stocked with a variety of items used at home or around the farm.
+                </motion.p>
+                <motion.p variants={reveal} className="text-base sm:text-lg leading-relaxed text-muted font-light m-0">
+                  Today's poultry producers choose to invest millions of dollars, often their family land and their
+                  time, in order to achieve their goal of self-employment in this great industry. That is why it is
+                  so important for them to team up with a reliable and time-tested supplier for their housing,
+                  equipment, and service needs.
+                </motion.p>
+                <motion.div variants={reveal} className="border-l-2 border-rust pl-4 sm:pl-6 py-2 mt-2">
+                  <p className="font-label text-xs font-bold tracking-[2px] sm:tracking-[3px] uppercase text-rust mb-2">Expanded Service Area</p>
+                  <p className="text-base sm:text-lg leading-relaxed text-muted font-light m-0">
+                    While we only have one retail store located in Center, Texas, our warehouse in Gonzales, Texas
+                    gives us the base to offer full service to south and central Texas as well. Our ability to ship
+                    poultry equipment and supplies anywhere also expands our market area.
+                  </p>
                 </motion.div>
-              ))}
-            </motion.div>
-          </motion.div>
-        </Section>
+              </motion.div>
 
-        {/* ==================== Our Commitments ==================== */}
-        <Section className="mb-24">
-          <SectionHeader
-            label="What We Stand For"
-            title="Our "
-            titleHighlight="Commitments"
-            description="Customer satisfaction is job one. We back that promise with top quality equipment, a well-trained service team, and the ability to ship anywhere in the world."
-          />
+              {/* Timeline */}
+              <motion.div variants={contentStagger}>
+                {TIMELINE.map(({ year, title, desc }) => (
+                  <motion.div
+                    key={year}
+                    variants={reveal}
+                    className="flex flex-col sm:flex-row gap-3 sm:gap-6 md:gap-8 py-5 sm:py-7 md:py-9 border-t border-mid/15 last:border-b last:border-mid/15"
+                  >
+                    <div className="flex-shrink-0 sm:w-14">
+                      <span className="font-display text-xl sm:text-2xl text-rust leading-none">{year}</span>
+                    </div>
+                    <div className="flex-1">
+                      <strong className="font-label text-xs sm:text-sm font-bold tracking-[1px] uppercase text-nav-text block mb-1.5">{title}</strong>
+                      <p className="text-sm sm:text-base leading-relaxed text-muted font-light m-0">{desc}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </motion.div>
+            </div>
+          </Section>
 
-          {PILLARS.map(({ number, title, desc }) => (
-            <motion.div
-              key={number}
-              variants={reveal}
-              className="flex gap-8 py-10 border-t border-mid/15 last:border-b last:border-mid/15"
-            >
-              <div className="flex-shrink-0 w-14">
-                <span className="font-display text-5xl text-nav-text leading-none">{number}</span>
-              </div>
-              <div className="flex-1">
-                <h3 className="font-label text-3xl font-bold tracking-[2px] uppercase text-nav-text mb-4">{title}</h3>
-                <p className="text-lg leading-relaxed text-muted font-light m-0">{desc}</p>
-              </div>
-            </motion.div>
-          ))}
-        </Section>
+          {/* ==================== Our Commitments ==================== */}
+          <Section className="mb-18 sm:mb-22 md:mb-26 lg:mb-28">
+            <SectionHeader
+              label="What We Stand For"
+              title="Our "
+              titleHighlight="Commitments"
+              description="Customer satisfaction is job one. We back that promise with top quality equipment, a well-trained service team, and the ability to ship anywhere in the world."
+            />
 
-        {/* ==================== Our Inventory ==================== */}
-        <Section>
-          <SectionHeader
-            label="What We Carry"
-            title="More Than Just "
-            titleHighlight="Poultry"
-            description="Our inventory goes well beyond what our name implies. From industrial motors to farm retail goods, East Texas Poultry Supply is a full-service supplier for your operation."
-          />
-
-          <motion.div
-            variants={contentStagger}
-            className="grid gap-4"
-            style={{ gridTemplateColumns: "repeat(3, 1fr)" }}
-          >
-            {INVENTORY.map(({ number, title, desc }) => (
+            {PILLARS.map(({ number, title, desc }) => (
               <motion.div
                 key={number}
                 variants={reveal}
-                className="bg-white border border-mid/15 border-l-2 border-l-rust p-7"
+                className="flex flex-col sm:flex-row gap-4 sm:gap-6 md:gap-8 py-6 sm:py-8 md:py-10 border-t border-mid/15 last:border-b last:border-mid/15"
               >
-                <div className="font-display text-2xl text-rust leading-none mb-4 select-none">{number}</div>
-                <h4 className="font-label text-sm font-bold tracking-[1px] uppercase text-nav-text mb-2">{title}</h4>
-                <p className="text-sm leading-relaxed text-muted font-light m-0">{desc}</p>
+                <div className="flex-shrink-0 sm:w-14">
+                  <span className="font-display text-3xl sm:text-4xl md:text-5xl text-nav-text leading-none">{number}</span>
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-label text-xl sm:text-2xl md:text-3xl font-bold tracking-[1px] sm:tracking-[2px] uppercase text-nav-text mb-3 sm:mb-4">{title}</h3>
+                  <p className="text-base sm:text-lg leading-relaxed text-muted font-light m-0">{desc}</p>
+                </div>
               </motion.div>
             ))}
-          </motion.div>
+          </Section>
 
-          <motion.div variants={reveal} className="mt-12 border-t border-mid/20 pt-10">
-            <p className="text-sm leading-relaxed text-muted font-light max-w-3xl">
-              Call us for quotes on new construction, refurbishing older houses, or equipment purchases.
-              You will be pleased with our prices and service.
-            </p>
+          {/* ==================== Our Inventory ==================== */}
+          <Section>
+            <SectionHeader
+              label="What We Carry"
+              title="More Than Just "
+              titleHighlight="Poultry"
+              description="Our inventory goes well beyond what our name implies. From industrial motors to farm retail goods, East Texas Poultry Supply is a full-service supplier for your operation."
+            />
+
+            <motion.div
+              variants={contentStagger}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-7"
+            >
+              {INVENTORY.map(({ number, title, desc }) => (
+                <motion.div
+                  key={number}
+                  variants={reveal}
+                  className="bg-white border border-mid/15 border-l-2 border-l-rust p-5 sm:p-6 md:p-7"
+                >
+                  <div className="font-display text-xl sm:text-2xl text-rust leading-none mb-3 sm:mb-4 select-none">{number}</div>
+                  <h4 className="font-label text-xs sm:text-sm font-bold tracking-[1px] uppercase text-nav-text mb-2">{title}</h4>
+                  <p className="text-xs sm:text-sm leading-relaxed text-muted font-light m-0">{desc}</p>
+                </motion.div>
+              ))}
+            </motion.div>
+
+            <motion.div variants={reveal} className="mt-8 sm:mt-10 md:mt-12 border-t border-mid/20 pt-8 sm:pt-10">
+              <p className="text-xs sm:text-sm leading-relaxed text-muted font-light max-w-3xl">
+                Call us for quotes on new construction, refurbishing older houses, or equipment purchases.
+                You will be pleased with our prices and service.
+              </p>
+            </motion.div>
+          </Section>
+        </div>
+
+        {/* ==================== CTA ==================== */}
+        <Section className="bg-white border-t border-mid/15 px-6 sm:px-10 md:px-14 lg:px-24 py-10 sm:py-14 md:py-18 lg:py-20 flex flex-col sm:flex-row items-center justify-between gap-6 sm:gap-8">
+          <motion.div variants={reveal} className="text-center sm:text-left">
+            <p className="font-bold text-base sm:text-lg tracking-[2px] sm:tracking-[3px] uppercase text-rust mb-2">Get Started</p>
+            <h3 className="font-display text-xl sm:text-2xl md:text-3xl text-nav-text leading-tight sm:leading-none">Ready to work with us?</h3>
+          </motion.div>
+          <motion.div variants={reveal} className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
+            <a
+              href="/support/contact"
+              className="inline-block transition-all duration-200 bg-rust text-white px-6 sm:px-8 py-2.5 sm:py-3.5 font-label font-bold text-xs tracking-[2px] sm:tracking-[3px] uppercase border-2 border-rust hover:bg-rust-dark hover:border-rust-dark text-center w-full sm:w-auto"
+            >
+              Contact Us
+            </a>
+            <a
+              href="/products"
+              className="inline-block transition-all duration-200 text-nav-text px-6 sm:px-8 py-2.5 sm:py-3.5 font-label font-bold text-xs tracking-[2px] sm:tracking-[3px] uppercase border-2 border-mid hover:border-rust hover:text-rust text-center w-full sm:w-auto"
+            >
+              Browse Products
+            </a>
           </motion.div>
         </Section>
-
       </div>
-
-      {/* ==================== CTA ==================== */}
-      <Section className="bg-white border-t border-mid/15 px-20 py-16 flex items-center justify-between">
-        <motion.div variants={reveal}>
-          <p className="font-bold text-lg tracking-[3px] uppercase text-rust mb-2">Get Started</p>
-          <h3 className="font-display text-3xl text-nav-text leading-none">Ready to work with us?</h3>
-        </motion.div>
-        <motion.div variants={reveal} className="flex gap-4">
-          <a
-            href="/contact"
-            className="inline-block transition-all duration-200 bg-rust text-white px-8 py-3.5 font-label font-bold text-xs tracking-[3px] uppercase border-2 border-rust hover:bg-rust-dark hover:border-rust-dark"
-          >
-            Contact Us
-          </a>
-          <a
-            href="/products"
-            className="inline-block transition-all duration-200 text-nav-text px-8 py-3.5 font-label font-bold text-xs tracking-[3px] uppercase border-2 border-mid hover:border-rust hover:text-rust"
-          >
-            Browse Products
-          </a>
-        </motion.div>
-      </Section>
-
     </main>
   )
 }
