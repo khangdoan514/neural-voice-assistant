@@ -43,11 +43,11 @@ function SectionHeader({ label, title, titleHighlight, description = "" }) {
           <span className="block w-8 h-0.5 bg-rust" />
           {label}
         </motion.div>
-        <motion.h2 variants={reveal} className="font-display text-title leading-none text-nav-text">
+        <motion.h2 variants={reveal} className="font-display text-title leading-none text-nav-text text-2xl sm:text-3xl md:text-4xl lg:text-5xl">
           {title} {titleHighlight && <span className="text-rust">{titleHighlight}</span>}
         </motion.h2>
       </motion.div>
-      <motion.p variants={reveal} className="text-md text-muted leading-relaxed mb-16 font-light">
+      <motion.p variants={reveal} className="text-sm sm:text-md text-muted leading-relaxed mb-8 sm:mb-12 md:mb-16 font-light">
         {description}
       </motion.p>
     </>
@@ -115,123 +115,123 @@ export default function Privacy() {
   ]
 
   return (
-    <main className="bg-barn min-h-screen pt-16">
+    <main className="bg-barn min-h-screen pt-16 overflow-x-hidden">
+      <div className="max-w-full overflow-x-hidden">
 
-      {/* ==================== Page Header ==================== */}
-      <div className="bg-nav-text py-20 px-20 relative overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none opacity-[0.04] bg-[linear-gradient(rgba(255,255,255,1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,1)_1px,transparent_1px)] bg-[size:40px_40px]"/>
-        <motion.div
-          className="relative"
-          variants={sectionStagger}
-          initial="hidden"
-          animate="visible"
-        >
-          <motion.div variants={reveal} className="flex items-center gap-3 mb-5 font-label text-section-label font-bold tracking-[4px] uppercase text-rust">
-            <span className="block w-8 h-0.5 bg-rust" />
-            Legal
-          </motion.div>
-          <motion.h1 variants={reveal} className="font-display text-hero leading-[0.92] text-white mb-4">
-            Terms &amp; <span className="text-rust">Privacy</span>
-          </motion.h1>
-          <motion.p variants={reveal} className="font-label text-md tracking-[3px] uppercase text-white/40 mt-4">
-            Last updated: March, 2026 · East Texas Poultry Supply
-          </motion.p>
-        </motion.div>
-      </div>
-
-      <div className="px-20 py-20">
-
-        {/* ==================== Terms & Conditions ==================== */}
-        <Section className="mb-24">
-          <SectionHeader
-            label="Section One"
-            title="Terms & "
-            titleHighlight="Conditions"
-            description="Your privacy is very important to us. Accordingly, we have developed this Policy in order for you to understand how we collect, use, communicate, disclose, and make use of personal information. The following outlines our privacy policy."
-          />
-
-          {TERMS.map(({ number, title, content, items }) => (
-            <motion.div
-              key={number}
-              variants={reveal}
-              className="flex gap-8 py-10 border-t border-mid/15 last:border-b last:border-mid/15"
-            >
-              <div className="flex-shrink-0 w-14">
-                <span className="font-display text-5xl text-nav-text leading-none">{number}</span>
-              </div>
-              <div className="flex-1">
-                <h3 className="font-label text-3xl font-bold tracking-[2px] uppercase text-nav-text mb-4">{title}</h3>
-                {content && (
-                  <p className="text-lg leading-relaxed text-muted font-light m-0">{content}</p>
-                )}
-                {items && (
-                  <ul className="flex flex-col gap-3 list-none p-0 m-0">
-                    {items.map((item, j) => (
-                      <li key={j} className="flex gap-4 text-lg leading-relaxed text-muted font-light">
-                        <span className="block w-4 h-px bg-muted/40 mt-3 flex-shrink-0" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </motion.div>
-          ))}
-        </Section>
-
-        {/* ==================== Privacy Policy ==================== */}
-        <Section>
-          <SectionHeader
-            label="Section Two"
-            title="Privacy "
-            titleHighlight="Policy"
-            description="Your privacy is very important to us. Accordingly, we have developed this Policy in order for you to understand how we collect, use, communicate, disclose, and make use of personal information. The following outlines our privacy policy."
-          />
-
+        {/* ==================== Page Header ==================== */}
+        <div className="bg-nav-text py-14 sm:py-18 md:py-22 lg:py-24 px-6 sm:px-10 md:px-14 lg:px-24 relative overflow-hidden">
+          <div className="absolute inset-0 pointer-events-none opacity-[0.04] bg-[linear-gradient(rgba(255,255,255,1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,1)_1px,transparent_1px)] bg-[size:40px_40px]"/>
           <motion.div
-            variants={contentStagger}
-            className="grid gap-4"
-            style={{ gridTemplateColumns: "repeat(3, 1fr)" }}
+            className="relative"
+            variants={sectionStagger}
+            initial="hidden"
+            animate="visible"
           >
-            {PRIVACY_PRINCIPLES.map((principle, i) => (
+            <motion.div variants={reveal} className="flex items-center gap-3 mb-5 font-label text-section-label font-bold tracking-[4px] uppercase text-rust">
+              <span className="block w-8 h-0.5 bg-rust" />
+              Legal
+            </motion.div>
+            <motion.h1 variants={reveal} className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-hero leading-[1.1] sm:leading-[0.92] text-white mb-4">
+              Terms &amp; <span className="text-rust">Privacy</span>
+            </motion.h1>
+            <motion.p variants={reveal} className="font-label text-xs sm:text-sm md:text-md tracking-[2px] sm:tracking-[3px] uppercase text-white/40 mt-4">
+              Last updated: April, 2026 · East Texas Poultry Supply
+            </motion.p>
+          </motion.div>
+        </div>
+
+        <div className="px-6 sm:px-10 md:px-14 lg:px-24 py-14 sm:py-18 md:py-22 lg:py-24">
+
+          {/* ==================== Terms & Conditions ==================== */}
+          <Section className="mb-18 sm:mb-22 md:mb-26 lg:mb-28">
+            <SectionHeader
+              label="Section One"
+              title="Terms & "
+              titleHighlight="Conditions"
+              description="Your privacy is very important to us. Accordingly, we have developed this Policy in order for you to understand how we collect, use, communicate, disclose, and make use of personal information. The following outlines our privacy policy."
+            />
+
+            {TERMS.map(({ number, title, content, items }) => (
               <motion.div
-                key={i}
+                key={number}
                 variants={reveal}
-                className="bg-white border border-mid/15 border-l-2 border-l-rust p-7"
+                className="flex flex-col sm:flex-row gap-4 sm:gap-6 md:gap-8 py-6 sm:py-8 md:py-10 border-t border-mid/15 last:border-b last:border-mid/15"
               >
-                <div className="font-display text-2xl text-rust leading-none mb-4 select-none">
-                  {String(i + 1).padStart(2, "0")}
+                <div className="flex-shrink-0 sm:w-14">
+                  <span className="font-display text-3xl sm:text-4xl md:text-5xl text-nav-text leading-none">{number}</span>
                 </div>
-                <p className="text-sm leading-relaxed text-muted font-light m-0">{principle}</p>
+                <div className="flex-1">
+                  <h3 className="font-label text-xl sm:text-2xl md:text-3xl font-bold tracking-[1px] sm:tracking-[2px] uppercase text-nav-text mb-3 sm:mb-4">{title}</h3>
+                  {content && (
+                    <p className="text-base sm:text-lg leading-relaxed text-muted font-light m-0">{content}</p>
+                  )}
+                  {items && (
+                    <ul className="flex flex-col gap-2 sm:gap-3 list-none p-0 m-0">
+                      {items.map((item, j) => (
+                        <li key={j} className="flex gap-3 sm:gap-4 text-base sm:text-lg leading-relaxed text-muted font-light">
+                          <span className="block w-3 sm:w-4 h-px bg-muted/40 mt-3 flex-shrink-0" />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
               </motion.div>
             ))}
-          </motion.div>
+          </Section>
 
-          <motion.div variants={reveal} className="mt-12 border-t border-mid/20 pt-10">
-            <p className="text-sm leading-relaxed text-muted font-light max-w-3xl">
-              We are committed to conducting our business in accordance with these principles in order to
-              ensure that the confidentiality of personal information is protected and maintained.
-            </p>
+          {/* ==================== Privacy Policy ==================== */}
+          <Section>
+            <SectionHeader
+              label="Section Two"
+              title="Privacy "
+              titleHighlight="Policy"
+              description="Your privacy is very important to us. Accordingly, we have developed this Policy in order for you to understand how we collect, use, communicate, disclose, and make use of personal information. The following outlines our privacy policy."
+            />
+
+            <motion.div
+              variants={contentStagger}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-7"
+            >
+              {PRIVACY_PRINCIPLES.map((principle, i) => (
+                <motion.div
+                  key={i}
+                  variants={reveal}
+                  className="bg-white border border-mid/15 border-l-2 border-l-rust p-5 sm:p-6 md:p-7"
+                >
+                  <div className="font-display text-xl sm:text-2xl text-rust leading-none mb-3 sm:mb-4 select-none">
+                    {String(i + 1).padStart(2, "0")}
+                  </div>
+                  <p className="text-xs sm:text-sm leading-relaxed text-muted font-light m-0">{principle}</p>
+                </motion.div>
+              ))}
+            </motion.div>
+
+            <motion.div variants={reveal} className="mt-8 sm:mt-10 md:mt-12 border-t border-mid/20 pt-8 sm:pt-10">
+              <p className="text-xs sm:text-sm leading-relaxed text-muted font-light max-w-3xl">
+                We are committed to conducting our business in accordance with these principles in order to
+                ensure that the confidentiality of personal information is protected and maintained.
+              </p>
+            </motion.div>
+          </Section>
+        </div>
+
+        {/* ==================== CTA ==================== */}
+        <Section className="bg-white border-t border-mid/15 px-6 sm:px-10 md:px-14 lg:px-24 py-10 sm:py-14 md:py-18 lg:py-20 flex flex-col sm:flex-row items-center justify-between gap-6 sm:gap-8">
+          <motion.div variants={reveal} className="text-center sm:text-left">
+            <p className="font-bold text-base sm:text-lg tracking-[2px] sm:tracking-[3px] uppercase text-rust mb-2">Questions?</p>
+            <h3 className="font-display text-xl sm:text-2xl md:text-3xl text-nav-text leading-tight sm:leading-none">Get in touch with our team.</h3>
+          </motion.div>
+          <motion.div variants={reveal} className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
+            <a
+              href="/support/contact"
+              className="inline-block transition-all duration-200 bg-rust text-white px-6 sm:px-8 py-2.5 sm:py-3.5 font-label font-bold text-xs tracking-[2px] sm:tracking-[3px] uppercase border-2 border-rust hover:bg-rust-dark hover:border-rust-dark text-center w-full sm:w-auto"
+            >
+              Contact Us
+            </a>
           </motion.div>
         </Section>
-
       </div>
-
-      {/* ==================== Contact CTA ==================== */}
-      <Section className="bg-white border-t border-mid/15 px-20 py-16 flex items-center justify-between">
-        <motion.div variants={reveal}>
-          <p className="font-bold text-lg tracking-[3px] uppercase text-rust mb-2">Questions?</p>
-          <h3 className="font-display text-3xl text-nav-text leading-none">Get in touch with our team.</h3>
-        </motion.div>
-        <motion.a
-          variants={reveal}
-          href="/contact"
-          className="inline-block transition-all duration-200 bg-rust text-white px-8 py-3.5 font-label font-bold text-xs tracking-[3px] uppercase border-2 border-rust hover:bg-rust-dark hover:border-rust-dark"
-        >
-          Contact Us
-        </motion.a>
-      </Section>
-
     </main>
   )
 }
