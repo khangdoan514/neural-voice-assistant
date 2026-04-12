@@ -39,19 +39,48 @@ export default function Login() {
       setIsLoading(true)
       setErrors({})
       
-      // Simulate API call
-      setTimeout(() => {
-        // For demo purposes - replace with actual API call
-        if (formData.email === "admin@etpoultry.com" && formData.password === "admin123") {
+      try {
+        // API call to Flask
+        const response = await fetch('http://localhost:5001/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password
+          })
+        })
+
+        const data = await response.json()
+
+        if (response.ok && data.success) {
           // Successful login
-          localStorage.setItem("isAuthenticated", "true")
-          localStorage.setItem("user", JSON.stringify({ email: formData.email, role: "admin" }))
-          navigate("/admin")
+          if (formData.rememberMe) {
+            localStorage.setItem("accessToken", data.access_token)
+            localStorage.setItem("refreshToken", data.refresh_token)
+            localStorage.setItem("user", JSON.stringify(data.user))
+          } else {
+            sessionStorage.setItem("accessToken", data.access_token)
+            sessionStorage.setItem("refreshToken", data.refresh_token)
+            sessionStorage.setItem("user", JSON.stringify(data.user))
+          }
+          
+          // Redirect based on role
+          if (data.user.role === "admin") {
+            navigate("/admin")
+          } else {
+            navigate("/dashboard")
+          }
         } else {
-          setErrors({ general: "Invalid email or password" })
+          setErrors({ general: data.error || "Invalid email or password" })
         }
+      } catch (error) {
+        console.error("Login error:", error)
+        setErrors({ general: "Unable to connect to server. Please try again." })
+      } finally {
         setIsLoading(false)
-      }, 1500)
+      }
     } else {
       setErrors(newErrors)
     }
@@ -189,13 +218,6 @@ export default function Login() {
                 "Sign In"
               )}
             </button>
-          </div>
-
-          {/* Demo Credentials */}
-          <div className="text-center">
-            <p className="text-xs text-muted">
-              Demo: admin@etpoultry.com / admin123
-            </p>
           </div>
         </form>
 

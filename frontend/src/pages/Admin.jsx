@@ -20,6 +20,13 @@ export default function Admin() {
   const navigate = useNavigate()
 
   useEffect(() => {
+    // Conversations array
+    if (!Array.isArray(conversations)) {
+      setConversations([])
+    }
+  }, [conversations])
+
+  useEffect(() => {
     // Check if user is authenticated
     const isAuthenticated = localStorage.getItem("isAuthenticated")
     if (!isAuthenticated) {
@@ -38,7 +45,15 @@ export default function Admin() {
     setError('')
     try {
       const response = await api.get('/api/conversations')
-      setConversations(response.data)
+      
+      if (Array.isArray(response.data)) {
+        setConversations(response.data)
+      } else if (response.data && typeof response.data === 'object') {
+        const arr = Object.values(response.data)
+        setConversations(Array.isArray(arr) ? arr : [])
+      } else {
+        setConversations([])
+      }
     } catch (err) {
       setError('Failed to load conversations')
       console.error(err)
@@ -142,7 +157,7 @@ export default function Admin() {
                 </div>
               ) : (
                 <div className="space-y-2 max-h-[600px] overflow-y-auto pr-2">
-                  {conversations.map((conv) => (
+                  {Array.isArray(conversations) && conversations.map((conv) => (
                     <button
                       key={conv.name}
                       onClick={() => fetchConversationContent(conv.name)}
@@ -173,7 +188,7 @@ export default function Admin() {
                     </button>
                   ))}
                   
-                  {conversations.length === 0 && !isLoading && (
+                  {(!conversations || conversations.length === 0) && !isLoading && (
                     <p className="text-muted text-sm text-center py-8">
                       No conversation files found
                     </p>
