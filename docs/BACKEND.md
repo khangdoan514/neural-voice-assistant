@@ -32,19 +32,37 @@ source ../venv/bin/activate
 pip install -r ../requirements.txt
 ```
 
-### **6. Restart backend with PM2**
+### **6. Start backend with PM2**
+
+```bash
+pm2 start main.py --name "backend" --interpreter python3
+```
+
+### **7. Save PM2 configuration**
+
+```bash
+pm2 save
+```
+
+### **8. Set up PM2 to start on boot**
+
+```bash
+pm2 startup
+```
+
+### **9. Restart backend with PM2**
 
 ```bash
 pm2 restart backend
 ```
 
-### **7. Verify backend is running**
+### **10. Verify backend is running**
 
 ```bash
 pm2 status
 ```
 
-### **8. Test API endpoint**
+### **11. Test API endpoint**
 
 ```bash
 curl https://etpoultry.com/api/conversations

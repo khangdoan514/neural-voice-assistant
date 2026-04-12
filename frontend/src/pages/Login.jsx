@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline"
+import { useLogin } from "../hooks/login.js"
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false)
@@ -9,80 +10,22 @@ export default function Login() {
     password: "",
     rememberMe: false
   })
-  const [errors, setErrors] = useState({})
-  const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
-
-  const validateForm = () => {
-    const newErrors = {}
-    
-    if (!formData.email) {
-      newErrors.email = "Email is required"
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Email is invalid"
-    }
-    
-    if (!formData.password) {
-      newErrors.password = "Password is required"
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters"
-    }
-    
-    return newErrors
-  }
+  
+  // Use hook
+  const { login, isLoading, errors, clearFieldError } = useLogin()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const newErrors = validateForm()
     
-    if (Object.keys(newErrors).length === 0) {
-      setIsLoading(true)
-      setErrors({})
-      
-      try {
-        // API call to Flask
-        const response = await fetch('http://localhost:5001/api/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: formData.email,
-            password: formData.password
-          })
-        })
-
-        const data = await response.json()
-
-        if (response.ok && data.success) {
-          // Successful login
-          if (formData.rememberMe) {
-            localStorage.setItem("accessToken", data.access_token)
-            localStorage.setItem("refreshToken", data.refresh_token)
-            localStorage.setItem("user", JSON.stringify(data.user))
-          } else {
-            sessionStorage.setItem("accessToken", data.access_token)
-            sessionStorage.setItem("refreshToken", data.refresh_token)
-            sessionStorage.setItem("user", JSON.stringify(data.user))
-          }
-          
-          // Redirect based on role
-          if (data.user.role === "admin") {
-            navigate("/admin")
-          } else {
-            navigate("/dashboard")
-          }
-        } else {
-          setErrors({ general: data.error || "Invalid email or password" })
-        }
-      } catch (error) {
-        console.error("Login error:", error)
-        setErrors({ general: "Unable to connect to server. Please try again." })
-      } finally {
-        setIsLoading(false)
+    const result = await login(formData.email, formData.password, formData.rememberMe)
+    
+    if (result.success) {
+      if (result.user.role === "admin") {
+        navigate("/admin")
+      } else {
+        navigate("/dashboard")
       }
-    } else {
-      setErrors(newErrors)
     }
   }
 
@@ -93,9 +36,7 @@ export default function Login() {
       [name]: type === "checkbox" ? checked : value
     }))
     // Clear error for this field when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: "" }))
-    }
+    clearFieldError(name)
   }
 
   return (

@@ -89,11 +89,5 @@ export const useLogin = () => {
     }
   }
 
-  return {
-    login,
-    isLoading,
-    errors,
-    clearErrors,
-    clearFieldError
-  }
+  return { login, isLoading, errors, clearErrors, clearFieldError }
 }
