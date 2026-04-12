@@ -41,7 +41,10 @@ def create_user(email: str, password_hash: str, role: str = 'user') -> Optional[
     return User.from_dict(dict(result))
 
 # Update user's last login timestamp
-def update_timestamp(user_id: int) -> None:
+def update_timestamp(user_id: Optional[int]) -> None:
+    if user_id is None:
+        return
+    
     conn = get_db_connection()
     cur = conn.cursor()
     

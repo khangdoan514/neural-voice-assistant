@@ -1,8 +1,13 @@
 from routes.call_routes import call_bp
 from routes.conversation_routes import conversation_bp
-from flask import Flask
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 import logging
+import jwt
+from datetime import datetime, timezone, timedelta
+from werkzeug.security import check_password_hash
+from database import find_user, update_timestamp
+from config import Config
 
 # Disable loggings
 logging.getLogger('werkzeug').disabled = True
@@ -11,8 +16,79 @@ logging.getLogger('flask.app').disabled = True
 # Initialize Flask app
 app = Flask(__name__)
 
-# Enable CORS for all routes
-CORS(app, origins=["http://localhost:3000", "http://127.0.0.1:3000"])
+# Validate configuration (will raise error if JWT_SECRET_KEY is missing)
+Config.validate()
+
+# Get config from Config class
+JWT_SECRET_KEY = Config.JWT_SECRET_KEY
+ALGORITHM = Config.ALGORITHM
+ACCESS_TOKEN_EXPIRE_MINUTES = Config.ACCESS_TOKEN_EXPIRE_MINUTES
+REFRESH_TOKEN_EXPIRE_DAYS = Config.REFRESH_TOKEN_EXPIRE_DAYS
+FRONTEND_URL = Config.FRONTEND_URL
+
+# Enable CORS
+CORS(app, origins=[
+    "http://localhost:3000", 
+    "http://127.0.0.1:3000",
+    FRONTEND_URL,
+    f"https://{FRONTEND_URL}",
+    f"http://{FRONTEND_URL}"
+])
+
+@app.route('/api/login', methods=['POST', 'OPTIONS'])
+def login():
+    if request.method == 'OPTIONS':
+        return '', 200
+    
+    try:
+        data = request.get_json()
+        email = data.get('email')
+        password = data.get('password')
+        
+        if not email or not password:
+            return jsonify({"error": "Email and password required"}), 400
+        
+        # Find user in database
+        user = find_user(email)
+        
+        # Check user and password_hash
+        if not user or not user.password_hash:
+            return jsonify({"error": "Invalid email or password"}), 401
+        
+        # String password_hash
+        if not check_password_hash(user.password_hash, password):
+            return jsonify({"error": "Invalid email or password"}), 401
+        
+        # Update last login
+        update_timestamp(user.id)
+        
+        # Create tokens
+        access_token = jwt.encode({
+            'user_id': user.id,
+            'email': user.email,
+            'role': user.role,
+            'exp': datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        }, JWT_SECRET_KEY, algorithm=ALGORITHM) # type: ignore
+        
+        refresh_token = jwt.encode({
+            'user_id': user.id,
+            'exp': datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+        }, JWT_SECRET_KEY, algorithm=ALGORITHM) # type: ignore
+        
+        return jsonify({
+            "success": True,
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+            "user": {
+                "id": user.id,
+                "email": user.email,
+                "role": user.role
+            }
+        }), 200
+        
+    except Exception as e:
+        print(f"Login error: {e}")
+        return jsonify({"error": "Internal server error"}), 500
 
 # Register blueprints
 app.register_blueprint(call_bp, url_prefix='/twilio')

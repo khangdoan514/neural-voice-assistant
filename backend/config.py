@@ -9,6 +9,13 @@ class Config:
     TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
     TWILIO_PHONE_NUMBER = os.getenv("TWILIO_PHONE_NUMBER")
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+    
+    # JWT Configuration
+    JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+    ALGORITHM = os.getenv("ALGORITHM", "HS256")
+    ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "15"))
+    REFRESH_TOKEN_EXPIRE_DAYS = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", "7"))
+    FRONTEND_URL = os.getenv("FRONTEND_URL", "https://etpoultry.com")
 
     # Application Settings
     RECORDING_TIMEOUT = 4 # seconds
@@ -30,7 +37,8 @@ class Config:
             "TWILIO_ACCOUNT_SID": cls.TWILIO_ACCOUNT_SID,
             "TWILIO_AUTH_TOKEN": cls.TWILIO_AUTH_TOKEN,
             "TWILIO_PHONE_NUMBER": cls.TWILIO_PHONE_NUMBER,
-            "OPENAI_API_KEY": cls.OPENAI_API_KEY
+            "OPENAI_API_KEY": cls.OPENAI_API_KEY,
+            "JWT_SECRET_KEY": cls.JWT_SECRET_KEY
         }
         
         missing = [key for key, value in required.items() if not value]
