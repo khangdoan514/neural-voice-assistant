@@ -19,17 +19,12 @@ export default function Admin() {
   const [error, setError] = useState('')
   const navigate = useNavigate()
 
+  // Check authentication
   useEffect(() => {
-    // Conversations array
-    if (!Array.isArray(conversations)) {
-      setConversations([])
-    }
-  }, [conversations])
-
-  useEffect(() => {
-    // Check if user is authenticated
-    const isAuthenticated = localStorage.getItem("isAuthenticated")
-    if (!isAuthenticated) {
+    const accessToken = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken")
+    const user = localStorage.getItem("user") || sessionStorage.getItem("user")
+    
+    if (!accessToken || !user) {
       navigate("/login")
     }
   }, [navigate])
@@ -88,8 +83,13 @@ export default function Admin() {
   }
 
   const handleLogout = () => {
-    localStorage.removeItem("isAuthenticated")
+    // Clear all auth data
+    localStorage.removeItem("accessToken")
+    localStorage.removeItem("refreshToken")
     localStorage.removeItem("user")
+    sessionStorage.removeItem("accessToken")
+    sessionStorage.removeItem("refreshToken")
+    sessionStorage.removeItem("user")
     navigate("/login")
   }
 
