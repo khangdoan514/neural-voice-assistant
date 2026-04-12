@@ -208,3 +208,27 @@ __marimo__/
 
 # Ensure .gitignore uses LF endings, even on Windows
 .gitignore text eol=lf
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+logs/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment variables (already have .env but adding .env.local)
+.env.local
+.env.production
+
+# JWT secrets file (if you ever save one)
+.secret
+*.key
+*.pem
