@@ -39,19 +39,19 @@ function Section({ children, className = "", style }) {
   )
 }
 
-function SectionHeader({ label, title, titleHighlight, description = "", className = "" }) {
+function SectionHeader({ label, title, titleHighlight, description = "" }) {
   return (
     <>
-      <motion.div variants={reveal} className={`mb-4 ${className}`}>
-        <div className="flex items-center gap-3 mb-5 font-label font-section-label font-bold tracking-[4px] uppercase text-rust">
+      <motion.div variants={reveal} className="mb-4">
+        <motion.div variants={reveal} className="flex items-center gap-3 mb-5 font-label font-section-label font-bold tracking-[4px] uppercase text-rust">
           <span className="block w-8 h-0.5 bg-rust" />
           {label}
-        </div>
-        <h2 className="font-display text-title leading-none text-nav-text">
+        </motion.div>
+        <motion.h2 variants={reveal} className="font-display text-title leading-none text-nav-text text-2xl sm:text-3xl md:text-4xl lg:text-5xl">
           {title} {titleHighlight && <span className="text-rust">{titleHighlight}</span>}
-        </h2>
+        </motion.h2>
       </motion.div>
-      <motion.p variants={reveal} className="text-md text-muted leading-relaxed mb-16 font-light">
+      <motion.p variants={reveal} className="text-sm sm:text-md text-muted leading-relaxed mb-8 sm:mb-12 md:mb-16 font-light">
         {description}
       </motion.p>
     </>
@@ -79,7 +79,7 @@ function PrimaryButton({ to, children }) {
   return (
     <Link
       to={to}
-      className="inline-block no-underline transition-all duration-200 bg-rust text-white px-8 py-3.5 font-label font-bold text-body tracking-[2px] uppercase border-2 border-rust hover:bg-rust-dark hover:border-rust-dark hover:-translate-y-0.5 hover:shadow-lg"
+      className="inline-block w-full sm:w-auto text-center no-underline transition-all duration-200 bg-rust text-white px-6 sm:px-8 py-3 sm:py-3.5 font-label font-bold text-xs sm:text-body tracking-[2px] uppercase border-2 border-rust hover:bg-rust-dark hover:border-rust-dark hover:-translate-y-0.5 hover:shadow-lg"
     >
       {children}
     </Link>
@@ -90,7 +90,7 @@ function OutlineButton({ to, children }) {
   return (
     <Link
       to={to}
-      className="inline-block no-underline transition-all duration-200 bg-white text-nav-text px-8 py-3.5 font-label font-bold text-body tracking-[2px] uppercase border-1 border-nav-text hover:border-rust hover:text-rust"
+      className="inline-block w-full sm:w-auto text-center no-underline transition-all duration-200 bg-white text-nav-text px-6 sm:px-8 py-3 sm:py-3.5 font-label font-bold text-xs sm:text-body tracking-[2px] uppercase border-1 border-nav-text hover:border-rust hover:text-rust"
     >
       {children}
     </Link>
@@ -99,21 +99,52 @@ function OutlineButton({ to, children }) {
 
 // ============================== Hero ==============================
 function Hero() {
+  const [currentSlide, setCurrentSlide] = useState(0)
+
   const STATS = [
     ["75+", "Years in Business"],
     ["2", "Locations"],
     ["100s", "Farms Served"]
   ];
 
-  const HERO_MOSAIC = [
-    { label: "Something", bg: "linear-gradient(135deg,#2C2010,#1A1208)" },
-    { label: "Poultry Farming", bg: "linear-gradient(135deg,#2C2010,#1A1208)" },
-    { label: "Feeding Systems", bg: "linear-gradient(135deg,#3A2A18,#221A10)" },
-    { label: "Equipment Service", bg: "linear-gradient(135deg,#281E12,#1C140C)" },
+  const DEFAULT_HERO_MOSAIC = [
+    { label: "Farm Setup", image: "", bg: "linear-gradient(135deg,#2C2010,#1A1208)" },
+    { label: "Poultry Farming", image: "", bg: "linear-gradient(135deg,#2C2010,#1A1208)" },
+    { label: "Feeding Systems", image: "", bg: "linear-gradient(135deg,#3A2A18,#221A10)" },
+    { label: "Equipment Service", image: "", bg: "linear-gradient(135deg,#281E12,#1C140C)" },
   ];
+  const [heroMosaic, setHeroMosaic] = useState(DEFAULT_HERO_MOSAIC)
+
+  useEffect(() => {
+    const savedHeroCards = localStorage.getItem("homeHeroCards")
+    if (!savedHeroCards) return
+
+    try {
+      const parsed = JSON.parse(savedHeroCards)
+      if (!Array.isArray(parsed) || parsed.length !== 4) return
+
+      setHeroMosaic(
+        parsed.map((card, index) => ({
+          ...DEFAULT_HERO_MOSAIC[index],
+          label: card.label || DEFAULT_HERO_MOSAIC[index].label,
+          image: card.image || "",
+        }))
+      )
+    } catch (err) {
+      console.error("Failed to parse Home hero cards", err)
+    }
+  }, [])
+
+  const handlePrevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + heroMosaic.length) % heroMosaic.length)
+  }
+
+  const handleNextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % heroMosaic.length)
+  }
 
   return (
-    <section className="relative min-h-screen grid pt-16 overflow-hidden bg-barn" style={{ gridTemplateColumns: "1fr 1fr" }}>
+    <section className="relative min-h-screen grid grid-cols-1 lg:grid-cols-2 pt-16 overflow-hidden bg-barn">
       {/* ==================== Background Effects ==================== */}
       <div
         className="absolute inset-0 pointer-events-none"
@@ -132,17 +163,17 @@ function Hero() {
 
       {/* ==================== Left - Content ==================== */}
       <motion.div
-        className="relative z-10 flex flex-col justify-center p-[clamp(1.5rem,5vw,5rem)]"
+        className="relative z-10 flex flex-col justify-center p-[clamp(1.25rem,4.5vw,5rem)]"
         variants={sectionStagger}
         initial="hidden"
         animate="visible"
       >
         <motion.div variants={reveal}>
-          <Label>Serving Poultry Growers Since 1958</Label>
+          <Label>Since 1958</Label>
         </motion.div>
 
         <motion.h1
-          className="font-display text-hero leading-[0.95] text-nav-text mb-3"
+          className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-hero leading-[1.05] sm:leading-[1] lg:leading-[0.95] text-nav-text mb-3"
           variants={reveal}
         >
           If It Goes In A{" "}
@@ -151,7 +182,7 @@ function Hero() {
         </motion.h1>
 
         <motion.p
-          className="font-display text-subtitle tracking-[4px] text-muted mb-4 mt-4"
+          className="font-display text-sm sm:text-base md:text-lg lg:text-subtitle tracking-[2px] sm:tracking-[3px] lg:tracking-[4px] text-muted mb-4 mt-4"
           variants={reveal}
         >
           East Texas · Louisiana · South &amp; Central Texas
@@ -167,7 +198,7 @@ function Hero() {
         </motion.p>
 
         <motion.div
-          className="flex gap-4 items-center mb-12"
+          className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center mb-10 sm:mb-12"
           variants={reveal}
         >
           <PrimaryButton to="/products">Browse Products</PrimaryButton>
@@ -176,7 +207,7 @@ function Hero() {
 
         {/* ==================== Stats ==================== */}
         <motion.div
-          className="flex gap-[clamp(1.5rem,4vw,2.5rem)] border-t border-mid/20 pt-[clamp(1.5rem,3vw,2rem)]"
+          className="flex flex-wrap gap-x-8 gap-y-4 sm:gap-[clamp(1.5rem,4vw,2.5rem)] border-t border-mid/20 pt-[clamp(1.25rem,3vw,2rem)]"
           variants={contentStagger}
         >
           {STATS.map(([num, label]) => (
@@ -190,24 +221,90 @@ function Hero() {
 
       {/* ==================== Right - Mosaic ==================== */}
       <motion.div
-        className="relative z-10 grid overflow-hidden gap-0.5"
-        style={{ gridTemplateColumns: "1fr 1fr", gridTemplateRows: "1fr 1fr" }}
+        className="relative z-10 overflow-hidden px-4 pb-6 sm:px-6 sm:pb-8 lg:px-0 lg:pb-0"
         variants={contentStagger}
         initial="hidden"
         animate="visible"
       >
-        {HERO_MOSAIC.map(({ label, bg }) => (
-          <motion.div
-            key={label}
-            className="relative flex items-center justify-center overflow-hidden"
-            style={{ background: bg }}
-            variants={reveal}
-          >
-            <span className="absolute bottom-3 left-3 font-label font-bold tracking-[2px] uppercase text-straw bg-nav-text/10 px-2 py-1 backdrop-blur-sm" style={{ fontSize: "var(--text-sm)" }}>
-              {label}
-            </span>
-          </motion.div>
-        ))}
+        {/* Mobile/Tablet: slider window */}
+        <div className="relative lg:hidden">
+          <div className="overflow-hidden">
+            <motion.div
+              className="flex"
+              animate={{ x: `-${currentSlide * 100}%` }}
+              transition={{ duration: 0.45, ease: "easeInOut" }}
+            >
+              {heroMosaic.map(({ label, image, bg }) => (
+                <motion.div
+                  key={label}
+                  className="relative w-full shrink-0 aspect-[4/3] sm:aspect-[5/3] overflow-hidden"
+                  style={{
+                    backgroundImage: image
+                      ? `linear-gradient(180deg,rgba(0,0,0,0.12),rgba(0,0,0,0.65)), url(${image})`
+                      : bg,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  }}
+                  variants={reveal}
+                >
+                  <span className="absolute bottom-3 left-3 font-label font-bold tracking-[2px] uppercase text-straw bg-nav-text/20 px-2 py-1 backdrop-blur-sm text-xs sm:text-sm">
+                    {label}
+                  </span>
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
+
+          <div className="flex items-center justify-between mt-3">
+            <button
+              type="button"
+              onClick={handlePrevSlide}
+              className="px-3 py-1.5 text-xs font-label font-bold tracking-[2px] uppercase border border-mid/40 text-nav-text hover:border-rust hover:text-rust transition-colors"
+            >
+              Prev
+            </button>
+            <div className="flex items-center gap-2">
+              {heroMosaic.map((_, index) => (
+                <button
+                  key={`dot-${index}`}
+                  type="button"
+                  onClick={() => setCurrentSlide(index)}
+                  className={`h-1.5 rounded-full transition-all ${currentSlide === index ? "w-6 bg-rust" : "w-2 bg-mid/40"}`}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={handleNextSlide}
+              className="px-3 py-1.5 text-xs font-label font-bold tracking-[2px] uppercase border border-mid/40 text-nav-text hover:border-rust hover:text-rust transition-colors"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+
+        {/* Desktop: keep 2x2 mosaic */}
+        <div className="hidden lg:grid lg:grid-cols-2 lg:grid-rows-2 gap-0.5 h-full">
+          {heroMosaic.map(({ label, image, bg }) => (
+            <motion.div
+              key={label}
+              className="relative flex items-center justify-center overflow-hidden"
+              style={{
+                backgroundImage: image
+                  ? `linear-gradient(180deg,rgba(0,0,0,0.12),rgba(0,0,0,0.65)), url(${image})`
+                  : bg,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }}
+              variants={reveal}
+            >
+              <span className="absolute bottom-3 left-3 font-label font-bold tracking-[2px] uppercase text-straw bg-nav-text/20 px-2 py-1 backdrop-blur-sm text-sm">
+                {label}
+              </span>
+            </motion.div>
+          ))}
+        </div>
       </motion.div>
     </section>
   );
@@ -224,12 +321,12 @@ function Marquee() {
   const items = [...MARQUEE_ITEMS, ...MARQUEE_ITEMS];
 
   return (
-    <div className="bg-rust py-4 overflow-hidden whitespace-nowrap">
+    <div className="bg-rust mb-18 sm:mb-22 md:mb-26 lg:mb-28 py-3 sm:py-4 overflow-hidden whitespace-nowrap">
       <div className="animate-marquee inline-block">
         {items.map((item, i) => (
           <span
             key={`${item}-${i}`}
-            className="font-label text-section-label tracking-[4px] text-white/90 px-10"
+            className="font-label text-xs sm:text-section-label tracking-[2px] sm:tracking-[4px] text-white/90 px-6 sm:px-10"
           >
             <span className="text-white/40">◆  </span>
             {item}
@@ -251,26 +348,27 @@ function About() {
 
   return (
     <Section
-      className="grid gap-[clamp(2rem,5vw,5rem)] items-center py-[clamp(3rem,8vw,6rem)] px-[clamp(1.5rem,5vw,5rem)] bg-barn"
-      style={{ gridTemplateColumns: "repeat(2,1fr)" }}
+      className="mb-18 sm:mb-22 md:mb-26 lg:mb-28 px-6 sm:px-10 md:px-14 lg:px-24"
     >
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-center">
       {/* ==================== Left - Story ==================== */}
       <motion.div variants={reveal}>
-        <Label>Our Story</Label>
-        <Title>
-          Built on <span className="text-rust">Trust.</span><br />
-          Proven Over <span className="text-rust">Decades.</span>
-        </Title>
+        <SectionHeader
+          label="Who We Are"
+          title="Built on "
+          titleHighlight="Trust"
+          description="East Texas Poultry Supply has helped poultry growers succeed for decades with quality equipment, dependable service, and deep regional experience."
+        />
 
-        <p className="leading-relaxed text-muted text-body font-light mb-5">
+        <p className="leading-relaxed text-muted text-sm sm:text-body font-light mb-5">
           <strong className="text-nav-text font-medium">East Texas Poultry Supply</strong> has proven their ability to help poultry growers achieve success for over half a century. We offer top quality equipment at competitive prices and have a well-trained service team ready to assist.
         </p>
 
-        <p className="leading-relaxed text-muted text-body font-light mb-5">
+        <p className="leading-relaxed text-muted text-sm sm:text-body font-light mb-5">
           Founded in Center, Texas in 1958, we've expanded to include a second location in Gonzales, Texas — allowing us to serve south, central, and north Texas, plus Louisiana.
         </p>
 
-        <p className="leading-relaxed text-muted text-body font-light mb-5">
+        <p className="leading-relaxed text-muted text-sm sm:text-body font-light mb-5">
           Beyond poultry, our retail store stocks water storage tanks, pressure pumps, HVAC motors, capacitors, drive belts, and bearings for farm or industrial use. <strong className="text-nav-text font-medium">We ship worldwide.</strong>
         </p>
 
@@ -288,20 +386,20 @@ function About() {
           <motion.div
             key={year}
             variants={reveal}
-            className="grid relative py-6"
-            style={{ gridTemplateColumns: "80px 1fr", gap: "24px" }}
+            className="grid grid-cols-1 sm:grid-cols-[80px_1fr] gap-3 sm:gap-6 relative py-5 sm:py-6"
           >
-            {index < TIMELINE.length && (
-              <div className="absolute left-[76px] top-0 bottom-0 w-0.5 bg-rust/20" />
+            {index < TIMELINE.length - 1 && (
+              <div className="hidden sm:block absolute left-[76px] top-0 bottom-0 w-0.5 bg-rust/20" />
             )}
-            <div className="font-display text-subtitle text-rust leading-none">{year}</div>
+            <div className="font-display text-2xl sm:text-subtitle text-rust leading-none">{year}</div>
             <div className="pt-1.5">
-              <strong className="text-section-label text-nav-text block mb-1">{title}</strong>
-              <div className="text-body">{desc}</div>
+              <strong className="text-xs sm:text-section-label text-nav-text block mb-1">{title}</strong>
+              <div className="text-sm sm:text-body text-muted">{desc}</div>
             </div>
           </motion.div>
         ))}
       </motion.div>
+      </div>
     </Section>
   );
 }
@@ -315,10 +413,10 @@ function Services() {
     { to: "/services/repair", title: "On-Farm Repair", desc: "We come to you. Our trained team provides on-site diagnostics and repair to minimize your downtime." },
   ];
 
-  const [hovered, setHovered] = useState(false)
+  const [hovered, setHovered] = useState(null)
 
   return (
-    <Section className="py-[clamp(3rem,8vw,6rem)] px-[clamp(1.5rem,5vw,5rem)] bg-barn">
+    <Section className="mb-18 sm:mb-22 md:mb-26 lg:mb-28 px-6 sm:px-10 md:px-14 lg:px-24">
       <SectionHeader
         label="What We Do"
         title="Our "
@@ -326,14 +424,14 @@ function Services() {
         description="Lorem ipsum dolor sit amet consectetur, adipisicing elit. Corporis dolorum ea mollitia eum quas! Ipsum quia ducimus reiciendis unde!"
       />
       <motion.div
-        className="grid grid-cols-4 gap-6"
+        className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-7"
         variants={contentStagger}
       >
         {SERVICES.map((service, index) => (
           <motion.div key={service.title} variants={reveal}>
             <Link to={service.to}>
               <div
-                className={`relative h-full overflow-hidden cursor-pointer transition-all duration-300 p-10 ${hovered === index ? "bg-white shadow-lg" : "bg-white"
+                className={`relative h-full overflow-hidden cursor-pointer transition-all duration-300 p-6 sm:p-8 md:p-10 ${hovered === index ? "bg-white shadow-lg" : "bg-white"
                   }`}
                 onMouseEnter={() => setHovered(index)}
                 onMouseLeave={() => setHovered(null)}
@@ -343,8 +441,8 @@ function Services() {
                     }`}
                 />
 
-                <h3 className="font-label text-xl font-bold tracking-[1px] uppercase text-nav-text mb-3">{service.title}</h3>
-                <p className="text-body leading-relaxed text-muted font-light">{service.desc}</p>
+                <h3 className="font-label text-lg sm:text-xl font-bold tracking-[1px] uppercase text-nav-text mb-3">{service.title}</h3>
+                <p className="text-sm sm:text-body leading-relaxed text-muted font-light">{service.desc}</p>
 
                 <div
                   className={`transition-all duration-300 mt-6 font-label text-sm font-bold tracking-[2px] uppercase ${hovered === index ? "opacity-100 text-rust" : "opacity-30"
@@ -379,7 +477,7 @@ function Products() {
   const [hovered, setHovered] = useState(null)
 
   return (
-    <Section className="bg-mid/5 py-[clamp(3rem,8vw,6rem)] px-[clamp(1.5rem,5vw,5rem)]">
+    <Section className="mb-18 sm:mb-22 md:mb-26 lg:mb-28 px-6 sm:px-10 md:px-14 lg:px-24">
       <SectionHeader
         label="What We Sell"
         title="Product "
@@ -387,14 +485,14 @@ function Products() {
         description="Lorem ipsum dolor sit amet consectetur, adipisicing elit. Corporis dolorum ea mollitia eum quas! Ipsum quia ducimus reiciendis unde!"
       />
       <motion.div
-        className="grid grid-cols-5 gap-6"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6 md:gap-7"
         variants={contentStagger}
       >
         {PRODUCTS.map((product, index) => (
           <motion.div key={product.name} variants={reveal}>
             <Link to={product.to}>
               <div
-                className={`relative h-full cursor-pointer transition-all duration-200 p-10 bg-white ${hovered === index
+                className={`relative h-full cursor-pointer transition-all duration-200 p-6 sm:p-8 md:p-10 bg-white ${hovered === index
                   ? "border border-rust -translate-y-1 shadow-lg"
                   : "border border-mid/20"
                   }`}
@@ -407,8 +505,8 @@ function Products() {
                   </span>
                 )}
 
-                <h3 className="font-label text-xl font-bold tracking-[1px] uppercase text-nav-text mb-2">{product.name}</h3>
-                <p className="text-body leading-relaxed text-muted font-light">{product.sub}</p>
+                <h3 className="font-label text-lg sm:text-xl font-bold tracking-[1px] uppercase text-nav-text mb-2">{product.name}</h3>
+                <p className="text-sm sm:text-body leading-relaxed text-muted font-light">{product.sub}</p>
 
                 <div
                     className={`transition-all duration-300 mt-6 font-label text-sm font-bold tracking-[2px] uppercase ${hovered === index ? "opacity-100 text-rust" : "opacity-30"
@@ -510,7 +608,7 @@ function Locations() {
   }
 
   return (
-    <Section className="bg-mid/5 py-[clamp(3rem,8vw,6rem)] px-[clamp(1.5rem,5vw,5rem)]">
+    <Section className="mb-18 sm:mb-22 md:mb-26 lg:mb-28 px-6 sm:px-10 md:px-14 lg:px-24">
       <SectionHeader
         label="Where We Operate"
         title="Two "
@@ -519,8 +617,7 @@ function Locations() {
       />
 
       <motion.div
-        className="grid gap-16 items-start"
-        style={{ gridTemplateColumns: "1fr 1fr" }}
+        className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-start"
         variants={contentStagger}
       >
         {/* ==================== Map ==================== */}
@@ -574,23 +671,23 @@ function Locations() {
 
         {/* ==================== Location Cards ==================== */}
         <motion.div variants={contentStagger}>
-          <div className="flex flex-col gap-8 mb-8">
+          <div className="flex flex-col gap-5 sm:gap-8 mb-6 sm:mb-8">
             {locations.map((location) => (
               <motion.div
                 key={location.id}
                 variants={reveal}
                 onClick={() => handleLocationClick(location.id)}
                 className={`
-                  border-l-3 p-8
+                  border-l-2 sm:border-l-3 p-5 sm:p-8
                   transition-all duration-300 cursor-pointer
                   ${selectedLocation === location.id
-                    ? 'border-rust-light bg-rust/10 shadow-lg scale-105'
-                    : 'border-rust bg-mid/5 hover:bg-rust/5 hover:scale-102'
+                    ? 'border-rust-light bg-rust/10 shadow-lg sm:scale-105'
+                    : 'border-rust bg-mid/5 hover:bg-rust/5'
                   }
                 `}
               >
                 <div className="flex justify-between items-start">
-                  <h4 className="font-bold text-xl tracking-[1px] uppercase text-nav-text mb-2">
+                  <h4 className="font-bold text-lg sm:text-xl tracking-[1px] uppercase text-nav-text mb-2">
                     {location.name}
                   </h4>
                   {selectedLocation === location.id && (
@@ -599,8 +696,8 @@ function Locations() {
                     </span>
                   )}
                 </div>
-                <p className="text-md text-muted mb-1">{location.address}</p>
-                <p className="text-md text-muted">{location.phone}</p>
+                <p className="text-sm sm:text-md text-muted mb-1">{location.address}</p>
+                <p className="text-sm sm:text-md text-muted">{location.phone}</p>
 
                 {selectedLocation === location.id && (
                   <div className="mt-4 pt-3 border-t border-rust/20">
@@ -634,27 +731,21 @@ function Locations() {
 // ============================== Call To Action ==============================
 function CTA() {
   return (
-    <Section className="relative text-center overflow-hidden py-[clamp(3rem,8vw,6rem)] px-[clamp(1.5rem,5vw,5rem)] py-20 px-20 bg-white border-t border-mid/20 border-b border-mid/20">
+    <Section className="relative text-center overflow-hidden px-6 sm:px-10 md:px-14 lg:px-24 py-10 sm:py-14 md:py-18 lg:py-20 bg-white border-t border-mid/15">
       <div
         className="absolute inset-0 pointer-events-none"
         style={{ background: "radial-gradient(ellipse at center, rgba(196,82,26,0.08) 0%, transparent 65%)" }}
       />
 
-      <motion.h2
-        variants={reveal}
-        className="relative font-display leading-[0.95] text-title text-nav-text mb-6"
-      >
+      <motion.h2 variants={reveal} className="relative font-display leading-[1] text-3xl sm:text-4xl md:text-title text-nav-text mb-5 sm:mb-6">
         Ready to <span className="text-rust">Equip</span><br />Your Farm?
       </motion.h2>
 
-      <motion.p
-        variants={reveal}
-        className="relative mx-auto text-body text-muted mb-12 max-w-md leading-relaxed"
-      >
+      <motion.p variants={reveal} className="relative mx-auto text-sm sm:text-body text-muted mb-8 sm:mb-12 max-w-md leading-relaxed">
         Reach out for quotes on new construction, equipment, or retrofit projects. Customer satisfaction is job one.
       </motion.p>
 
-      <motion.div variants={reveal} className="flex gap-4 justify-center relative">
+      <motion.div variants={reveal} className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center relative max-w-md sm:max-w-none mx-auto">
         <PrimaryButton to="/contact">Contact Us Today</PrimaryButton>
         <OutlineButton to="/products">Browse All Products</OutlineButton>
       </motion.div>
