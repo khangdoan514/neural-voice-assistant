@@ -1,56 +1,93 @@
 import { useState, useEffect } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import { 
-  DocumentTextIcon, 
-  FolderIcon,
-  ArrowLeftIcon,
-  CalendarIcon,
-  ClockIcon 
-} from "@heroicons/react/24/outline"
-import api from "../hooks/axios"
+import { useNavigate, useLocation } from "react-router-dom"
+import { motion } from "framer-motion"
+import { useAdminProfile } from "../hooks/useAdminProfile"
+import { fetchConversationsListApi, fetchConversationContentApi } from "../api/adminAPI"
+import Sidebar from "../components/Sidebar"
+import { fadeInUp } from "./admin/variants"
+import { tabMeta } from "./admin/tabMeta"
+import { activeTabForPathname } from "../routing/adminRouting"
+import {
+  cloneDefaultContactPeople,
+  cloneDefaultHomeHeroCards,
+  defaultAboutStoryImage,
+  defaultContactBusinessHoursImage,
+  newContactPersonTemplate,
+} from "./admin/contentDefaults"
+import AdminWelcome from "./admin/AdminWelcome"
+import AdminConversations from "./admin/AdminConversations"
+import AdminHomeEditor from "./admin/AdminHomeEditor"
+import AdminAboutEditor from "./admin/AdminAboutEditor"
+import AdminContactEditor from "./admin/AdminContactEditor"
+import AdminSettings from "./admin/AdminSettings"
+import AdminComingSoon from "./admin/AdminComingSoon"
 
 export default function Admin() {
-  const [activeTab, setActiveTab] = useState('conversations')
+  const [activeTab, setActiveTab] = useState("welcome")
   const [conversations, setConversations] = useState([])
   const [selectedConversation, setSelectedConversation] = useState(null)
-  const [conversationContent, setConversationContent] = useState('')
+  const [conversationContent, setConversationContent] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [isLoadingContent, setIsLoadingContent] = useState(false)
-  const [error, setError] = useState('')
+  const [error, setError] = useState("")
+  const { adminProfile, fetchAdminProfile, updateAdminProfile, isLoading: isLoadingProfile } = useAdminProfile()
+  const [isSavingHome, setIsSavingHome] = useState(false)
+  const [isSavingAbout, setIsSavingAbout] = useState(false)
+  const [isSavingContact, setIsSavingContact] = useState(false)
+  const [isSavingSettings, setIsSavingSettings] = useState(false)
+  const [saveSuccess, setSaveSuccess] = useState("")
+  const [homeHeroCards, setHomeHeroCards] = useState(() => cloneDefaultHomeHeroCards())
+  const [aboutStoryImage, setAboutStoryImage] = useState(defaultAboutStoryImage)
+  const [contactBusinessHoursImage, setContactBusinessHoursImage] = useState(defaultContactBusinessHoursImage)
+  const [contactPeople, setContactPeople] = useState(() => cloneDefaultContactPeople())
   const navigate = useNavigate()
+  const location = useLocation()
+  const [settingsFirstName, setSettingsFirstName] = useState("")
+  const [settingsLastName, setSettingsLastName] = useState("")
+  const [settingsEmail, setSettingsEmail] = useState("")
+  const [settingsProfilePicture, setSettingsProfilePicture] = useState("")
 
-  // Check authentication
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken")
     const user = localStorage.getItem("user") || sessionStorage.getItem("user")
-    
+
     if (!accessToken || !user) {
       navigate("/login")
     }
   }, [navigate])
 
   useEffect(() => {
-    if (activeTab === 'conversations') {
+    const accessToken = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken")
+    if (!accessToken) return
+    fetchAdminProfile(accessToken)
+  }, [fetchAdminProfile])
+
+  useEffect(() => {
+    if (!adminProfile) return
+    setSettingsFirstName(adminProfile.first_name || "")
+    setSettingsLastName(adminProfile.last_name || "")
+    setSettingsEmail(adminProfile.email || "")
+    setSettingsProfilePicture(adminProfile.profile_picture || adminProfile.avatar || "")
+  }, [adminProfile])
+
+  useEffect(() => {
+    if (activeTab === "conversations") {
       fetchConversations()
     }
   }, [activeTab])
 
+  useEffect(() => {
+    setActiveTab(activeTabForPathname(location.pathname))
+  }, [location.pathname])
+
   const fetchConversations = async () => {
     setIsLoading(true)
-    setError('')
+    setError("")
     try {
-      const response = await api.get('/api/conversations')
-      
-      if (Array.isArray(response.data)) {
-        setConversations(response.data)
-      } else if (response.data && typeof response.data === 'object') {
-        const arr = Object.values(response.data)
-        setConversations(Array.isArray(arr) ? arr : [])
-      } else {
-        setConversations([])
-      }
+      const list = await fetchConversationsListApi()
+      setConversations(list)
     } catch (err) {
-      setError('Failed to load conversations')
+      setError("Failed to load conversations")
       console.error(err)
     } finally {
       setIsLoading(false)
@@ -59,31 +96,26 @@ export default function Admin() {
 
   const fetchConversationContent = async (filename) => {
     setIsLoadingContent(true)
-    setError('')
+    setError("")
     try {
-      const response = await api.get(`/api/conversations/${filename}`)
-      setConversationContent(response.data.content)
-      setSelectedConversation(response.data)
+      const data = await fetchConversationContentApi(filename)
+      setConversationContent(data.content)
+      setSelectedConversation(data)
     } catch (err) {
-      setError('Failed to load conversation content')
+      setError("Failed to load conversation content")
       console.error(err)
     } finally {
       setIsLoadingContent(false)
     }
   }
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleString()
-  }
-
   const formatFileSize = (bytes) => {
-    if (bytes < 1024) return bytes + ' B'
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'
-    return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
+    if (bytes < 1024) return bytes + " B"
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB"
+    return (bytes / (1024 * 1024)).toFixed(1) + " MB"
   }
 
   const handleLogout = () => {
-    // Clear all auth data
     localStorage.removeItem("accessToken")
     localStorage.removeItem("refreshToken")
     localStorage.removeItem("user")
@@ -93,150 +125,252 @@ export default function Admin() {
     navigate("/login")
   }
 
+  const handleSettingsImageUpload = (file) => {
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => setSettingsProfilePicture(String(reader.result || ""))
+    reader.readAsDataURL(file)
+  }
+
+  const saveSettings = async () => {
+    setIsSavingSettings(true)
+    setSaveSuccess("")
+    setError("")
+
+    try {
+      const accessToken = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken")
+      if (!accessToken) {
+        navigate("/login")
+        return
+      }
+
+      const updated = await updateAdminProfile(accessToken, {
+        first_name: settingsFirstName,
+        last_name: settingsLastName,
+        email: settingsEmail,
+        profile_picture: settingsProfilePicture || null,
+      })
+
+      if (!updated) {
+        setError("Failed to save settings")
+        return
+      }
+
+      setSaveSuccess("Settings saved successfully.")
+      setTimeout(() => setSaveSuccess(""), 2000)
+    } catch (err) {
+      setError("Failed to save settings")
+      console.error(err)
+    } finally {
+      setIsSavingSettings(false)
+    }
+  }
+
+  const updateHomeCard = (index, field, value) => {
+    setHomeHeroCards((prev) => prev.map((card, i) => (i === index ? { ...card, [field]: value } : card)))
+  }
+
+  const handleImageUpload = (index, file) => {
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = () => {
+      updateHomeCard(index, "image", String(reader.result || ""))
+    }
+
+    reader.readAsDataURL(file)
+  }
+
+  const handleAboutImageUpload = (file) => {
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = () => {
+      setAboutStoryImage(String(reader.result || ""))
+    }
+
+    reader.readAsDataURL(file)
+  }
+
+  const handleContactBusinessImageUpload = (file) => {
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => {
+      setContactBusinessHoursImage(String(reader.result || ""))
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const updateContactPerson = (index, field, value) => {
+    setContactPeople((prev) => prev.map((person, i) => (i === index ? { ...person, [field]: value } : person)))
+  }
+
+  const addContactPerson = () => {
+    setContactPeople((prev) => [...prev, { ...newContactPersonTemplate }])
+  }
+
+  const removeContactPerson = (index) => {
+    setContactPeople((prev) => {
+      if (prev.length <= 2) return prev
+      return prev.filter((_, i) => i !== index)
+    })
+  }
+
+  const handleContactPersonImageUpload = (index, file) => {
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => {
+      updateContactPerson(index, "image", String(reader.result || ""))
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const saveHomeContent = () => {
+    setIsSavingHome(true)
+    setSaveSuccess("")
+    setSaveSuccess("Home hero cards updated (not persisted yet).")
+    setTimeout(() => setSaveSuccess(""), 2000)
+    setIsSavingHome(false)
+  }
+
+  const resetHomeContent = () => {
+    setHomeHeroCards(cloneDefaultHomeHeroCards())
+    setSaveSuccess("Home hero cards reset to defaults.")
+    setTimeout(() => setSaveSuccess(""), 2000)
+  }
+
+  const saveAboutContent = () => {
+    setIsSavingAbout(true)
+    setSaveSuccess("")
+    setSaveSuccess("About image updated (not persisted yet).")
+    setTimeout(() => setSaveSuccess(""), 2000)
+    setIsSavingAbout(false)
+  }
+
+  const resetAboutContent = () => {
+    setAboutStoryImage(defaultAboutStoryImage)
+    setSaveSuccess("About image reset to default.")
+    setTimeout(() => setSaveSuccess(""), 2000)
+  }
+
+  const saveContactContent = () => {
+    setIsSavingContact(true)
+    setSaveSuccess("")
+    setSaveSuccess("Contact section updated (not persisted yet).")
+    setTimeout(() => setSaveSuccess(""), 2000)
+    setIsSavingContact(false)
+  }
+
+  const resetContactContent = () => {
+    setContactBusinessHoursImage(defaultContactBusinessHoursImage)
+    setContactPeople(cloneDefaultContactPeople())
+    setSaveSuccess("Contact images reset to defaults.")
+    setTimeout(() => setSaveSuccess(""), 2000)
+  }
+
   return (
-    <div className="min-h-screen bg-barn">
-      {/* Header */}
-      <div className="bg-charcoal border-b border-rust/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <h1 className="font-display text-2xl text-nav-text">
-              Admin <span className="text-rust">Dashboard</span>
-            </h1>
-            <button
-              onClick={handleLogout}
-              className="px-4 py-2 bg-rust text-white rounded-lg hover:bg-rust-dark transition-colors text-sm"
+    <div className="h-screen bg-barn flex overflow-hidden">
+      <Sidebar onLogout={handleLogout} userProfile={adminProfile} />
+
+      <div className="flex-1 min-w-0 flex flex-col overflow-y-auto">
+        <div className="flex-1 p-4 sm:p-6 lg:p-6 xl:p-8">
+          {activeTab !== "welcome" && (
+            <motion.div
+              variants={fadeInUp}
+              initial="hidden"
+              animate="visible"
+              className="mb-6 sm:mb-8 border-b border-rust/20 pb-4"
             >
-              Logout
-            </button>
-          </div>
-        </div>
-      </div>
+              <h1 className="font-display text-2xl sm:text-3xl text-nav-text">
+                {tabMeta[activeTab]?.title || "Admin"}
+              </h1>
+              <p className="text-sm sm:text-base text-muted mt-1">
+                {tabMeta[activeTab]?.subtitle || "Manage content and settings."}
+              </p>
+            </motion.div>
+          )}
 
-      {/* Tabs */}
-      <div className="border-b border-rust/20 bg-charcoal/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex space-x-8">
-            <button
-              onClick={() => {
-                setActiveTab('conversations')
-                setSelectedConversation(null)
-                setConversationContent('')
-              }}
-              className={`py-4 px-1 border-b-2 font-label text-sm font-medium transition-colors ${
-                activeTab === 'conversations'
-                  ? 'border-rust text-rust'
-                  : 'border-transparent text-muted hover:text-nav-text hover:border-rust/30'
-              }`}
-            >
-              Conversations
-            </button>
-          </nav>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {error && (
-          <div className="mb-4 bg-red-500/10 border border-red-500/30 text-red-500 px-4 py-3 rounded-lg">
-            {error}
-          </div>
-        )}
-
-        {activeTab === 'conversations' && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Conversations List */}
-            <div className="lg:col-span-1 bg-charcoal/30 rounded-lg border border-rust/20 p-4">
-              <h2 className="font-label text-lg text-nav-text mb-4 flex items-center">
-                <FolderIcon className="h-5 w-5 mr-2 text-rust" />
-                Conversation Files
-              </h2>
-              
-              {isLoading ? (
-                <div className="flex justify-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-rust"></div>
-                </div>
-              ) : (
-                <div className="space-y-2 max-h-[600px] overflow-y-auto pr-2">
-                  {Array.isArray(conversations) && conversations.map((conv) => (
-                    <button
-                      key={conv.name}
-                      onClick={() => fetchConversationContent(conv.name)}
-                      className={`w-full text-left p-3 rounded-lg transition-all duration-200 ${
-                        selectedConversation?.filename === conv.name
-                          ? 'bg-rust/20 border border-rust'
-                          : 'bg-charcoal hover:bg-charcoal/80 border border-rust/10 hover:border-rust/30'
-                      }`}
-                    >
-                      <div className="flex items-start">
-                        <DocumentTextIcon className="h-5 w-5 text-rust mt-0.5 mr-2 flex-shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-nav-text truncate">
-                            {conv.name}
-                          </p>
-                          <div className="flex items-center text-xs text-muted mt-1 space-x-2">
-                            <span className="flex items-center">
-                              <CalendarIcon className="h-3 w-3 mr-1" />
-                              {new Date(conv.modified).toLocaleDateString()}
-                            </span>
-                            <span className="flex items-center">
-                              <ClockIcon className="h-3 w-3 mr-1" />
-                              {formatFileSize(conv.size)}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </button>
-                  ))}
-                  
-                  {(!conversations || conversations.length === 0) && !isLoading && (
-                    <p className="text-muted text-sm text-center py-8">
-                      No conversation files found
-                    </p>
-                  )}
-                </div>
-              )}
+          {error && (
+            <div className="mb-4 bg-red-500/10 border border-red-500/30 text-red-500 px-4 py-3 rounded-lg">
+              {error}
             </div>
+          )}
 
-            {/* Conversation Content */}
-            <div className="lg:col-span-2 bg-charcoal/30 rounded-lg border border-rust/20 p-6">
-              {selectedConversation ? (
-                <>
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-label text-lg text-nav-text flex items-center">
-                      <DocumentTextIcon className="h-5 w-5 mr-2 text-rust" />
-                      {selectedConversation.filename}
-                    </h3>
-                    <button
-                      onClick={() => fetchConversationContent(selectedConversation.filename)}
-                      className="text-xs text-rust hover:text-rust-light"
-                    >
-                      Refresh
-                    </button>
-                  </div>
-                  
-                  {isLoadingContent ? (
-                    <div className="flex justify-center py-12">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-rust"></div>
-                    </div>
-                  ) : (
-                    <div className="bg-barn rounded-lg p-4 border border-rust/10 overflow-auto max-h-[600px]">
-                      <pre className="text-sm text-muted whitespace-pre-wrap font-mono">
-                        {conversationContent}
-                      </pre>
-                    </div>
-                  )}
-                </>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <DocumentTextIcon className="h-16 w-16 text-rust/30 mb-4" />
-                  <p className="text-muted text-sm">
-                    Select a conversation file to view its content
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
+          {activeTab === "welcome" && <AdminWelcome adminProfile={adminProfile} />}
+
+          {activeTab === "conversations" && (
+            <AdminConversations
+              conversations={conversations}
+              isLoading={isLoading}
+              selectedConversation={selectedConversation}
+              conversationContent={conversationContent}
+              isLoadingContent={isLoadingContent}
+              fetchConversationContent={fetchConversationContent}
+              formatFileSize={formatFileSize}
+            />
+          )}
+
+          {activeTab === "settings" && (
+            <AdminSettings
+              settingsFirstName={settingsFirstName}
+              setSettingsFirstName={setSettingsFirstName}
+              settingsLastName={settingsLastName}
+              setSettingsLastName={setSettingsLastName}
+              settingsEmail={settingsEmail}
+              setSettingsEmail={setSettingsEmail}
+              settingsProfilePicture={settingsProfilePicture}
+              setSettingsProfilePicture={setSettingsProfilePicture}
+              handleSettingsImageUpload={handleSettingsImageUpload}
+              saveSettings={saveSettings}
+              isSavingSettings={isSavingSettings}
+              isLoadingProfile={isLoadingProfile}
+              saveSuccess={saveSuccess}
+            />
+          )}
+
+          {activeTab === "home" && (
+            <AdminHomeEditor
+              homeHeroCards={homeHeroCards}
+              updateHomeCard={updateHomeCard}
+              handleImageUpload={handleImageUpload}
+              saveHomeContent={saveHomeContent}
+              resetHomeContent={resetHomeContent}
+              isSavingHome={isSavingHome}
+              saveSuccess={saveSuccess}
+            />
+          )}
+
+          {activeTab === "about" && (
+            <AdminAboutEditor
+              aboutStoryImage={aboutStoryImage}
+              setAboutStoryImage={setAboutStoryImage}
+              handleAboutImageUpload={handleAboutImageUpload}
+              saveAboutContent={saveAboutContent}
+              resetAboutContent={resetAboutContent}
+              isSavingAbout={isSavingAbout}
+              saveSuccess={saveSuccess}
+            />
+          )}
+
+          {activeTab === "contact" && (
+            <AdminContactEditor
+              contactBusinessHoursImage={contactBusinessHoursImage}
+              setContactBusinessHoursImage={setContactBusinessHoursImage}
+              handleContactBusinessImageUpload={handleContactBusinessImageUpload}
+              contactPeople={contactPeople}
+              updateContactPerson={updateContactPerson}
+              addContactPerson={addContactPerson}
+              removeContactPerson={removeContactPerson}
+              handleContactPersonImageUpload={handleContactPersonImageUpload}
+              saveContactContent={saveContactContent}
+              resetContactContent={resetContactContent}
+              isSavingContact={isSavingContact}
+              saveSuccess={saveSuccess}
+            />
+          )}
+
+          {activeTab === "comingSoon" && <AdminComingSoon />}
+        </div>
       </div>
     </div>
   )
