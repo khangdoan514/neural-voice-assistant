@@ -7,6 +7,7 @@ import jwt
 from datetime import datetime, timezone, timedelta
 from werkzeug.security import check_password_hash
 from database import find_user, update_timestamp
+from database.connection import edit_user, get_user_by_id
 from config import Config
 
 # Disable loggings
@@ -82,12 +83,78 @@ def login():
             "user": {
                 "id": user.id,
                 "email": user.email,
+                "first_name": getattr(user, "first_name", None),
+                "last_name": getattr(user, "last_name", None),
+                "profile_picture": getattr(user, "profile_picture", None),
+                "avatar": getattr(user, "profile_picture", None),
                 "role": user.role
             }
         }), 200
         
     except Exception as e:
         print(f"Login error: {e}")
+        return jsonify({"error": "Internal server error"}), 500
+
+# Return user's profile
+@app.route("/api/admin/profile", methods=["GET"])
+def admin_profile():
+    try:
+        auth_header = request.headers.get("Authorization", "")
+        if not auth_header.startswith("Bearer "):
+            return jsonify({"error": "Missing Authorization Bearer token"}), 401
+
+        token = auth_header.split(" ", 1)[1].strip()
+        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[ALGORITHM])  # type: ignore
+
+        user_id = payload.get("user_id")
+        if not user_id:
+            return jsonify({"error": "Invalid token"}), 401
+
+        user_row = get_user_by_id(int(user_id))
+        if not user_row:
+            return jsonify({"error": "User not found"}), 404
+
+        user_row["avatar"] = user_row.get("profile_picture")
+        return jsonify({"success": True, "user": user_row}), 200
+    except jwt.ExpiredSignatureError:
+        return jsonify({"error": "Access token expired"}), 401
+    except Exception as e:
+        print(f"Admin profile error: {e}")
+        return jsonify({"error": "Internal server error"}), 500
+
+# Update user's profile
+@app.route("/api/admin/profile", methods=["PUT"])
+def update_admin_profile():
+    try:
+        auth_header = request.headers.get("Authorization", "")
+        if not auth_header.startswith("Bearer "):
+            return jsonify({"error": "Missing Authorization Bearer token"}), 401
+
+        token = auth_header.split(" ", 1)[1].strip()
+        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[ALGORITHM])  # type: ignore
+
+        user_id = payload.get("user_id")
+        if not user_id:
+            return jsonify({"error": "Invalid token"}), 401
+
+        data = request.get_json(silent=True) or {}
+        updated = edit_user(
+            int(user_id),
+            email=data.get("email"),
+            first_name=data.get("first_name"),
+            last_name=data.get("last_name"),
+            profile_picture=data.get("profile_picture"),
+        )
+
+        if not updated:
+            return jsonify({"error": "User not found"}), 404
+
+        updated["avatar"] = updated.get("profile_picture")
+        return jsonify({"success": True, "user": updated}), 200
+    except jwt.ExpiredSignatureError:
+        return jsonify({"error": "Access token expired"}), 401
+    except Exception as e:
+        print(f"Update admin profile error: {e}")
         return jsonify({"error": "Internal server error"}), 500
 
 # Register blueprints

@@ -34,9 +34,9 @@ export default function Navbar() {
       label: "Support",
       children: [
         { to: "/support/about", label: "About Us" },
-        { to: "/support/contact", label: "Contact" },
-        { to: "/support/request", label: "Submit a Request" },
-        { to: "/support/privacy", label: "Privacy Policy" },
+        { to: "/support/contact", label: "Contact Us" },
+        { to: "/support/request", label: "Service Request" },
+        { to: "/support/privacy", label: "Terms & Privacy" },
       ],
     },
   ]

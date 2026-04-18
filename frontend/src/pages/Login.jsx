@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline"
-import { useLogin } from "../hooks/login.js"
+import { useLogin } from "../hooks/useLogin"
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false)
