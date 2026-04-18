@@ -9,7 +9,7 @@ def find_user(email: str) -> Optional[User]:
     cur = conn.cursor()
     
     cur.execute(
-        "SELECT id, email, password_hash, role, created_at, updated_at, last_login FROM users WHERE email = %s",
+        "SELECT id, email, first_name, last_name, profile_picture, password_hash, role, created_at, updated_at, last_login FROM users WHERE email = %s",
         (email.lower(),)
     )
     
@@ -27,7 +27,7 @@ def create_user(email: str, password_hash: str, role: str = 'user') -> Optional[
     cur = conn.cursor()
     
     cur.execute(
-        "INSERT INTO users (email, password_hash, role) VALUES (%s, %s, %s) RETURNING id, email, role, created_at",
+        "INSERT INTO users (email, password_hash, role) VALUES (%s, %s, %s) RETURNING id, email, first_name, last_name, role, created_at",
         (email.lower(), password_hash, role)
     )
     

@@ -1,6 +1,6 @@
 "use client"
 import { motion, useInView } from "framer-motion"
-import { useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 
 /* ============================== Variants ============================== */
 const reveal = {
@@ -56,21 +56,8 @@ function SectionHeader({ label, title, titleHighlight, description = "" }) {
 
 /* ============================== About Page ============================== */
 export default function About() {
-  const PILLARS = [
-    { number: "01", title: "Customer Satisfaction", desc: "Customer satisfaction is job one. Today's poultry producers invest millions of dollars, often their family land and their time. That's why it's critical to team up with a reliable, time-tested supplier." },
-    { number: "02", title: "Top Quality Equipment", desc: "We offer top quality equipment at competitive prices. Our inventory includes all types of poultry equipment, water storage tanks, pressure pumps, and all parts for your water needs." },
-    { number: "03", title: "Expert Service Team", desc: "Our well-trained service team is ready to help growers if they need assistance — whether on the farm or in our repair shop, we keep your operation running." },
-    { number: "04", title: "Ships Worldwide", desc: "Our retail outlet is equipped to ship all over the world. Call us for quotes on new construction, refurbishing older houses, or equipment. You will be pleased with our prices and service." },
-  ]
-
-  const INVENTORY = [
-    { number: "01", title: "Poultry Equipment", desc: "All types of poultry equipment for feeding, watering, heating, cooling, and ventilation systems." },
-    { number: "02", title: "Water Systems", desc: "Water storage tanks, pressure pumps, and all parts for your water needs." },
-    { number: "03", title: "Electric Motors", desc: "New and refurbished electric motors — the largest inventory of HVAC motors, capacitors, and contactors in the east Texas area." },
-    { number: "04", title: "Drive Components", desc: "A large selection of drive belts, pulleys, and bearings of all sizes for farm or industrial use." },
-    { number: "05", title: "Repair Shop", desc: "Our shop is always busy repairing motors, water medication pumps, bearings, poultry equipment, and heavy equipment used around the farm." },
-    { number: "06", title: "Farm & Home Retail", desc: "Our retail store is well stocked with a variety of items used at home or around the farm, including bins for horse, cattle, and other farming operations." },
-  ]
+  const defaultStoryImage = "/images/about/story-photo.jpg"
+  const [storyImage, setStoryImage] = useState(defaultStoryImage)
 
   const TIMELINE = [
     { year: "1958", title: "Founded in Center, TX", desc: "East Texas Poultry Supply opens its doors in Center, Texas, serving local poultry growers with quality equipment and reliable service." },
@@ -79,6 +66,13 @@ export default function About() {
     { year: "2000s", title: "Expanded Service Region", desc: "Our primary service area expands to include south, central, and north Texas, extending over into Louisiana and most of that state." },
     { year: "Today", title: "TX, LA & Worldwide", desc: "We continue to serve growers across Texas and Louisiana, and ship poultry equipment and supplies anywhere in the world." },
   ]
+
+  useEffect(() => {
+    const savedStoryImage = localStorage.getItem("aboutStoryImage")
+    if (savedStoryImage) {
+      setStoryImage(savedStoryImage)
+    }
+  }, [])
 
   return (
     <main className="bg-barn min-h-screen pt-16 overflow-x-hidden">
@@ -110,7 +104,7 @@ export default function About() {
         <div className="px-6 sm:px-10 md:px-14 lg:px-24 py-14 sm:py-18 md:py-22 lg:py-24">
 
           {/* ==================== Our Story ==================== */}
-          <Section className="mb-18 sm:mb-22 md:mb-26 lg:mb-28">
+          <Section>
             <SectionHeader
               label="Who We Are"
               title="Our "
@@ -139,6 +133,13 @@ export default function About() {
                   so important for them to team up with a reliable and time-tested supplier for their housing,
                   equipment, and service needs.
                 </motion.p>
+                <motion.figure variants={reveal} className="overflow-hidden rounded-sm border border-mid/20 bg-white">
+                  <img
+                    src={storyImage}
+                    alt="East Texas Poultry Supply story"
+                    className="w-full h-56 sm:h-64 lg:h-72 object-cover"
+                  />
+                </motion.figure>
                 <motion.div variants={reveal} className="border-l-2 border-rust pl-4 sm:pl-6 py-2 mt-2">
                   <p className="font-label text-xs font-bold tracking-[2px] sm:tracking-[3px] uppercase text-rust mb-2">Expanded Service Area</p>
                   <p className="text-base sm:text-lg leading-relaxed text-muted font-light m-0">
@@ -168,66 +169,6 @@ export default function About() {
                 ))}
               </motion.div>
             </div>
-          </Section>
-
-          {/* ==================== Our Commitments ==================== */}
-          <Section className="mb-18 sm:mb-22 md:mb-26 lg:mb-28">
-            <SectionHeader
-              label="What We Stand For"
-              title="Our "
-              titleHighlight="Commitments"
-              description="Customer satisfaction is job one. We back that promise with top quality equipment, a well-trained service team, and the ability to ship anywhere in the world."
-            />
-
-            {PILLARS.map(({ number, title, desc }) => (
-              <motion.div
-                key={number}
-                variants={reveal}
-                className="flex flex-col sm:flex-row gap-4 sm:gap-6 md:gap-8 py-6 sm:py-8 md:py-10 border-t border-mid/15 last:border-b last:border-mid/15"
-              >
-                <div className="flex-shrink-0 sm:w-14">
-                  <span className="font-display text-3xl sm:text-4xl md:text-5xl text-nav-text leading-none">{number}</span>
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-label text-xl sm:text-2xl md:text-3xl font-bold tracking-[1px] sm:tracking-[2px] uppercase text-nav-text mb-3 sm:mb-4">{title}</h3>
-                  <p className="text-base sm:text-lg leading-relaxed text-muted font-light m-0">{desc}</p>
-                </div>
-              </motion.div>
-            ))}
-          </Section>
-
-          {/* ==================== Our Inventory ==================== */}
-          <Section>
-            <SectionHeader
-              label="What We Carry"
-              title="More Than Just "
-              titleHighlight="Poultry"
-              description="Our inventory goes well beyond what our name implies. From industrial motors to farm retail goods, East Texas Poultry Supply is a full-service supplier for your operation."
-            />
-
-            <motion.div
-              variants={contentStagger}
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-7"
-            >
-              {INVENTORY.map(({ number, title, desc }) => (
-                <motion.div
-                  key={number}
-                  variants={reveal}
-                  className="bg-white border border-mid/15 border-l-2 border-l-rust p-5 sm:p-6 md:p-7"
-                >
-                  <div className="font-display text-xl sm:text-2xl text-rust leading-none mb-3 sm:mb-4 select-none">{number}</div>
-                  <h4 className="font-label text-xs sm:text-sm font-bold tracking-[1px] uppercase text-nav-text mb-2">{title}</h4>
-                  <p className="text-xs sm:text-sm leading-relaxed text-muted font-light m-0">{desc}</p>
-                </motion.div>
-              ))}
-            </motion.div>
-
-            <motion.div variants={reveal} className="mt-8 sm:mt-10 md:mt-12 border-t border-mid/20 pt-8 sm:pt-10">
-              <p className="text-xs sm:text-sm leading-relaxed text-muted font-light max-w-3xl">
-                Call us for quotes on new construction, refurbishing older houses, or equipment purchases.
-                You will be pleased with our prices and service.
-              </p>
-            </motion.div>
           </Section>
         </div>
 

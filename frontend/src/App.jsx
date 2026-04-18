@@ -46,7 +46,7 @@ function ScrollToTop() {
 
 export default function App() {
   const location = useLocation()
-  const hideNavbarFooter = ['/login', '/admin'].includes(location.pathname)
+  const hideNavbarFooter = location.pathname === "/login" || location.pathname.startsWith("/admin")
 
   return (
     <>
@@ -62,6 +62,11 @@ export default function App() {
           
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/admin/dashboard" element={<Admin />} />
+          <Route path="/admin/conversation" element={<Admin />} />
+          <Route path="/admin/settings" element={<Admin />} />
+          <Route path="/admin/home" element={<Admin />} />
+          <Route path="/admin/*" element={<Admin />} />
 
           <Route path="/services/construction" element={<Construction />} />
           <Route path="/services/retro" element={<Retro />} />
