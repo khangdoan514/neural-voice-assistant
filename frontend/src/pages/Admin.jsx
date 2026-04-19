@@ -2,25 +2,66 @@ import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { motion } from "framer-motion"
 import { useAdminProfile } from "../hooks/useAdminProfile"
-import { fetchConversationsListApi, fetchConversationContentApi } from "../api/adminAPI"
+import {
+  fetchConversationsListApi,
+  fetchConversationContentApi,
+  fetchHomeHeroCardsApi,
+  saveHomeHeroCardsApi,
+} from "../api/adminAPI"
 import Sidebar from "../components/Sidebar"
 import { fadeInUp } from "./admin/variants"
 import { tabMeta } from "./admin/tabMeta"
-import { activeTabForPathname } from "../routing/adminRouting"
-import {
-  cloneDefaultContactPeople,
-  cloneDefaultHomeHeroCards,
-  defaultAboutStoryImage,
-  defaultContactBusinessHoursImage,
-  newContactPersonTemplate,
-} from "./admin/contentDefaults"
-import AdminWelcome from "./admin/AdminWelcome"
-import AdminConversations from "./admin/AdminConversations"
-import AdminHomeEditor from "./admin/AdminHomeEditor"
-import AdminAboutEditor from "./admin/AdminAboutEditor"
-import AdminContactEditor from "./admin/AdminContactEditor"
-import AdminSettings from "./admin/AdminSettings"
-import AdminComingSoon from "./admin/AdminComingSoon"
+import { activeTabForPathname } from "../routes/adminRouting"
+import Welcome from "./admin/Welcome"
+import Conversations from "./admin/Conversations"
+import HomeEditor from "./admin/HomeEditor"
+import AboutEditor from "./admin/AboutEditor"
+import ContactEditor from "./admin/ContactEditor"
+import Settings from "./admin/Settings"
+import ComingSoon from "./admin/ComingSoon"
+
+const DEFAULT_HOME_HERO_CARDS = [
+  { label: "Farm Setup", image: "" },
+  { label: "Poultry Farming", image: "" },
+  { label: "Feeding Systems", image: "" },
+  { label: "Equipment Service", image: "" },
+]
+
+const DEFAULT_ABOUT_STORY_IMAGE = "/images/about/story-photo.jpg"
+const DEFAULT_CONTACT_BUSINESS_HOURS_IMAGE = "/images/support/business-hours.jpg"
+
+const DEFAULT_CONTACT_PEOPLE = [
+  {
+    name: "Someone 1",
+    role: "Service Coordinator",
+    phone: "(000) 000-0000",
+    email: "someone1@etpsupply.com",
+    image: "/images/team/someone-1.jpg",
+  },
+  {
+    name: "Someone 2",
+    role: "Parts & Sales Support",
+    phone: "(000) 000-0000",
+    email: "someone2@etpsupply.com",
+    image: "/images/team/someone-2.jpg",
+  },
+]
+
+const NEW_CONTACT_PERSON_TEMPLATE = {
+  name: "New Person",
+  role: "Support Team",
+  phone: "(000) 000-0000",
+  email: "new.person@etpsupply.com",
+  image: "",
+}
+
+function cloneDefaultHomeHeroCards() {
+  return DEFAULT_HOME_HERO_CARDS.map((c) => ({ ...c }))
+}
+
+function cloneDefaultContactPeople() {
+  return DEFAULT_CONTACT_PEOPLE.map((p) => ({ ...p }))
+}
 
 export default function Admin() {
   const [activeTab, setActiveTab] = useState("welcome")
@@ -37,8 +78,8 @@ export default function Admin() {
   const [isSavingSettings, setIsSavingSettings] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState("")
   const [homeHeroCards, setHomeHeroCards] = useState(() => cloneDefaultHomeHeroCards())
-  const [aboutStoryImage, setAboutStoryImage] = useState(defaultAboutStoryImage)
-  const [contactBusinessHoursImage, setContactBusinessHoursImage] = useState(defaultContactBusinessHoursImage)
+  const [aboutStoryImage, setAboutStoryImage] = useState(DEFAULT_ABOUT_STORY_IMAGE)
+  const [contactBusinessHoursImage, setContactBusinessHoursImage] = useState(DEFAULT_CONTACT_BUSINESS_HOURS_IMAGE)
   const [contactPeople, setContactPeople] = useState(() => cloneDefaultContactPeople())
   const navigate = useNavigate()
   const location = useLocation()
@@ -50,7 +91,6 @@ export default function Admin() {
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken")
     const user = localStorage.getItem("user") || sessionStorage.getItem("user")
-
     if (!accessToken || !user) {
       navigate("/login")
     }
@@ -73,6 +113,24 @@ export default function Admin() {
   useEffect(() => {
     if (activeTab === "conversations") {
       fetchConversations()
+    }
+  }, [activeTab])
+
+  useEffect(() => {
+    if (activeTab !== "home") return
+    let cancelled = false
+    ;(async () => {
+      try {
+        const cards = await fetchHomeHeroCardsApi()
+        if (cancelled || !cards || !Array.isArray(cards) || cards.length !== 4) return
+        setHomeHeroCards(cards.map((c) => ({ label: c.label || "", image: typeof c.image === "string" ? c.image : "" })))
+      } catch (err) {
+        console.error("Failed to load home hero cards for admin", err)
+      }
+    })()
+
+    return () => {
+      cancelled = true
     }
   }, [activeTab])
 
@@ -172,7 +230,6 @@ export default function Admin() {
 
   const handleImageUpload = (index, file) => {
     if (!file) return
-
     const reader = new FileReader()
     reader.onload = () => {
       updateHomeCard(index, "image", String(reader.result || ""))
@@ -183,7 +240,6 @@ export default function Admin() {
 
   const handleAboutImageUpload = (file) => {
     if (!file) return
-
     const reader = new FileReader()
     reader.onload = () => {
       setAboutStoryImage(String(reader.result || ""))
@@ -198,6 +254,7 @@ export default function Admin() {
     reader.onload = () => {
       setContactBusinessHoursImage(String(reader.result || ""))
     }
+
     reader.readAsDataURL(file)
   }
 
@@ -206,7 +263,7 @@ export default function Admin() {
   }
 
   const addContactPerson = () => {
-    setContactPeople((prev) => [...prev, { ...newContactPersonTemplate }])
+    setContactPeople((prev) => [...prev, { ...NEW_CONTACT_PERSON_TEMPLATE }])
   }
 
   const removeContactPerson = (index) => {
@@ -222,21 +279,55 @@ export default function Admin() {
     reader.onload = () => {
       updateContactPerson(index, "image", String(reader.result || ""))
     }
+
     reader.readAsDataURL(file)
   }
 
-  const saveHomeContent = () => {
+  const saveHomeContent = async () => {
     setIsSavingHome(true)
     setSaveSuccess("")
-    setSaveSuccess("Home hero cards updated (not persisted yet).")
-    setTimeout(() => setSaveSuccess(""), 2000)
-    setIsSavingHome(false)
+    setError("")
+    try {
+      const accessToken = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken")
+      if (!accessToken) {
+        navigate("/login")
+        return
+      }
+
+      const saved = await saveHomeHeroCardsApi(accessToken, homeHeroCards)
+      if (saved && Array.isArray(saved) && saved.length === 4) {
+        setHomeHeroCards(saved.map((c) => ({ label: c.label || "", image: typeof c.image === "string" ? c.image : "" })))
+      }
+
+      setSaveSuccess("Home hero cards saved.")
+      setTimeout(() => setSaveSuccess(""), 2000)
+    } catch (err) {
+      setError("Failed to save home hero cards")
+      console.error(err)
+    } finally {
+      setIsSavingHome(false)
+    }
   }
 
-  const resetHomeContent = () => {
-    setHomeHeroCards(cloneDefaultHomeHeroCards())
-    setSaveSuccess("Home hero cards reset to defaults.")
-    setTimeout(() => setSaveSuccess(""), 2000)
+  const resetHomeContent = async () => {
+    const defaults = cloneDefaultHomeHeroCards()
+    setHomeHeroCards(defaults)
+    setSaveSuccess("")
+    setError("")
+    try {
+      const accessToken = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken")
+      if (!accessToken) {
+        navigate("/login")
+        return
+      }
+
+      await saveHomeHeroCardsApi(accessToken, defaults)
+      setSaveSuccess("Home hero cards reset to defaults and saved.")
+      setTimeout(() => setSaveSuccess(""), 2000)
+    } catch (err) {
+      setError("Failed to save default home hero cards")
+      console.error(err)
+    }
   }
 
   const saveAboutContent = () => {
@@ -248,7 +339,7 @@ export default function Admin() {
   }
 
   const resetAboutContent = () => {
-    setAboutStoryImage(defaultAboutStoryImage)
+    setAboutStoryImage(DEFAULT_ABOUT_STORY_IMAGE)
     setSaveSuccess("About image reset to default.")
     setTimeout(() => setSaveSuccess(""), 2000)
   }
@@ -262,7 +353,7 @@ export default function Admin() {
   }
 
   const resetContactContent = () => {
-    setContactBusinessHoursImage(defaultContactBusinessHoursImage)
+    setContactBusinessHoursImage(DEFAULT_CONTACT_BUSINESS_HOURS_IMAGE)
     setContactPeople(cloneDefaultContactPeople())
     setSaveSuccess("Contact images reset to defaults.")
     setTimeout(() => setSaveSuccess(""), 2000)
@@ -271,7 +362,6 @@ export default function Admin() {
   return (
     <div className="h-screen bg-barn flex overflow-hidden">
       <Sidebar onLogout={handleLogout} userProfile={adminProfile} />
-
       <div className="flex-1 min-w-0 flex flex-col overflow-y-auto">
         <div className="flex-1 p-4 sm:p-6 lg:p-6 xl:p-8">
           {activeTab !== "welcome" && (
@@ -296,10 +386,10 @@ export default function Admin() {
             </div>
           )}
 
-          {activeTab === "welcome" && <AdminWelcome adminProfile={adminProfile} />}
+          {activeTab === "welcome" && <Welcome adminProfile={adminProfile} />}
 
           {activeTab === "conversations" && (
-            <AdminConversations
+            <Conversations
               conversations={conversations}
               isLoading={isLoading}
               selectedConversation={selectedConversation}
@@ -311,7 +401,7 @@ export default function Admin() {
           )}
 
           {activeTab === "settings" && (
-            <AdminSettings
+            <Settings
               settingsFirstName={settingsFirstName}
               setSettingsFirstName={setSettingsFirstName}
               settingsLastName={settingsLastName}
@@ -329,7 +419,7 @@ export default function Admin() {
           )}
 
           {activeTab === "home" && (
-            <AdminHomeEditor
+            <HomeEditor
               homeHeroCards={homeHeroCards}
               updateHomeCard={updateHomeCard}
               handleImageUpload={handleImageUpload}
@@ -341,7 +431,7 @@ export default function Admin() {
           )}
 
           {activeTab === "about" && (
-            <AdminAboutEditor
+            <AboutEditor
               aboutStoryImage={aboutStoryImage}
               setAboutStoryImage={setAboutStoryImage}
               handleAboutImageUpload={handleAboutImageUpload}
@@ -353,7 +443,7 @@ export default function Admin() {
           )}
 
           {activeTab === "contact" && (
-            <AdminContactEditor
+            <ContactEditor
               contactBusinessHoursImage={contactBusinessHoursImage}
               setContactBusinessHoursImage={setContactBusinessHoursImage}
               handleContactBusinessImageUpload={handleContactBusinessImageUpload}
@@ -369,7 +459,7 @@ export default function Admin() {
             />
           )}
 
-          {activeTab === "comingSoon" && <AdminComingSoon />}
+          {activeTab === "comingSoon" && <ComingSoon />}
         </div>
       </div>
     </div>

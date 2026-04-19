@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react"
 import { Link } from "react-router-dom"
 import { motion, useInView } from "framer-motion"
+import { fetchHomeHeroCardsApi } from "../api/adminAPI"
 
 /* ============================== Variants ============================== */
 const reveal = {
@@ -113,22 +114,25 @@ function Hero() {
   const [heroMosaic, setHeroMosaic] = useState(DEFAULT_HERO_MOSAIC)
 
   useEffect(() => {
-    const savedHeroCards = localStorage.getItem("homeHeroCards")
-    if (!savedHeroCards) return
+    let cancelled = false
+    ;(async () => {
+      try {
+        const cards = await fetchHomeHeroCardsApi()
+        if (cancelled || !cards || !Array.isArray(cards) || cards.length !== 4) return
 
-    try {
-      const parsed = JSON.parse(savedHeroCards)
-      if (!Array.isArray(parsed) || parsed.length !== 4) return
-
-      setHeroMosaic(
-        parsed.map((card, index) => ({
-          ...DEFAULT_HERO_MOSAIC[index],
-          label: card.label || DEFAULT_HERO_MOSAIC[index].label,
-          image: card.image || "",
-        }))
-      )
-    } catch (err) {
-      console.error("Failed to parse Home hero cards", err)
+        setHeroMosaic(
+          cards.map((card, index) => ({
+            ...DEFAULT_HERO_MOSAIC[index],
+            label: card.label || DEFAULT_HERO_MOSAIC[index].label,
+            image: typeof card.image === "string" ? card.image : "",
+          }))
+        )
+      } catch (err) {
+        console.error("Failed to load Home hero cards", err)
+      }
+    })()
+    return () => {
+      cancelled = true
     }
   }, [])
 

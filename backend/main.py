@@ -7,7 +7,13 @@ import jwt
 from datetime import datetime, timezone, timedelta
 from werkzeug.security import check_password_hash
 from database import find_user, update_timestamp
-from database.connection import edit_user, get_user_by_id
+from database.connection import (
+    HOME_HERO_CARDS_KEY,
+    edit_user,
+    get_site_content,
+    get_user_by_id,
+    upsert_site_content,
+)
 from config import Config
 
 # Disable loggings
@@ -35,6 +41,13 @@ CORS(app, origins=[
     f"https://{FRONTEND_URL}",
     f"http://{FRONTEND_URL}"
 ])
+
+DEFAULT_HOME_HERO_LABELS = [
+    "Farm Setup",
+    "Poultry Farming",
+    "Feeding Systems",
+    "Equipment Service",
+]
 
 @app.route('/api/login', methods=['POST', 'OPTIONS'])
 def login():
@@ -116,8 +129,10 @@ def admin_profile():
 
         user_row["avatar"] = user_row.get("profile_picture")
         return jsonify({"success": True, "user": user_row}), 200
+    
     except jwt.ExpiredSignatureError:
         return jsonify({"error": "Access token expired"}), 401
+    
     except Exception as e:
         print(f"Admin profile error: {e}")
         return jsonify({"error": "Internal server error"}), 500
@@ -151,10 +166,68 @@ def update_admin_profile():
 
         updated["avatar"] = updated.get("profile_picture")
         return jsonify({"success": True, "user": updated}), 200
+    
     except jwt.ExpiredSignatureError:
         return jsonify({"error": "Access token expired"}), 401
+    
     except Exception as e:
         print(f"Update admin profile error: {e}")
+        return jsonify({"error": "Internal server error"}), 500
+
+@app.route("/api/content/home-hero", methods=["GET", "OPTIONS"])
+def home_content():
+    if request.method == "OPTIONS":
+        return "", 200
+    
+    try:
+        cards = get_site_content(HOME_HERO_CARDS_KEY)
+        return jsonify({"success": True, "cards": cards}), 200
+    
+    except Exception as e:
+        print(f"Home hero read error: {e}")
+        return jsonify({"error": "Internal server error"}), 500
+
+@app.route("/api/admin/content/home-hero", methods=["PUT", "OPTIONS"])
+def update_home_content():
+    if request.method == "OPTIONS":
+        return "", 200
+    
+    try:
+        auth_header = request.headers.get("Authorization", "")
+        if not auth_header.startswith("Bearer "):
+            return jsonify({"error": "Missing Authorization Bearer token"}), 401
+
+        token = auth_header.split(" ", 1)[1].strip()
+        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[ALGORITHM])  # type: ignore
+
+        if not payload.get("user_id"):
+            return jsonify({"error": "Invalid token"}), 401
+
+        data = request.get_json(silent=True) or {}
+        cards = data.get("cards")
+        if not isinstance(cards, list) or len(cards) != 4:
+            return jsonify({"error": "cards must be an array of exactly 4 items"}), 400
+
+        normalized = []
+        for i, c in enumerate(cards):
+            if not isinstance(c, dict):
+                return jsonify({"error": f"cards[{i}] must be an object"}), 400
+            
+            label = str(c.get("label") or "").strip() or DEFAULT_HOME_HERO_LABELS[i]
+            raw_image = c.get("image", "")
+            if raw_image is not None and not isinstance(raw_image, str):
+                return jsonify({"error": f"cards[{i}].image must be a string"}), 400
+            
+            normalized.append({"label": label, "image": str(raw_image or "")})
+
+        row = upsert_site_content(HOME_HERO_CARDS_KEY, normalized)
+        return jsonify({"success": True, "cards": row.get("value")}), 200
+    
+    except jwt.ExpiredSignatureError:
+        return jsonify({"error": "Access token expired"}), 401
+    
+    except Exception as e:
+        print(f"Home hero write error: {e}")
         return jsonify({"error": "Internal server error"}), 500
 
 # Register blueprints
