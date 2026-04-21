@@ -19,13 +19,12 @@ import AboutEditor from "./admin/AboutEditor"
 import ContactEditor from "./admin/ContactEditor"
 import Settings from "./admin/Settings"
 import ComingSoon from "./admin/ComingSoon"
-
-const DEFAULT_HOME_HERO_CARDS = [
-  { label: "Farm Setup", image: "" },
-  { label: "Poultry Farming", image: "" },
-  { label: "Feeding Systems", image: "" },
-  { label: "Equipment Service", image: "" },
-]
+import {
+  HERO_IMAGES_HARD_MAX,
+  createDefaultHeroCards,
+  normalizeHeroCardsFromApi,
+  validateHeroCardsForSave,
+} from "../lib/homeHeroCards"
 
 const DEFAULT_ABOUT_STORY_IMAGE = "/images/about/story-photo.jpg"
 const DEFAULT_CONTACT_BUSINESS_HOURS_IMAGE = "/images/support/business-hours.jpg"
@@ -55,10 +54,6 @@ const NEW_CONTACT_PERSON_TEMPLATE = {
   image: "",
 }
 
-function cloneDefaultHomeHeroCards() {
-  return DEFAULT_HOME_HERO_CARDS.map((c) => ({ ...c }))
-}
-
 function cloneDefaultContactPeople() {
   return DEFAULT_CONTACT_PEOPLE.map((p) => ({ ...p }))
 }
@@ -77,7 +72,7 @@ export default function Admin() {
   const [isSavingContact, setIsSavingContact] = useState(false)
   const [isSavingSettings, setIsSavingSettings] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState("")
-  const [homeHeroCards, setHomeHeroCards] = useState(() => cloneDefaultHomeHeroCards())
+  const [homeHeroCards, setHomeHeroCards] = useState(() => createDefaultHeroCards())
   const [aboutStoryImage, setAboutStoryImage] = useState(DEFAULT_ABOUT_STORY_IMAGE)
   const [contactBusinessHoursImage, setContactBusinessHoursImage] = useState(DEFAULT_CONTACT_BUSINESS_HOURS_IMAGE)
   const [contactPeople, setContactPeople] = useState(() => cloneDefaultContactPeople())
@@ -122,8 +117,9 @@ export default function Admin() {
     ;(async () => {
       try {
         const cards = await fetchHomeHeroCardsApi()
-        if (cancelled || !cards || !Array.isArray(cards) || cards.length !== 4) return
-        setHomeHeroCards(cards.map((c) => ({ label: c.label || "", image: typeof c.image === "string" ? c.image : "" })))
+        if (cancelled || !cards) return
+        const normalized = normalizeHeroCardsFromApi(cards)
+        if (normalized) setHomeHeroCards(normalized)
       } catch (err) {
         console.error("Failed to load home hero cards for admin", err)
       }
@@ -224,17 +220,51 @@ export default function Admin() {
     }
   }
 
-  const updateHomeCard = (index, field, value) => {
-    setHomeHeroCards((prev) => prev.map((card, i) => (i === index ? { ...card, [field]: value } : card)))
+  const updateHomeCardLabel = (index, value) => {
+    setHomeHeroCards((prev) => prev.map((card, i) => (i === index ? { ...card, label: value } : card)))
   }
 
-  const handleImageUpload = (index, file) => {
+  const updateHomeBoxImage = (boxIndex, imageIndex, url) => {
+    setHomeHeroCards((prev) =>
+      prev.map((card, i) => {
+        if (i !== boxIndex) return card
+        const images = [...(card.images || [])]
+        images[imageIndex] = url
+        return { ...card, images }
+      })
+    )
+  }
+
+  const addHomeBoxImage = (boxIndex) => {
+    setHomeHeroCards((prev) =>
+      prev.map((card, i) => {
+        if (i !== boxIndex) return card
+        const images = [...(card.images || [])]
+        if (images.length >= HERO_IMAGES_HARD_MAX) return card
+        images.push("")
+        return { ...card, images }
+      })
+    )
+  }
+
+  const removeHomeBoxImage = (boxIndex, imageIndex) => {
+    setHomeHeroCards((prev) =>
+      prev.map((card, i) => {
+        if (i !== boxIndex) return card
+        const images = [...(card.images || [])]
+        if (images.length <= 0) return card
+        images.splice(imageIndex, 1)
+        return { ...card, images }
+      })
+    )
+  }
+
+  const handleHomeBoxImageUpload = (boxIndex, imageIndex, file) => {
     if (!file) return
     const reader = new FileReader()
     reader.onload = () => {
-      updateHomeCard(index, "image", String(reader.result || ""))
+      updateHomeBoxImage(boxIndex, imageIndex, String(reader.result || ""))
     }
-
     reader.readAsDataURL(file)
   }
 
@@ -287,6 +317,12 @@ export default function Admin() {
     setIsSavingHome(true)
     setSaveSuccess("")
     setError("")
+    const validationError = validateHeroCardsForSave(homeHeroCards)
+    if (validationError) {
+      setError(validationError)
+      setIsSavingHome(false)
+      return
+    }
     try {
       const accessToken = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken")
       if (!accessToken) {
@@ -295,14 +331,13 @@ export default function Admin() {
       }
 
       const saved = await saveHomeHeroCardsApi(accessToken, homeHeroCards)
-      if (saved && Array.isArray(saved) && saved.length === 4) {
-        setHomeHeroCards(saved.map((c) => ({ label: c.label || "", image: typeof c.image === "string" ? c.image : "" })))
-      }
+      const normalized = normalizeHeroCardsFromApi(saved)
+      if (normalized) setHomeHeroCards(normalized)
 
       setSaveSuccess("Home hero cards saved.")
       setTimeout(() => setSaveSuccess(""), 2000)
     } catch (err) {
-      setError("Failed to save home hero cards")
+      setError(err instanceof Error ? err.message : "Failed to save home hero cards")
       console.error(err)
     } finally {
       setIsSavingHome(false)
@@ -310,7 +345,7 @@ export default function Admin() {
   }
 
   const resetHomeContent = async () => {
-    const defaults = cloneDefaultHomeHeroCards()
+    const defaults = createDefaultHeroCards()
     setHomeHeroCards(defaults)
     setSaveSuccess("")
     setError("")
@@ -325,7 +360,7 @@ export default function Admin() {
       setSaveSuccess("Home hero cards reset to defaults and saved.")
       setTimeout(() => setSaveSuccess(""), 2000)
     } catch (err) {
-      setError("Failed to save default home hero cards")
+      setError(err instanceof Error ? err.message : "Failed to save default home hero cards")
       console.error(err)
     }
   }
@@ -421,8 +456,11 @@ export default function Admin() {
           {activeTab === "home" && (
             <HomeEditor
               homeHeroCards={homeHeroCards}
-              updateHomeCard={updateHomeCard}
-              handleImageUpload={handleImageUpload}
+              updateHomeCardLabel={updateHomeCardLabel}
+              updateHomeBoxImage={updateHomeBoxImage}
+              addHomeBoxImage={addHomeBoxImage}
+              removeHomeBoxImage={removeHomeBoxImage}
+              handleHomeBoxImageUpload={handleHomeBoxImageUpload}
               saveHomeContent={saveHomeContent}
               resetHomeContent={resetHomeContent}
               isSavingHome={isSavingHome}

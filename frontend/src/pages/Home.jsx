@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useMemo } from "react"
 import { Link } from "react-router-dom"
-import { motion, useInView } from "framer-motion"
+import { motion, useInView, AnimatePresence } from "framer-motion"
 import { fetchHomeHeroCardsApi } from "../api/adminAPI"
+import { createDefaultHeroMosaic, normalizeHeroCardsFromApi } from "../lib/homeHeroCards"
 
 /* ============================== Variants ============================== */
 const reveal = {
@@ -95,6 +96,196 @@ function OutlineButton({ to, children }) {
   )
 }
 
+const HERO_INNER_SLIDE_MS = 2500
+const HERO_INNER_SLIDE_EASE = [0.33, 1, 0.68, 1]
+
+/** Centered indeterminate ring — used while hero content is fetched and while images preload. */
+function HeroTileCenterSpinner({ className = "" }) {
+  return (
+    <div
+      className={`pointer-events-none flex h-12 w-12 items-center justify-center sm:h-14 sm:w-14 ${className}`}
+      aria-hidden
+    >
+      <div className="h-full w-full rounded-full border-2 border-white/25 border-t-rust border-r-rust/40 animate-spin shadow-lg" />
+    </div>
+  )
+}
+
+function HeroBoxCarousel({ label, images, bg, className = "", contentLoading = false }) {
+  const slots = useMemo(() => (Array.isArray(images) ? images : []), [images])
+  const n = slots.length
+  const [innerIdx, setInnerIdx] = useState(0)
+  const imageUrls = useMemo(() => {
+    const seen = new Set()
+    const out = []
+    for (const s of slots) {
+      const u = (s || "").trim()
+      if (u && !seen.has(u)) {
+        seen.add(u)
+        out.push(u)
+      }
+    }
+    return out
+  }, [slots])
+
+  const [imagesReady, setImagesReady] = useState(() => imageUrls.length === 0)
+
+  useEffect(() => {
+    if (imageUrls.length === 0) {
+      setImagesReady(true)
+      return
+    }
+    setImagesReady(false)
+    let alive = true
+    let remaining = imageUrls.length
+    const done = () => {
+      remaining -= 1
+      if (remaining <= 0 && alive) setImagesReady(true)
+    }
+    for (const u of imageUrls) {
+      const img = new Image()
+      img.onload = done
+      img.onerror = done
+      img.src = u
+    }
+    return () => {
+      alive = false
+    }
+  }, [imageUrls])
+
+  useEffect(() => {
+    setInnerIdx(0)
+  }, [n])
+
+  useEffect(() => {
+    if (n <= 1) return undefined
+    const id = setInterval(() => {
+      setInnerIdx((p) => (p + 1) % n)
+    }, HERO_INNER_SLIDE_MS)
+    return () => clearInterval(id)
+  }, [n])
+
+  const shellClass = `${className} relative block h-full w-full min-h-[min(40vh,300px)] overflow-hidden sm:min-h-[min(42vh,340px)] lg:min-h-[min(36vh,260px)]`
+  const showImageLoadOverlay = !contentLoading && n > 0 && imageUrls.length > 0 && !imagesReady
+
+  if (n === 0) {
+    return (
+      <div className={shellClass} style={{ backgroundImage: bg, backgroundSize: "cover", backgroundPosition: "center" }}>
+        <AnimatePresence>
+          {contentLoading && (
+            <motion.div
+              key="hero-db-load"
+              className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center bg-black/20"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              aria-busy="true"
+              aria-label={`Loading ${label}`}
+            >
+              <HeroTileCenterSpinner className="relative z-10" />
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <span className="absolute bottom-3 left-3 z-40 font-label font-bold tracking-[2px] uppercase text-straw bg-nav-text/20 px-2 py-1 backdrop-blur-sm text-xs sm:text-sm">
+          {label}
+        </span>
+      </div>
+    )
+  }
+
+  const slidePercent = 100 / n
+
+  return (
+    <div className={shellClass}>
+      <div className="absolute inset-0 overflow-hidden">
+        <motion.div
+          className="flex h-full"
+          style={{ width: `${n * 100}%` }}
+          initial={false}
+          animate={{ x: `${-(slidePercent * innerIdx)}%` }}
+          transition={{ duration: 0.55, ease: HERO_INNER_SLIDE_EASE }}
+        >
+          {slots.map((src, i) => {
+            const u = (src || "").trim()
+            return (
+              <div
+                key={`slide-${i}`}
+                className="h-full shrink-0 bg-cover bg-center"
+                style={{
+                  width: `${slidePercent}%`,
+                  backgroundImage: u
+                    ? `linear-gradient(180deg,rgba(0,0,0,0.12),rgba(0,0,0,0.65)), url(${u})`
+                    : bg,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }}
+              />
+            )
+          })}
+        </motion.div>
+      </div>
+
+      <AnimatePresence>
+        {contentLoading && (
+          <motion.div
+            key="hero-db-load"
+            className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center bg-black/20"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            aria-busy="true"
+            aria-label={`Loading ${label}`}
+          >
+            <HeroTileCenterSpinner className="relative z-10" />
+          </motion.div>
+        )}
+        {showImageLoadOverlay && (
+          <motion.div
+            key="hero-tile-img-load"
+            className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center"
+            initial={{ opacity: 1 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
+            aria-busy="true"
+            aria-label={`Loading ${label} images`}
+          >
+            <div className="absolute inset-0 bg-black/25 backdrop-blur-[2px]" />
+            <motion.div
+              className="absolute inset-3 rounded-md border-2 border-dashed border-rust/55 sm:inset-4"
+              style={{ transformOrigin: "50% 50%" }}
+              animate={{ rotate: 360 }}
+              transition={{ duration: 14, repeat: Infinity, ease: "linear" }}
+            />
+            <motion.div
+              className="absolute inset-3 rounded-md border-2 border-rust/25 sm:inset-4"
+              animate={{ opacity: [0.35, 0.85, 0.35] }}
+              transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+            />
+            <HeroTileCenterSpinner className="relative z-10" />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <span className="pointer-events-none absolute bottom-3 left-3 z-40 font-label font-bold tracking-[2px] uppercase text-straw bg-nav-text/20 px-2 py-1 backdrop-blur-sm text-xs sm:text-sm">
+        {label}
+      </span>
+      {n > 1 && (
+        <div className="pointer-events-none absolute bottom-3 right-3 z-40 flex items-center gap-1.5" aria-hidden="true">
+          {slots.map((_, i) => (
+            <span
+              key={`dot-${i}`}
+              className={`h-1 rounded-full transition-all duration-300 ${innerIdx === i ? "w-5 bg-straw" : "w-1.5 bg-white/45"}`}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ============================== Hero ==============================
 function Hero() {
   const [currentSlide, setCurrentSlide] = useState(0)
@@ -105,30 +296,30 @@ function Hero() {
     ["100s", "Farms Served"]
   ];
 
-  const DEFAULT_HERO_MOSAIC = [
-    { label: "Farm Setup", image: "", bg: "linear-gradient(135deg,#2C2010,#1A1208)" },
-    { label: "Poultry Farming", image: "", bg: "linear-gradient(135deg,#2C2010,#1A1208)" },
-    { label: "Feeding Systems", image: "", bg: "linear-gradient(135deg,#3A2A18,#221A10)" },
-    { label: "Equipment Service", image: "", bg: "linear-gradient(135deg,#281E12,#1C140C)" },
-  ];
-  const [heroMosaic, setHeroMosaic] = useState(DEFAULT_HERO_MOSAIC)
+  const [heroMosaic, setHeroMosaic] = useState(() => createDefaultHeroMosaic())
+  const [heroContentLoading, setHeroContentLoading] = useState(true)
 
   useEffect(() => {
     let cancelled = false
     ;(async () => {
       try {
         const cards = await fetchHomeHeroCardsApi()
-        if (cancelled || !cards || !Array.isArray(cards) || cards.length !== 4) return
-
+        if (cancelled) return
+        if (!cards) return
+        const normalized = normalizeHeroCardsFromApi(cards)
+        if (!normalized) return
+        const base = createDefaultHeroMosaic()
         setHeroMosaic(
-          cards.map((card, index) => ({
-            ...DEFAULT_HERO_MOSAIC[index],
-            label: card.label || DEFAULT_HERO_MOSAIC[index].label,
-            image: typeof card.image === "string" ? card.image : "",
+          normalized.map((card, index) => ({
+            ...base[index],
+            label: card.label,
+            images: card.images,
           }))
         )
       } catch (err) {
         console.error("Failed to load Home hero cards", err)
+      } finally {
+        if (!cancelled) setHeroContentLoading(false)
       }
     })()
     return () => {
@@ -145,7 +336,7 @@ function Hero() {
   }
 
   return (
-    <section className="relative min-h-screen grid grid-cols-1 lg:grid-cols-2 pt-16 overflow-hidden bg-barn">
+    <section className="relative min-h-screen grid grid-cols-1 items-stretch lg:grid-cols-2 pt-16 overflow-hidden bg-barn">
       {/* ==================== Background Effects ==================== */}
       <div
         className="absolute inset-0 pointer-events-none"
@@ -222,35 +413,32 @@ function Hero() {
 
       {/* ==================== Right - Mosaic ==================== */}
       <motion.div
-        className="relative z-10 overflow-hidden px-4 pb-6 sm:px-6 sm:pb-8 lg:px-0 lg:pb-0"
+        className="relative z-10 flex min-h-[min(48vh,400px)] flex-col overflow-hidden px-4 pb-6 sm:px-6 sm:pb-8 lg:h-full lg:min-h-0 lg:self-stretch lg:px-0 lg:pb-0"
         variants={contentStagger}
         initial="hidden"
         animate="visible"
       >
         {/* Mobile/Tablet: slider window */}
-        <div className="relative lg:hidden">
+        <div className="relative shrink-0 lg:hidden">
           <div className="overflow-hidden">
             <motion.div
               className="flex"
               animate={{ x: `-${currentSlide * 100}%` }}
               transition={{ duration: 0.45, ease: "easeInOut" }}
             >
-              {heroMosaic.map(({ label, image, bg }) => (
+              {heroMosaic.map((tile, idx) => (
                 <motion.div
-                  key={label}
-                  className="relative w-full shrink-0 aspect-[4/3] sm:aspect-[5/3] overflow-hidden"
-                  style={{
-                    backgroundImage: image
-                      ? `linear-gradient(180deg,rgba(0,0,0,0.12),rgba(0,0,0,0.65)), url(${image})`
-                      : bg,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                  }}
+                  key={`${tile.label}-${idx}`}
+                  className="relative w-full shrink-0 aspect-[4/3] sm:aspect-[5/3]"
                   variants={reveal}
                 >
-                  <span className="absolute bottom-3 left-3 font-label font-bold tracking-[2px] uppercase text-straw bg-nav-text/20 px-2 py-1 backdrop-blur-sm text-xs sm:text-sm">
-                    {label}
-                  </span>
+                  <HeroBoxCarousel
+                    label={tile.label}
+                    images={tile.images}
+                    bg={tile.bg}
+                    className="h-full w-full"
+                    contentLoading={heroContentLoading}
+                  />
                 </motion.div>
               ))}
             </motion.div>
@@ -285,24 +473,21 @@ function Hero() {
           </div>
         </div>
 
-        {/* Desktop: keep 2x2 mosaic */}
-        <div className="hidden lg:grid lg:grid-cols-2 lg:grid-rows-2 gap-0.5 h-full">
-          {heroMosaic.map(({ label, image, bg }) => (
+        {/* Desktop: 2x2 fills column height; carousel uses min-height (label is position:absolute). */}
+        <div className="hidden min-h-0 flex-1 lg:grid lg:grid-cols-2 lg:grid-rows-2 lg:gap-0.5">
+          {heroMosaic.map((tile, idx) => (
             <motion.div
-              key={label}
-              className="relative flex items-center justify-center overflow-hidden"
-              style={{
-                backgroundImage: image
-                  ? `linear-gradient(180deg,rgba(0,0,0,0.12),rgba(0,0,0,0.65)), url(${image})`
-                  : bg,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }}
+              key={`${tile.label}-${idx}`}
+              className="relative min-h-0 overflow-hidden"
               variants={reveal}
             >
-              <span className="absolute bottom-3 left-3 font-label font-bold tracking-[2px] uppercase text-straw bg-nav-text/20 px-2 py-1 backdrop-blur-sm text-sm">
-                {label}
-              </span>
+              <HeroBoxCarousel
+                label={tile.label}
+                images={tile.images}
+                bg={tile.bg}
+                className="h-full"
+                contentLoading={heroContentLoading}
+              />
             </motion.div>
           ))}
         </div>
