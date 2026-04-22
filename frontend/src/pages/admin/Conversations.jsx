@@ -11,8 +11,8 @@ export default function Conversations({
 }) {
   return (
     <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
-      <div className="xl:col-span-1 bg-charcoal/30 rounded-lg border border-rust/20 p-4 sm:p-5">
-        <h2 className="font-label text-xl text-nav-text mb-4 flex items-center">
+      <div className="xl:col-span-1 bg-paper/30 rounded-lg border border-rust/20 p-4 sm:p-5">
+        <h2 className="font-label text-xl text-foreground mb-4 flex items-center">
           <FolderIcon className="h-5 w-5 mr-2 text-rust" />
           Conversation Files
         </h2>
@@ -32,13 +32,13 @@ export default function Conversations({
                   className={`w-full text-left p-3 rounded-lg transition-all duration-200 ${
                     selectedConversation?.filename === conv.name
                       ? "bg-rust/20 border border-rust"
-                      : "bg-charcoal hover:bg-charcoal/80 border border-rust/10 hover:border-rust/30"
+                      : "bg-paper hover:bg-paper/80 border border-rust/10 hover:border-rust/30"
                   }`}
                 >
                   <div className="flex items-start">
                     <DocumentTextIcon className="h-5 w-5 text-rust mt-0.5 mr-2 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <p className="text-base font-medium text-nav-text truncate">{conv.name}</p>
+                      <p className="text-base font-medium text-foreground truncate">{conv.name}</p>
                       <div className="flex items-center text-sm text-muted mt-1 space-x-2">
                         <span className="flex items-center">
                           <CalendarIcon className="h-3 w-3 mr-1" />
@@ -61,11 +61,11 @@ export default function Conversations({
         )}
       </div>
 
-      <div className="xl:col-span-2 bg-charcoal/30 rounded-lg border border-rust/20 p-4 sm:p-6 min-w-0">
+      <div className="xl:col-span-2 bg-paper/30 rounded-lg border border-rust/20 p-4 sm:p-6 min-w-0">
         {selectedConversation ? (
           <>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-label text-xl text-nav-text flex items-center">
+              <h3 className="font-label text-xl text-foreground flex items-center">
                 <DocumentTextIcon className="h-5 w-5 mr-2 text-rust" />
                 {selectedConversation.filename}
               </h3>

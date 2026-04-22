@@ -19,10 +19,10 @@ export default function Settings({
   return (
     <motion.div variants={fadeInUp} initial="hidden" animate="visible" className="max-w-4xl">
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-        <div className="lg:col-span-2 bg-charcoal/30 border border-rust/20 rounded-xl p-5">
+        <div className="lg:col-span-2 bg-paper/30 border border-rust/20 rounded-xl p-5">
           <p className="text-sm uppercase tracking-[2px] text-rust font-label mb-3">Profile picture</p>
           <div className="flex items-center gap-4">
-            <div className="h-20 w-20 rounded-full overflow-hidden border border-rust/25 bg-charcoal flex items-center justify-center">
+            <div className="h-20 w-20 rounded-full overflow-hidden border border-rust/25 bg-paper flex items-center justify-center">
               {settingsProfilePicture ? (
                 <img src={settingsProfilePicture} alt="Admin profile" className="h-full w-full object-cover" />
               ) : (
@@ -37,7 +37,7 @@ export default function Settings({
                 type="text"
                 value={settingsProfilePicture}
                 onChange={(e) => setSettingsProfilePicture(e.target.value)}
-                className="w-full rounded-lg bg-charcoal border border-rust/20 px-3 py-2 text-base text-nav-text focus:outline-none focus:border-rust focus:ring-1 focus:ring-rust/40"
+                className="w-full rounded-lg bg-paper border border-rust/20 px-3 py-2 text-base text-foreground focus:outline-none focus:border-rust focus:ring-1 focus:ring-rust/40"
                 placeholder="https://... or data:image/... or /images/..."
               />
               <div className="mt-3 flex items-center justify-between gap-3">
@@ -48,14 +48,14 @@ export default function Settings({
                     className="hidden"
                     onChange={(e) => handleSettingsImageUpload(e.target.files?.[0])}
                   />
-                  <span className="px-3 py-2 rounded-lg bg-barn/60 border border-rust/20 text-nav-text hover:border-rust/50 transition-colors">
+                  <span className="px-3 py-2 rounded-lg bg-barn/60 border border-rust/20 text-foreground hover:border-rust/50 transition-colors">
                     Upload image
                   </span>
                 </label>
                 <button
                   type="button"
                   onClick={() => setSettingsProfilePicture("")}
-                  className="text-sm text-muted hover:text-nav-text transition-colors"
+                  className="text-sm text-muted hover:text-foreground transition-colors"
                 >
                   Clear
                 </button>
@@ -64,7 +64,7 @@ export default function Settings({
           </div>
         </div>
 
-        <div className="lg:col-span-3 bg-charcoal/30 border border-rust/20 rounded-xl p-5">
+        <div className="lg:col-span-3 bg-paper/30 border border-rust/20 rounded-xl p-5">
           <p className="text-sm uppercase tracking-[2px] text-rust font-label mb-4">Account details</p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -74,7 +74,7 @@ export default function Settings({
                 type="text"
                 value={settingsFirstName}
                 onChange={(e) => setSettingsFirstName(e.target.value)}
-                className="w-full rounded-lg bg-charcoal border border-rust/20 px-3 py-2 text-base text-nav-text focus:outline-none focus:border-rust focus:ring-1 focus:ring-rust/40"
+                className="w-full rounded-lg bg-paper border border-rust/20 px-3 py-2 text-base text-foreground focus:outline-none focus:border-rust focus:ring-1 focus:ring-rust/40"
                 placeholder="First name"
               />
             </div>
@@ -84,7 +84,7 @@ export default function Settings({
                 type="text"
                 value={settingsLastName}
                 onChange={(e) => setSettingsLastName(e.target.value)}
-                className="w-full rounded-lg bg-charcoal border border-rust/20 px-3 py-2 text-base text-nav-text focus:outline-none focus:border-rust focus:ring-1 focus:ring-rust/40"
+                className="w-full rounded-lg bg-paper border border-rust/20 px-3 py-2 text-base text-foreground focus:outline-none focus:border-rust focus:ring-1 focus:ring-rust/40"
                 placeholder="Last name"
               />
             </div>
@@ -94,7 +94,7 @@ export default function Settings({
                 type="email"
                 value={settingsEmail}
                 onChange={(e) => setSettingsEmail(e.target.value)}
-                className="w-full rounded-lg bg-charcoal border border-rust/20 px-3 py-2 text-base text-nav-text focus:outline-none focus:border-rust focus:ring-1 focus:ring-rust/40"
+                className="w-full rounded-lg bg-paper border border-rust/20 px-3 py-2 text-base text-foreground focus:outline-none focus:border-rust focus:ring-1 focus:ring-rust/40"
                 placeholder="email@example.com"
               />
             </div>
@@ -107,7 +107,7 @@ export default function Settings({
               onClick={saveSettings}
               disabled={isSavingSettings}
               className={`px-4 py-2 rounded-lg font-label text-sm uppercase tracking-[2px] transition-all ${
-                isSavingSettings ? "bg-rust/30 text-rust/70 cursor-not-allowed" : "bg-rust text-white hover:bg-rust/90"
+                isSavingSettings ? "bg-rust/30 text-rust/70 cursor-not-allowed" : "bg-rust text-paper hover:bg-rust/90"
               }`}
             >
               {isSavingSettings ? "Saving..." : "Save"}

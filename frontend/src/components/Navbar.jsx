@@ -42,26 +42,26 @@ export default function Navbar() {
   ]
 
   return (
-    <nav className="fixed top-0 w-full z-50 h-16 flex items-center justify-between px-4 lg:px-12 bg-nav-bg/96 backdrop-blur-md border-b border-rust/30">
-      {/* Logo */}
+    <nav className="fixed top-0 w-full z-50 h-16 flex items-center justify-between px-4 lg:px-12 bg-paper/96 backdrop-blur-md border-b border-rust/30">
+      {/* ==================== Logo ==================== */}
       <Link
         to="/"
-        className="flex items-center h-full gap-2 text-nav-text font-label font-semibold text-xl tracking-[2px]"
+        className="flex items-center h-full gap-2 text-foreground font-label font-semibold text-xl tracking-[2px]"
         onClick={() => setMobileMenuOpen(false)}
       >
         East Texas
         <span className="text-rust">Poultry Supply</span>
       </Link>
 
-      {/* Mobile Menu Button */}
+      {/* ==================== Mobile Menu Button ==================== */}
       <button 
         className="block lg:hidden bg-transparent border border-rust/50 rounded p-2 cursor-pointer z-50"
         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
       >
-        <span className="text-2xl text-nav-text">{mobileMenuOpen ? "✕" : "☰"}</span>
+        <span className="text-2xl text-foreground">{mobileMenuOpen ? "✕" : "☰"}</span>
       </button>
 
-      {/* Desktop Navigation */}
+      {/* ==================== Desktop Navigation ==================== */}
       <div className="hidden lg:flex items-center h-full gap-0">
         {NAV_LINKS.map((item) => (
           <div
@@ -73,14 +73,14 @@ export default function Navbar() {
             {item.to ? (
               <Link
                 to={item.to}
-                className="flex items-center h-full px-5 text-nav-text font-label text-[15px] font-semibold tracking-[2px] uppercase hover:text-nav-hover transition-colors duration-200"
+                className="flex items-center h-full px-5 text-foreground font-label text-[15px] font-semibold tracking-[2px] uppercase hover:text-rust transition-colors duration-200"
               >
                 {item.label}
               </Link>
             ) : (
               <button
                 className={`flex items-center h-full px-5 bg-transparent border-none cursor-pointer font-label text-[15px] font-semibold tracking-[2px] uppercase transition-colors duration-200 ${
-                  openMenu === item.label ? "text-nav-hover" : "text-nav-text"
+                  openMenu === item.label ? "text-rust" : "text-foreground"
                 }`}
               >
                 {item.label} <span className="ml-1">▾</span>
@@ -90,7 +90,7 @@ export default function Navbar() {
             {/* Desktop Dropdown */}
             {item.children && (
               <div
-                className={`absolute top-full left-0 min-w-60 bg-nav-bg border border-rust/30 border-t-2 border-t-rust transition-all duration-200 z-[100] ${
+                className={`absolute top-full left-0 min-w-60 bg-paper border border-rust/30 border-t-2 border-t-rust transition-all duration-200 z-[100] ${
                   openMenu === item.label 
                     ? "opacity-100 translate-y-0 pointer-events-auto" 
                     : "opacity-0 -translate-y-2 pointer-events-none"
@@ -100,7 +100,7 @@ export default function Navbar() {
                   <Link
                     key={child.to}
                     to={child.to}
-                    className="block px-5 py-2.5 text-[13px] font-medium tracking-[1px] text-nav-text border-b border-dropdown-border hover:bg-rust/15 hover:text-nav-hover hover:pl-7 transition-all duration-150"
+                    className="block px-5 py-2.5 text-[13px] font-medium tracking-[1px] text-foreground border-b border-muted/10 hover:bg-rust/15 hover:text-rust hover:pl-7 transition-all duration-150"
                   >
                     {child.label}
                   </Link>
@@ -110,10 +110,10 @@ export default function Navbar() {
           </div>
         ))}
 
-        {/* Desktop Login Button */}
+        {/*  Desktop Login Button */}
         <Link
           to="/login"
-          className="inline-flex items-center justify-center ml-4 px-5 py-2 bg-rust text-white font-label text-xs font-bold tracking-[2px] uppercase hover:bg-rust-dark transition-colors duration-200"
+          className="inline-flex items-center justify-center ml-4 px-5 py-2 bg-rust text-paper font-label text-xs font-bold tracking-[2px] uppercase hover:bg-rust-dark transition-colors duration-200"
         >
           Login
         </Link>
@@ -121,13 +121,13 @@ export default function Navbar() {
 
       {/* Mobile Menu Overlay */}
       {mobileMenuOpen && (
-        <div className="fixed top-16 left-0 w-full h-[calc(100vh-64px)] bg-nav-bg/98 backdrop-blur-md z-40 overflow-y-auto py-5 block lg:hidden">
+        <div className="fixed top-16 left-0 w-full h-[calc(100vh-64px)] bg-paper/98 backdrop-blur-md z-40 overflow-y-auto py-5 block lg:hidden">
           {NAV_LINKS.map((item) => (
             <div key={item.label} className="w-full border-b border-rust/10">
               {item.to ? (
                 <Link
                   to={item.to}
-                  className="flex items-center px-5 py-3 text-nav-text font-label text-[15px] font-semibold tracking-[2px] uppercase hover:text-nav-hover transition-colors duration-200 w-full"
+                  className="flex items-center px-5 py-3 text-foreground font-label text-[15px] font-semibold tracking-[2px] uppercase hover:text-rust transition-colors duration-200 w-full"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {item.label}
@@ -136,7 +136,7 @@ export default function Navbar() {
                 <>
                   <button
                     className={`flex items-center justify-between w-full px-5 py-3 bg-transparent border-none cursor-pointer font-label text-[15px] font-semibold tracking-[2px] uppercase transition-colors duration-200 ${
-                      openMenu === item.label ? "text-nav-hover" : "text-nav-text"
+                      openMenu === item.label ? "text-rust" : "text-foreground"
                     }`}
                     onClick={() => setOpenMenu(openMenu === item.label ? null : item.label)}
                   >
@@ -145,12 +145,12 @@ export default function Navbar() {
                   
                   {/* Mobile Dropdown */}
                   {item.children && openMenu === item.label && (
-                    <div className="bg-nav-bg/50 pl-5">
+                    <div className="bg-paper/50 pl-5">
                       {item.children.map((child) => (
                         <Link
                           key={child.to}
                           to={child.to}
-                          className="block px-5 py-2.5 text-[13px] font-medium tracking-[1px] text-nav-text border-l-2 border-rust hover:bg-rust/15 hover:text-nav-hover hover:pl-7 transition-all duration-150"
+                          className="block px-5 py-2.5 text-[13px] font-medium tracking-[1px] text-foreground border-l-2 border-rust hover:bg-rust/15 hover:text-rust hover:pl-7 transition-all duration-150"
                           onClick={() => {
                             setMobileMenuOpen(false)
                             setOpenMenu(null)
@@ -169,7 +169,7 @@ export default function Navbar() {
           {/* Mobile Login Button */}
           <Link
             to="/login"
-            className="flex items-center justify-center mx-5 mt-5 px-5 py-2 bg-rust text-white font-label text-xs font-bold tracking-[2px] uppercase hover:bg-rust-dark transition-colors duration-200"
+            className="flex items-center justify-center mx-5 mt-5 px-5 py-2 bg-rust text-paper font-label text-xs font-bold tracking-[2px] uppercase hover:bg-rust-dark transition-colors duration-200"
             onClick={() => setMobileMenuOpen(false)}
           >
             Login

@@ -43,7 +43,7 @@ function SectionHeader({ label, title, titleHighlight, description = "" }) {
           <span className="block w-8 h-0.5 bg-rust" />
           {label}
         </motion.div>
-        <motion.h2 variants={reveal} className="font-display text-title leading-none text-nav-text text-2xl sm:text-3xl md:text-4xl lg:text-5xl">
+        <motion.h2 variants={reveal} className="font-display text-title leading-none text-foreground text-2xl sm:text-3xl md:text-4xl lg:text-5xl">
           {title} {titleHighlight && <span className="text-rust">{titleHighlight}</span>}
         </motion.h2>
       </motion.div>
@@ -119,9 +119,9 @@ export default function Privacy() {
       <div className="max-w-full overflow-x-hidden">
 
         {/* ==================== Page Header ==================== */}
-        <div className="bg-nav-text py-14 sm:py-18 md:py-22 lg:py-24 px-6 sm:px-10 md:px-14 lg:px-24 relative overflow-hidden">
-          <div className="absolute inset-0 pointer-events-none opacity-[0.04] bg-[linear-gradient(rgba(255,255,255,1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,1)_1px,transparent_1px)] bg-[size:40px_40px]"/>
-          <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_30%_50%,rgba(196,82,26,0.12)_0%,transparent_60%)]" />
+        <div className="bg-foreground py-14 sm:py-18 md:py-22 lg:py-24 px-6 sm:px-10 md:px-14 lg:px-24 relative overflow-hidden">
+          <div className="support-band-grid pointer-events-none absolute inset-0" aria-hidden />
+          <div className="support-band-glow pointer-events-none absolute inset-0" aria-hidden />
           <motion.div
             className="relative"
             variants={sectionStagger}
@@ -132,10 +132,10 @@ export default function Privacy() {
               <span className="block w-8 h-0.5 bg-rust" />
               Legal
             </motion.div>
-            <motion.h1 variants={reveal} className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-hero leading-[1.1] sm:leading-[0.92] text-white mb-4">
+            <motion.h1 variants={reveal} className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-hero leading-[1.1] sm:leading-[0.92] text-paper mb-4">
               Terms &amp; <span className="text-rust">Privacy</span>
             </motion.h1>
-            <motion.p variants={reveal} className="font-label text-xs sm:text-sm md:text-md tracking-[2px] sm:tracking-[3px] uppercase text-white/40 mt-4">
+            <motion.p variants={reveal} className="font-label text-xs sm:text-sm md:text-md tracking-[2px] sm:tracking-[3px] uppercase text-paper/40 mt-4">
               Last updated: April, 2026 · East Texas Poultry Supply
             </motion.p>
           </motion.div>
@@ -159,10 +159,10 @@ export default function Privacy() {
                 className="flex flex-col sm:flex-row gap-4 sm:gap-6 md:gap-8 py-6 sm:py-8 md:py-10 border-t border-mid/15 last:border-b last:border-mid/15"
               >
                 <div className="flex-shrink-0 sm:w-14">
-                  <span className="font-display text-3xl sm:text-4xl md:text-5xl text-nav-text leading-none">{number}</span>
+                  <span className="font-display text-3xl sm:text-4xl md:text-5xl text-foreground leading-none">{number}</span>
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-label text-xl sm:text-2xl md:text-3xl font-bold tracking-[1px] sm:tracking-[2px] uppercase text-nav-text mb-3 sm:mb-4">{title}</h3>
+                  <h3 className="font-label text-xl sm:text-2xl md:text-3xl font-bold tracking-[1px] sm:tracking-[2px] uppercase text-foreground mb-3 sm:mb-4">{title}</h3>
                   {content && (
                     <p className="text-base sm:text-lg leading-relaxed text-muted font-light m-0">{content}</p>
                   )}
@@ -198,7 +198,7 @@ export default function Privacy() {
                 <motion.div
                   key={i}
                   variants={reveal}
-                  className="bg-white border border-mid/15 border-l-2 border-l-rust p-5 sm:p-6 md:p-7"
+                  className="bg-paper border border-mid/15 border-l-2 border-l-rust p-5 sm:p-6 md:p-7"
                 >
                   <div className="font-display text-xl sm:text-2xl text-rust leading-none mb-3 sm:mb-4 select-none">
                     {String(i + 1).padStart(2, "0")}
@@ -218,15 +218,15 @@ export default function Privacy() {
         </div>
 
         {/* ==================== CTA ==================== */}
-        <Section className="bg-white border-t border-mid/15 px-6 sm:px-10 md:px-14 lg:px-24 py-10 sm:py-14 md:py-18 lg:py-20 flex flex-col sm:flex-row items-center justify-between gap-6 sm:gap-8">
+        <Section className="bg-paper border-t border-mid/15 px-6 sm:px-10 md:px-14 lg:px-24 py-10 sm:py-14 md:py-18 lg:py-20 flex flex-col sm:flex-row items-center justify-between gap-6 sm:gap-8">
           <motion.div variants={reveal} className="text-center sm:text-left">
             <p className="font-bold text-base sm:text-lg tracking-[2px] sm:tracking-[3px] uppercase text-rust mb-2">Questions?</p>
-            <h3 className="font-display text-xl sm:text-2xl md:text-3xl text-nav-text leading-tight sm:leading-none">Get in touch with our team.</h3>
+            <h3 className="font-display text-xl sm:text-2xl md:text-3xl text-foreground leading-tight sm:leading-none">Get in touch with our team.</h3>
           </motion.div>
           <motion.div variants={reveal} className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
             <a
               href="/support/contact"
-              className="inline-block transition-all duration-200 bg-rust text-white px-6 sm:px-8 py-2.5 sm:py-3.5 font-label font-bold text-xs tracking-[2px] sm:tracking-[3px] uppercase border-2 border-rust hover:bg-rust-dark hover:border-rust-dark text-center w-full sm:w-auto"
+              className="inline-block transition-all duration-200 bg-rust text-paper px-6 sm:px-8 py-2.5 sm:py-3.5 font-label font-bold text-xs tracking-[2px] sm:tracking-[3px] uppercase border-2 border-rust hover:bg-rust-dark hover:border-rust-dark text-center w-full sm:w-auto"
             >
               Contact Us
             </a>

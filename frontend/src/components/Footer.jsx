@@ -44,7 +44,7 @@ export default function Footer() {
   ]
 
   return (
-    <footer className="bg-[#0D0B08] border-t border-rust/20 overflow-x-hidden">
+    <footer className="bg-scrim border-t border-rust/20 overflow-x-hidden">
       <div className="max-w-full overflow-x-hidden">
         
         {/* ==================== Content ==================== */}
@@ -54,7 +54,7 @@ export default function Footer() {
           <div className="hidden lg:grid grid-cols-[3fr_1fr_1fr_1fr] gap-8 sm:gap-10 md:gap-12 lg:gap-16 mb-8 sm:mb-10">
             {/* Logo & Info Section */}
             <div>
-              <div className="font-display text-2xl sm:text-3xl tracking-[2px] sm:tracking-[3px] text-white mb-3 sm:mb-4">
+              <div className="font-display text-2xl sm:text-3xl tracking-[2px] sm:tracking-[3px] text-paper mb-3 sm:mb-4">
                 East Texas <span className="text-rust">Poultry Supply</span>
               </div>
               <p className="text-sm sm:text-base text-gray-500 leading-relaxed font-light mb-4 sm:mb-6">
@@ -68,7 +68,7 @@ export default function Footer() {
             {/* Footer Sections */}
             {FOOTER_SECTIONS.map(({ heading, links }) => (
               <div key={heading}>
-                <h4 className="font-label text-sm sm:text-base font-bold tracking-[2px] sm:tracking-[3px] uppercase text-white mb-4 sm:mb-5">
+                <h4 className="font-label text-sm sm:text-base font-bold tracking-[2px] sm:tracking-[3px] uppercase text-paper mb-4 sm:mb-5">
                   {heading}
                 </h4>
                 <ul className="flex flex-col gap-2 sm:gap-2.5 list-none p-0 m-0">
@@ -91,7 +91,7 @@ export default function Footer() {
           <div className="lg:hidden">
             {/* Logo & Info Section */}
             <div className="mb-8 sm:mb-10">
-              <div className="font-display text-2xl sm:text-3xl tracking-[2px] sm:tracking-[3px] text-white mb-3 sm:mb-4">
+              <div className="font-display text-2xl sm:text-3xl tracking-[2px] sm:tracking-[3px] text-paper mb-3 sm:mb-4">
                 East Texas <span className="text-rust">Poultry Supply</span>
               </div>
               <p className="text-sm sm:text-base text-gray-500 leading-relaxed font-light mb-4 sm:mb-6">
@@ -107,7 +107,7 @@ export default function Footer() {
               <div className="grid grid-cols-3 gap-4 sm:gap-3 md:gap-4 lg:gap-6 mb-8 sm:mb-10">
                 {FOOTER_SECTIONS.map(({ heading, links }) => (
                   <div key={heading}>
-                    <h4 className="font-label text-xs sm:text-sm font-bold tracking-[2px] uppercase text-white mb-3">
+                    <h4 className="font-label text-xs sm:text-sm font-bold tracking-[2px] uppercase text-paper mb-3">
                       {heading}
                     </h4>
                     <ul className="flex flex-col gap-1.5 sm:gap-2 list-none p-0 m-0">
@@ -135,7 +135,7 @@ export default function Footer() {
                     onClick={() => toggleSection(heading)}
                     className="flex items-center justify-between w-full py-3 text-left"
                   >
-                    <h4 className="font-label text-sm font-bold tracking-[2px] uppercase text-white">
+                    <h4 className="font-label text-sm font-bold tracking-[2px] uppercase text-paper">
                       {heading}
                     </h4>
                     <span className="text-rust text-lg">

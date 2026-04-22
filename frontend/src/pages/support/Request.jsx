@@ -37,7 +37,7 @@ function SectionHeader({ label, title, titleHighlight, description = "" }) {
           <span className="block w-8 h-0.5 bg-rust" />
           {label}
         </motion.div>
-        <motion.h2 variants={reveal} className="font-display text-title leading-none text-nav-text text-2xl sm:text-3xl md:text-4xl lg:text-5xl">
+        <motion.h2 variants={reveal} className="font-display text-title leading-none text-foreground text-2xl sm:text-3xl md:text-4xl lg:text-5xl">
           {title} {titleHighlight && <span className="text-rust">{titleHighlight}</span>}
         </motion.h2>
       </motion.div>
@@ -164,9 +164,9 @@ export default function Request() {
   return (
     <main className="bg-barn min-h-screen pt-16 overflow-x-hidden">
       <div className="max-w-full overflow-x-hidden">
-        <div className="bg-nav-text py-14 sm:py-18 md:py-22 lg:py-24 px-6 sm:px-10 md:px-14 lg:px-24 relative overflow-hidden">
-          <div className="absolute inset-0 pointer-events-none opacity-[0.04] bg-[linear-gradient(rgba(255,255,255,1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,1)_1px,transparent_1px)] bg-[size:40px_40px]"/>
-          <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_30%_50%,rgba(196,82,26,0.12)_0%,transparent_60%)]" />
+        <div className="bg-foreground py-14 sm:py-18 md:py-22 lg:py-24 px-6 sm:px-10 md:px-14 lg:px-24 relative overflow-hidden">
+          <div className="support-band-grid pointer-events-none absolute inset-0" aria-hidden />
+          <div className="support-band-glow pointer-events-none absolute inset-0" aria-hidden />
           <motion.div
             className="relative"
             variants={sectionStagger}
@@ -177,10 +177,10 @@ export default function Request() {
               <span className="block w-8 h-0.5 bg-rust" />
               Support
             </motion.div>
-            <motion.h1 variants={reveal} className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-hero leading-[1.1] sm:leading-[0.92] text-white mb-4">
+            <motion.h1 variants={reveal} className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-hero leading-[1.1] sm:leading-[0.92] text-paper mb-4">
               Service <span className="text-rust">Request</span>
             </motion.h1>
-            <motion.p variants={reveal} className="font-label text-xs sm:text-sm md:text-md tracking-[2px] sm:tracking-[3px] uppercase text-white/40 mt-4">
+            <motion.p variants={reveal} className="font-label text-xs sm:text-sm md:text-md tracking-[2px] sm:tracking-[3px] uppercase text-paper/40 mt-4">
               Tell us what you need and we will follow up quickly
             </motion.p>
           </motion.div>
@@ -205,7 +205,7 @@ export default function Request() {
           {/* Name Row - First & Last */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label htmlFor="firstName" className="block text-sm sm:text-base font-label text-nav-text mb-1">
+              <label htmlFor="firstName" className="block text-sm sm:text-base font-label text-foreground mb-1">
                 First Name <span className="text-rust">*</span>
               </label>
               <input
@@ -214,16 +214,16 @@ export default function Request() {
                 type="text"
                 value={formData.firstName}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 bg-charcoal border ${
+                className={`w-full px-3 py-2 bg-paper border ${
                   errors.firstName ? 'border-rust' : 'border-rust/30'
-                } rounded-lg text-nav-text text-sm placeholder-muted/50 focus:outline-none focus:border-rust transition-colors`}
+                } rounded-lg text-foreground text-sm placeholder-muted/50 focus:outline-none focus:border-rust transition-colors`}
                 placeholder="John"
               />
               {errors.firstName && <p className="mt-0.5 text-xs text-red-500">{errors.firstName}</p>}
             </div>
 
             <div>
-              <label htmlFor="lastName" className="block text-sm sm:text-base font-label text-nav-text mb-1">
+              <label htmlFor="lastName" className="block text-sm sm:text-base font-label text-foreground mb-1">
                 Last Name <span className="text-rust">*</span>
               </label>
               <input
@@ -232,9 +232,9 @@ export default function Request() {
                 type="text"
                 value={formData.lastName}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 bg-charcoal border ${
+                className={`w-full px-3 py-2 bg-paper border ${
                   errors.lastName ? 'border-rust' : 'border-rust/30'
-                } rounded-lg text-nav-text text-sm placeholder-muted/50 focus:outline-none focus:border-rust transition-colors`}
+                } rounded-lg text-foreground text-sm placeholder-muted/50 focus:outline-none focus:border-rust transition-colors`}
                 placeholder="Doe"
               />
               {errors.lastName && <p className="mt-0.5 text-xs text-red-500">{errors.lastName}</p>}
@@ -244,7 +244,7 @@ export default function Request() {
           {/* Contact */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label htmlFor="phone" className="block text-sm sm:text-base font-label text-nav-text mb-1">
+              <label htmlFor="phone" className="block text-sm sm:text-base font-label text-foreground mb-1">
                 Phone Number <span className="text-rust">*</span>
               </label>
               <input
@@ -253,16 +253,16 @@ export default function Request() {
                 type="tel"
                 value={formData.phone}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 bg-charcoal border ${
+                className={`w-full px-3 py-2 bg-paper border ${
                   errors.phone ? 'border-rust' : 'border-rust/30'
-                } rounded-lg text-nav-text text-sm placeholder-muted/50 focus:outline-none focus:border-rust transition-colors`}
+                } rounded-lg text-foreground text-sm placeholder-muted/50 focus:outline-none focus:border-rust transition-colors`}
                 placeholder="(903) 555-0123"
               />
               {errors.phone && <p className="mt-0.5 text-xs text-red-500">{errors.phone}</p>}
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm sm:text-base font-label text-nav-text mb-1">
+              <label htmlFor="email" className="block text-sm sm:text-base font-label text-foreground mb-1">
                 Email Address <span className="text-rust">*</span>
               </label>
               <input
@@ -271,9 +271,9 @@ export default function Request() {
                 type="email"
                 value={formData.email}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 bg-charcoal border ${
+                className={`w-full px-3 py-2 bg-paper border ${
                   errors.email ? 'border-rust' : 'border-rust/30'
-                } rounded-lg text-nav-text text-sm placeholder-muted/50 focus:outline-none focus:border-rust transition-colors`}
+                } rounded-lg text-foreground text-sm placeholder-muted/50 focus:outline-none focus:border-rust transition-colors`}
                 placeholder="john.doe@example.com"
               />
               {errors.email && <p className="mt-0.5 text-xs text-red-500">{errors.email}</p>}
@@ -283,7 +283,7 @@ export default function Request() {
           {/* Address */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label htmlFor="streetAddress" className="block text-sm sm:text-base font-label text-nav-text mb-1">
+              <label htmlFor="streetAddress" className="block text-sm sm:text-base font-label text-foreground mb-1">
                 Street Address <span className="text-rust">*</span>
               </label>
               <input
@@ -292,16 +292,16 @@ export default function Request() {
                 type="text"
                 value={formData.streetAddress}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 bg-charcoal border ${
+                className={`w-full px-3 py-2 bg-paper border ${
                   errors.streetAddress ? 'border-rust' : 'border-rust/30'
-                } rounded-lg text-nav-text text-sm placeholder-muted/50 focus:outline-none focus:border-rust transition-colors`}
+                } rounded-lg text-foreground text-sm placeholder-muted/50 focus:outline-none focus:border-rust transition-colors`}
                 placeholder="123 Farm Road"
               />
               {errors.streetAddress && <p className="mt-0.5 text-xs text-red-500">{errors.streetAddress}</p>}
             </div>
 
             <div>
-              <label htmlFor="streetAddress2" className="block text-sm sm:text-base font-label text-nav-text mb-1">
+              <label htmlFor="streetAddress2" className="block text-sm sm:text-base font-label text-foreground mb-1">
                 Street Address Line 2 <span className="text-muted">(Optional)</span>
               </label>
               <input
@@ -310,7 +310,7 @@ export default function Request() {
                 type="text"
                 value={formData.streetAddress2}
                 onChange={handleChange}
-                className="w-full px-3 py-2 bg-charcoal border border-rust/30 rounded-lg text-nav-text text-sm placeholder-muted/50 focus:outline-none focus:border-rust transition-colors"
+                className="w-full px-3 py-2 bg-paper border border-rust/30 rounded-lg text-foreground text-sm placeholder-muted/50 focus:outline-none focus:border-rust transition-colors"
                 placeholder="Apt, Suite, Unit, etc."
               />
             </div>
@@ -319,7 +319,7 @@ export default function Request() {
           {/* Location */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div>
-              <label htmlFor="city" className="block text-sm sm:text-base font-label text-nav-text mb-1">
+              <label htmlFor="city" className="block text-sm sm:text-base font-label text-foreground mb-1">
                 City <span className="text-rust">*</span>
               </label>
               <input
@@ -328,16 +328,16 @@ export default function Request() {
                 type="text"
                 value={formData.city}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 bg-charcoal border ${
+                className={`w-full px-3 py-2 bg-paper border ${
                   errors.city ? 'border-rust' : 'border-rust/30'
-                } rounded-lg text-nav-text text-sm placeholder-muted/50 focus:outline-none focus:border-rust transition-colors`}
+                } rounded-lg text-foreground text-sm placeholder-muted/50 focus:outline-none focus:border-rust transition-colors`}
                 placeholder="Center"
               />
               {errors.city && <p className="mt-0.5 text-xs text-red-500">{errors.city}</p>}
             </div>
 
             <div>
-              <label htmlFor="state" className="block text-sm sm:text-base font-label text-nav-text mb-1">
+              <label htmlFor="state" className="block text-sm sm:text-base font-label text-foreground mb-1">
                 State <span className="text-rust">*</span>
               </label>
               <select
@@ -345,9 +345,9 @@ export default function Request() {
                 name="state"
                 value={formData.state}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 bg-charcoal border ${
+                className={`w-full px-3 py-2 bg-paper border ${
                   errors.state ? 'border-rust' : 'border-rust/30'
-                } rounded-lg text-nav-text text-sm focus:outline-none focus:border-rust transition-colors`}
+                } rounded-lg text-foreground text-sm focus:outline-none focus:border-rust transition-colors`}
               >
                 {states.map(state => (
                   <option key={state} value={state}>{state}</option>
@@ -357,7 +357,7 @@ export default function Request() {
             </div>
 
             <div>
-              <label htmlFor="zipCode" className="block text-sm sm:text-base font-label text-nav-text mb-1">
+              <label htmlFor="zipCode" className="block text-sm sm:text-base font-label text-foreground mb-1">
                 ZIP Code <span className="text-rust">*</span>
               </label>
               <input
@@ -366,16 +366,16 @@ export default function Request() {
                 type="text"
                 value={formData.zipCode}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 bg-charcoal border ${
+                className={`w-full px-3 py-2 bg-paper border ${
                   errors.zipCode ? 'border-rust' : 'border-rust/30'
-                } rounded-lg text-nav-text text-sm placeholder-muted/50 focus:outline-none focus:border-rust transition-colors`}
+                } rounded-lg text-foreground text-sm placeholder-muted/50 focus:outline-none focus:border-rust transition-colors`}
                 placeholder="75935"
               />
               {errors.zipCode && <p className="mt-0.5 text-xs text-red-500">{errors.zipCode}</p>}
             </div>
 
             <div>
-              <label htmlFor="country" className="block text-sm sm:text-base font-label text-nav-text mb-1">
+              <label htmlFor="country" className="block text-sm sm:text-base font-label text-foreground mb-1">
                 Country <span className="text-rust">*</span>
               </label>
               <select
@@ -383,9 +383,9 @@ export default function Request() {
                 name="country"
                 value={formData.country}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 bg-charcoal border ${
+                className={`w-full px-3 py-2 bg-paper border ${
                   errors.country ? 'border-rust' : 'border-rust/30'
-                } rounded-lg text-nav-text text-sm focus:outline-none focus:border-rust transition-colors`}
+                } rounded-lg text-foreground text-sm focus:outline-none focus:border-rust transition-colors`}
               >
                 {countries.map(country => (
                   <option key={country} value={country}>{country}</option>
@@ -397,7 +397,7 @@ export default function Request() {
 
           {/* Service Date */}
           <div>
-            <label htmlFor="serviceDate" className="block text-sm sm:text-base font-label text-nav-text mb-1">
+            <label htmlFor="serviceDate" className="block text-sm sm:text-base font-label text-foreground mb-1">
               Preferred Service Date <span className="text-rust">*</span>
             </label>
             <input
@@ -407,16 +407,16 @@ export default function Request() {
               value={formData.serviceDate}
               onChange={handleChange}
               min={new Date().toISOString().split('T')[0]}
-              className={`w-full px-3 py-2 bg-charcoal border ${
+              className={`w-full px-3 py-2 bg-paper border ${
                 errors.serviceDate ? 'border-rust' : 'border-rust/30'
-              } rounded-lg text-nav-text text-sm focus:outline-none focus:border-rust transition-colors`}
+              } rounded-lg text-foreground text-sm focus:outline-none focus:border-rust transition-colors`}
             />
             {errors.serviceDate && <p className="mt-0.5 text-xs text-red-500">{errors.serviceDate}</p>}
           </div>
 
           {/* Request Message */}
           <div>
-            <label htmlFor="requestMessage" className="block text-sm sm:text-base font-label text-nav-text mb-1">
+            <label htmlFor="requestMessage" className="block text-sm sm:text-base font-label text-foreground mb-1">
               Service Request Details <span className="text-rust">*</span>
             </label>
             <textarea
@@ -425,9 +425,9 @@ export default function Request() {
               rows={3}
               value={formData.requestMessage}
               onChange={handleChange}
-              className={`w-full px-3 py-2 bg-charcoal border ${
+              className={`w-full px-3 py-2 bg-paper border ${
                 errors.requestMessage ? 'border-rust' : 'border-rust/30'
-              } rounded-lg text-nav-text text-sm placeholder-muted/50 focus:outline-none focus:border-rust transition-colors resize-vertical`}
+              } rounded-lg text-foreground text-sm placeholder-muted/50 focus:outline-none focus:border-rust transition-colors resize-vertical`}
               placeholder="Please describe what you need help with..."
             />
             {errors.requestMessage && <p className="mt-0.5 text-xs text-red-500">{errors.requestMessage}</p>}
@@ -437,10 +437,10 @@ export default function Request() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-bold text-white bg-rust hover:bg-rust-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rust disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-bold text-paper bg-rust hover:bg-rust-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rust disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
               >
                 {isLoading ? (
-                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <svg className="animate-spin h-5 w-5 text-paper" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>

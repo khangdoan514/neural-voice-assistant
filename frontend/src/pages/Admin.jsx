@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+﻿import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { motion } from "framer-motion"
 import { useAdminProfile } from "../hooks/useAdminProfile"
@@ -406,7 +406,7 @@ export default function Admin() {
               animate="visible"
               className="mb-6 sm:mb-8 border-b border-rust/20 pb-4"
             >
-              <h1 className="font-display text-2xl sm:text-3xl text-nav-text">
+              <h1 className="font-display text-2xl sm:text-3xl text-foreground">
                 {tabMeta[activeTab]?.title || "Admin"}
               </h1>
               <p className="text-sm sm:text-base text-muted mt-1">

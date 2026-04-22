@@ -20,7 +20,7 @@ export default function HomeEditor({
       <div className="p-1 sm:p-2">
         <div className="flex items-center gap-2 mb-2">
           <PhotoIcon className="h-5 w-5 text-rust" />
-          <h2 className="font-label text-xl text-nav-text">Home Hero Mosaic</h2>
+          <h2 className="font-label text-xl text-foreground">Home Hero Mosaic</h2>
         </div>
         <p className="text-base text-muted mb-2 max-w-3xl">
           Each box has its own slideshow on the public Home page (auto-advance every 2.5 seconds). Add as many image
@@ -50,7 +50,7 @@ export default function HomeEditor({
                 type="text"
                 value={card.label}
                 onChange={(e) => updateHomeCardLabel(boxIndex, e.target.value)}
-                className="w-full rounded bg-charcoal border border-rust/20 px-3 py-2 text-base text-nav-text mb-4"
+                className="w-full rounded bg-paper border border-rust/20 px-3 py-2 text-base text-foreground mb-4"
                 placeholder="Card label"
               />
 
@@ -62,7 +62,7 @@ export default function HomeEditor({
                 {(card.images || []).map((imgUrl, imageIndex) => (
                   <div
                     key={`box-${boxIndex}-img-${imageIndex}`}
-                    className="rounded-lg border border-rust/15 bg-charcoal/20 p-3"
+                    className="rounded-lg border border-rust/15 bg-paper/20 p-3"
                   >
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-xs font-label uppercase tracking-wider text-muted">Image {imageIndex + 1}</span>
@@ -80,7 +80,7 @@ export default function HomeEditor({
                       type="text"
                       value={imgUrl}
                       onChange={(e) => updateHomeBoxImage(boxIndex, imageIndex, e.target.value)}
-                      className="w-full rounded bg-charcoal border border-rust/20 px-2 py-1.5 text-sm text-nav-text mb-2"
+                      className="w-full rounded bg-paper border border-rust/20 px-2 py-1.5 text-sm text-foreground mb-2"
                       placeholder="https://... or /images/..."
                     />
                     <label className="block text-xs text-muted mb-1">Upload</label>
@@ -90,7 +90,7 @@ export default function HomeEditor({
                       onChange={(e) => handleHomeBoxImageUpload(boxIndex, imageIndex, e.target.files?.[0])}
                       className="w-full text-xs text-muted file:mr-2 file:rounded file:border-0 file:bg-rust/20 file:px-2 file:py-1 file:text-rust file:font-label"
                     />
-                    <div className="mt-2 h-20 rounded overflow-hidden border border-rust/20 bg-charcoal/40">
+                    <div className="mt-2 h-20 rounded overflow-hidden border border-rust/20 bg-paper/40">
                       {imgUrl ? (
                         <img src={imgUrl} alt="" className="w-full h-full object-cover" />
                       ) : (
@@ -119,7 +119,7 @@ export default function HomeEditor({
             type="button"
             onClick={saveHomeContent}
             disabled={isSavingHome}
-            className="px-4 py-2 bg-rust text-white rounded-lg hover:bg-rust-dark transition-colors text-base disabled:opacity-60"
+            className="px-4 py-2 bg-rust text-paper rounded-lg hover:bg-rust-dark transition-colors text-base disabled:opacity-60"
             whileTap={{ scale: 0.98 }}
           >
             {isSavingHome ? "Saving..." : "Save Home Changes"}
@@ -127,7 +127,7 @@ export default function HomeEditor({
           <motion.button
             type="button"
             onClick={resetHomeContent}
-            className="px-4 py-2 bg-charcoal border border-rust/30 text-nav-text rounded-lg hover:border-rust hover:text-rust transition-colors text-base"
+            className="px-4 py-2 bg-paper border border-rust/30 text-foreground rounded-lg hover:border-rust hover:text-rust transition-colors text-base"
             whileTap={{ scale: 0.98 }}
           >
             Reset to Defaults

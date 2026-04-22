@@ -29,9 +29,16 @@ L.Icon.Default.mergeOptions({
   shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 })
 
+function readThemeColor(varName, fallbackHex) {
+  if (typeof window === "undefined") return fallbackHex
+  const raw = getComputedStyle(document.documentElement).getPropertyValue(varName).trim()
+  return raw || fallbackHex
+}
+
 const createMarkerIcon = (isSelected = false) => {
   const size = isSelected ? 30 : 20
-  const color = isSelected ? "#E8693A" : "#C4521A"
+  const color = isSelected ? readThemeColor("--color-rust-light", "#E8693A") : readThemeColor("--color-rust", "#C4521A")
+  const ring = readThemeColor("--color-paper", "#FFFFFF")
 
   return new L.Icon({
     iconUrl: `data:image/svg+xml;utf8,${encodeURIComponent(`
@@ -42,12 +49,12 @@ const createMarkerIcon = (isSelected = false) => {
             <animate attributeName="opacity" values="0.5;0.2;0.5" dur="1.5s" repeatCount="indefinite" />
           </circle>
         ` : ""}
-        <circle cx="12" cy="12" r="10" fill="${color}" stroke="white" stroke-width="2">
+        <circle cx="12" cy="12" r="10" fill="${color}" stroke="${ring}" stroke-width="2">
           ${isSelected ? `
             <animate attributeName="r" values="10;11;10" dur="1s" repeatCount="indefinite" />
           ` : ""}
         </circle>
-        <circle cx="12" cy="12" r="6" fill="white"/>
+        <circle cx="12" cy="12" r="6" fill="${ring}"/>
       </svg>
     `)}`,
     iconSize: [size, size],
@@ -89,7 +96,7 @@ function SectionHeader({ label, title, titleHighlight, description = "" }) {
           <span className="block w-8 h-0.5 bg-rust" />
           {label}
         </motion.div>
-        <motion.h2 variants={reveal} className="font-display text-title leading-none text-nav-text text-2xl sm:text-3xl md:text-4xl lg:text-5xl">
+        <motion.h2 variants={reveal} className="font-display text-title leading-none text-foreground text-2xl sm:text-3xl md:text-4xl lg:text-5xl">
           {title} {titleHighlight && <span className="text-rust">{titleHighlight}</span>}
         </motion.h2>
       </motion.div>
@@ -174,18 +181,18 @@ export default function Contact() {
   return (
     <main className="bg-barn min-h-screen pt-16 overflow-x-hidden">
       <div className="max-w-full overflow-x-hidden">
-        <div className="bg-nav-text py-14 sm:py-18 md:py-22 lg:py-24 px-6 sm:px-10 md:px-14 lg:px-24 relative overflow-hidden">
-          <div className="absolute inset-0 pointer-events-none opacity-[0.04] bg-[linear-gradient(rgba(255,255,255,1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,1)_1px,transparent_1px)] bg-[size:40px_40px]"/>
-          <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_30%_50%,rgba(196,82,26,0.12)_0%,transparent_60%)]" />
+        <div className="bg-foreground py-14 sm:py-18 md:py-22 lg:py-24 px-6 sm:px-10 md:px-14 lg:px-24 relative overflow-hidden">
+          <div className="support-band-grid pointer-events-none absolute inset-0" aria-hidden />
+          <div className="support-band-glow pointer-events-none absolute inset-0" aria-hidden />
           <motion.div className="relative" variants={sectionStagger} initial="hidden" animate="visible">
             <motion.div variants={reveal} className="flex items-center gap-3 mb-5 font-label text-section-label font-bold tracking-[4px] uppercase text-rust">
               <span className="block w-8 h-0.5 bg-rust" />
               Support
             </motion.div>
-            <motion.h1 variants={reveal} className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-hero leading-[1.1] sm:leading-[0.92] text-white mb-4">
+            <motion.h1 variants={reveal} className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-hero leading-[1.1] sm:leading-[0.92] text-paper mb-4">
               Contact <span className="text-rust">Us</span>
             </motion.h1>
-            <motion.p variants={reveal} className="font-label text-xs sm:text-sm md:text-md tracking-[2px] sm:tracking-[3px] uppercase text-white/40 mt-4">
+            <motion.p variants={reveal} className="font-label text-xs sm:text-sm md:text-md tracking-[2px] sm:tracking-[3px] uppercase text-paper/40 mt-4">
               We are here to help with equipment, service, and support
             </motion.p>
           </motion.div>
@@ -202,7 +209,7 @@ export default function Contact() {
             <motion.div variants={reveal} className="overflow-hidden">
               <div className="grid grid-cols-1 lg:grid-cols-3">
                 <div className="lg:col-span-2 border-b lg:border-b-0 lg:border-r border-mid/15 pr-0 lg:pr-8 pb-6 lg:pb-0">
-                  <div className="h-56 sm:h-64 md:h-72 bg-charcoal/20">
+                  <div className="h-56 sm:h-64 md:h-72 bg-paper/20">
                     <img
                       src={businessHoursImage}
                       alt="Business hours and storefront"
@@ -222,7 +229,7 @@ export default function Contact() {
                   <div className="space-y-3">
                     {BUSINESS_HOURS.map(({ days, hours }) => (
                       <div key={days} className="flex items-start justify-between gap-4 border-t border-mid/15 pt-3 first:border-t-0 first:pt-0">
-                        <p className="text-sm sm:text-base text-nav-text font-label">{days}</p>
+                        <p className="text-sm sm:text-base text-foreground font-label">{days}</p>
                         <p className="text-sm sm:text-base text-muted text-right">{hours}</p>
                       </div>
                     ))}
@@ -242,14 +249,14 @@ export default function Contact() {
             <motion.div variants={contentStagger} className="flex flex-wrap justify-center gap-4 sm:gap-6">
                 {contactPeople.map(({ name, role, phone, email, image }) => (
                   <motion.div key={`${name}-${email}`} variants={reveal} className="overflow-hidden w-full md:w-[calc(50%-0.75rem)] xl:w-[calc(33.333%-1rem)] max-w-sm">
-                    <div className="h-52 sm:h-56 bg-charcoal/20 border border-mid/20 rounded-sm overflow-hidden">
+                    <div className="h-52 sm:h-56 bg-paper/20 border border-mid/20 rounded-sm overflow-hidden">
                       <img src={image} alt={name} className="w-full h-full object-cover" />
                     </div>
                     <div className="pt-4 sm:pt-5">
-                      <h3 className="font-label text-lg sm:text-xl font-bold tracking-[1px] uppercase text-nav-text mb-1">{name}</h3>
+                      <h3 className="font-label text-lg sm:text-xl font-bold tracking-[1px] uppercase text-foreground mb-1">{name}</h3>
                       <p className="text-sm text-muted mb-4">{role}</p>
-                      <p className="text-sm sm:text-base text-nav-text mb-2"><span className="font-label text-rust">Phone:</span> {phone}</p>
-                      <p className="text-sm sm:text-base text-nav-text break-all"><span className="font-label text-rust">Email:</span> {email}</p>
+                      <p className="text-sm sm:text-base text-foreground mb-2"><span className="font-label text-rust">Phone:</span> {phone}</p>
+                      <p className="text-sm sm:text-base text-foreground break-all"><span className="font-label text-rust">Email:</span> {email}</p>
                     </div>
                   </motion.div>
                 ))}
@@ -284,7 +291,7 @@ export default function Contact() {
                               href={getDirectionsLink(location.position, location.name)}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="block text-sm bg-rust text-white px-3 py-2 rounded hover:bg-rust-dark transition-colors text-center"
+                              className="block text-sm bg-rust text-paper px-3 py-2 rounded hover:bg-rust-dark transition-colors text-center"
                               onClick={(e) => e.stopPropagation()}
                             >
                               Get Directions
@@ -309,8 +316,8 @@ export default function Contact() {
                       }`}
                     >
                       <div className="flex justify-between items-start">
-                        <h4 className="font-bold text-lg sm:text-xl tracking-[1px] uppercase text-nav-text mb-2">{location.name}</h4>
-                        {selectedLocation === location.id && <span className="text-xs bg-rust text-white px-2 py-1 rounded">Selected</span>}
+                        <h4 className="font-bold text-lg sm:text-xl tracking-[1px] uppercase text-foreground mb-2">{location.name}</h4>
+                        {selectedLocation === location.id && <span className="text-xs bg-rust text-paper px-2 py-1 rounded">Selected</span>}
                       </div>
                       <p className="text-sm sm:text-md text-muted mb-1">{location.address}</p>
                       <p className="text-sm sm:text-md text-muted">{location.phone}</p>
@@ -321,7 +328,7 @@ export default function Contact() {
                             href={getDirectionsLink(location.position, location.name)}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-block text-xs bg-rust text-white px-3 py-1.5 rounded hover:bg-rust-dark transition-colors"
+                            className="inline-block text-xs bg-rust text-paper px-3 py-1.5 rounded hover:bg-rust-dark transition-colors"
                             onClick={(e) => e.stopPropagation()}
                           >
                             Directions
@@ -336,13 +343,13 @@ export default function Contact() {
           </Section>
         </div>
 
-        <Section className="bg-white border-t border-mid/15 px-6 sm:px-10 md:px-14 lg:px-24 py-10 sm:py-14 md:py-18 lg:py-20 flex flex-col sm:flex-row items-center justify-between gap-6 sm:gap-8">
+        <Section className="bg-paper border-t border-mid/15 px-6 sm:px-10 md:px-14 lg:px-24 py-10 sm:py-14 md:py-18 lg:py-20 flex flex-col sm:flex-row items-center justify-between gap-6 sm:gap-8">
           <motion.div variants={reveal} className="text-center sm:text-left">
             <p className="font-bold text-base sm:text-lg tracking-[2px] sm:tracking-[3px] uppercase text-rust mb-2">Need Service?</p>
-            <h3 className="font-display text-xl sm:text-2xl md:text-3xl text-nav-text leading-tight sm:leading-none">Submit a request and we will follow up quickly.</h3>
+            <h3 className="font-display text-xl sm:text-2xl md:text-3xl text-foreground leading-tight sm:leading-none">Submit a request and we will follow up quickly.</h3>
           </motion.div>
           <motion.div variants={reveal} className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
-            <a href="/support/request" className="inline-block transition-all duration-200 bg-rust text-white px-6 sm:px-8 py-2.5 sm:py-3.5 font-label font-bold text-xs tracking-[2px] sm:tracking-[3px] uppercase border-2 border-rust hover:bg-rust-dark hover:border-rust-dark text-center w-full sm:w-auto">
+            <a href="/support/request" className="inline-block transition-all duration-200 bg-rust text-paper px-6 sm:px-8 py-2.5 sm:py-3.5 font-label font-bold text-xs tracking-[2px] sm:tracking-[3px] uppercase border-2 border-rust hover:bg-rust-dark hover:border-rust-dark text-center w-full sm:w-auto">
               Submit Request
             </a>
           </motion.div>

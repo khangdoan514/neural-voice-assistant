@@ -46,7 +46,7 @@ function SectionHeader({ label, title, titleHighlight, description = "" }) {
           <span className="block w-8 h-0.5 bg-rust" />
           {label}
         </motion.div>
-        <motion.h2 variants={reveal} className="font-display text-title leading-none text-nav-text text-2xl sm:text-3xl md:text-4xl lg:text-5xl">
+        <motion.h2 variants={reveal} className="font-display text-title leading-none text-foreground text-2xl sm:text-3xl md:text-4xl lg:text-5xl">
           {title} {titleHighlight && <span className="text-rust">{titleHighlight}</span>}
         </motion.h2>
       </motion.div>
@@ -68,7 +68,7 @@ function Label({ children }) {
 
 function Title({ children, className = "" }) {
   return (
-    <h2 className={`font-display leading-tight text-title text-nav-text mb-6 ${className}`}>
+    <h2 className={`font-display leading-tight text-title text-foreground mb-6 ${className}`}>
       {children}
     </h2>
   )
@@ -78,7 +78,7 @@ function PrimaryButton({ to, children }) {
   return (
     <Link
       to={to}
-      className="inline-block w-full sm:w-auto text-center no-underline transition-all duration-200 bg-rust text-white px-6 sm:px-8 py-3 sm:py-3.5 font-label font-bold text-xs sm:text-body tracking-[2px] uppercase border-2 border-rust hover:bg-rust-dark hover:border-rust-dark hover:-translate-y-0.5 hover:shadow-lg"
+      className="inline-block w-full sm:w-auto text-center no-underline transition-all duration-200 bg-rust text-paper px-6 sm:px-8 py-3 sm:py-3.5 font-label font-bold text-xs sm:text-body tracking-[2px] uppercase border-2 border-rust hover:bg-rust-dark hover:border-rust-dark hover:-translate-y-0.5 hover:shadow-lg"
     >
       {children}
     </Link>
@@ -89,7 +89,7 @@ function OutlineButton({ to, children }) {
   return (
     <Link
       to={to}
-      className="inline-block w-full sm:w-auto text-center no-underline transition-all duration-200 bg-white text-nav-text px-6 sm:px-8 py-3 sm:py-3.5 font-label font-bold text-xs sm:text-body tracking-[2px] uppercase border-1 border-nav-text hover:border-rust hover:text-rust"
+      className="inline-block w-full sm:w-auto text-center no-underline transition-all duration-200 bg-paper text-foreground px-6 sm:px-8 py-3 sm:py-3.5 font-label font-bold text-xs sm:text-body tracking-[2px] uppercase border-1 border-foreground hover:border-rust hover:text-rust"
     >
       {children}
     </Link>
@@ -106,7 +106,7 @@ function HeroTileCenterSpinner({ className = "" }) {
       className={`pointer-events-none flex h-12 w-12 items-center justify-center sm:h-14 sm:w-14 ${className}`}
       aria-hidden
     >
-      <div className="h-full w-full rounded-full border-2 border-white/25 border-t-rust border-r-rust/40 animate-spin shadow-lg" />
+      <div className="h-full w-full rounded-full border-2 border-paper/25 border-t-rust border-r-rust/40 animate-spin shadow-lg" />
     </div>
   )
 }
@@ -175,7 +175,7 @@ function HeroBoxCarousel({ label, images, bg, className = "", contentLoading = f
           {contentLoading && (
             <motion.div
               key="hero-db-load"
-              className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center bg-black/20"
+              className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center bg-scrim/20"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -187,7 +187,7 @@ function HeroBoxCarousel({ label, images, bg, className = "", contentLoading = f
             </motion.div>
           )}
         </AnimatePresence>
-        <span className="absolute bottom-3 left-3 z-40 font-label font-bold tracking-[2px] uppercase text-straw bg-nav-text/20 px-2 py-1 backdrop-blur-sm text-xs sm:text-sm">
+        <span className="absolute bottom-3 left-3 z-40 font-label font-bold tracking-[2px] uppercase text-straw bg-foreground/20 px-2 py-1 backdrop-blur-sm text-xs sm:text-sm">
           {label}
         </span>
       </div>
@@ -215,7 +215,7 @@ function HeroBoxCarousel({ label, images, bg, className = "", contentLoading = f
                 style={{
                   width: `${slidePercent}%`,
                   backgroundImage: u
-                    ? `linear-gradient(180deg,rgba(0,0,0,0.12),rgba(0,0,0,0.65)), url(${u})`
+                    ? `linear-gradient(180deg,color-mix(in srgb,var(--color-scrim) 12%,transparent),color-mix(in srgb,var(--color-scrim) 65%,transparent)), url(${u})`
                     : bg,
                   backgroundSize: "cover",
                   backgroundPosition: "center",
@@ -230,7 +230,7 @@ function HeroBoxCarousel({ label, images, bg, className = "", contentLoading = f
         {contentLoading && (
           <motion.div
             key="hero-db-load"
-            className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center bg-black/20"
+            className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center bg-scrim/20"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -252,7 +252,7 @@ function HeroBoxCarousel({ label, images, bg, className = "", contentLoading = f
             aria-busy="true"
             aria-label={`Loading ${label} images`}
           >
-            <div className="absolute inset-0 bg-black/25 backdrop-blur-[2px]" />
+            <div className="absolute inset-0 bg-scrim/25 backdrop-blur-[2px]" />
             <motion.div
               className="absolute inset-3 rounded-md border-2 border-dashed border-rust/55 sm:inset-4"
               style={{ transformOrigin: "50% 50%" }}
@@ -269,7 +269,7 @@ function HeroBoxCarousel({ label, images, bg, className = "", contentLoading = f
         )}
       </AnimatePresence>
 
-      <span className="pointer-events-none absolute bottom-3 left-3 z-40 font-label font-bold tracking-[2px] uppercase text-straw bg-nav-text/20 px-2 py-1 backdrop-blur-sm text-xs sm:text-sm">
+      <span className="pointer-events-none absolute bottom-3 left-3 z-40 font-label font-bold tracking-[2px] uppercase text-straw bg-foreground/20 px-2 py-1 backdrop-blur-sm text-xs sm:text-sm">
         {label}
       </span>
       {n > 1 && (
@@ -277,7 +277,7 @@ function HeroBoxCarousel({ label, images, bg, className = "", contentLoading = f
           {slots.map((_, i) => (
             <span
               key={`dot-${i}`}
-              className={`h-1 rounded-full transition-all duration-300 ${innerIdx === i ? "w-5 bg-straw" : "w-1.5 bg-white/45"}`}
+              className={`h-1 rounded-full transition-all duration-300 ${innerIdx === i ? "w-5 bg-straw" : "w-1.5 bg-paper/45"}`}
             />
           ))}
         </div>
@@ -341,13 +341,15 @@ function Hero() {
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: "radial-gradient(ellipse at 70% 50%, rgba(196,82,26,0.08) 0%, transparent 60%), radial-gradient(ellipse at 20% 80%, rgba(212,180,131,0.04) 0%, transparent 50%)",
+          background:
+            "radial-gradient(ellipse at 70% 50%, color-mix(in srgb, var(--color-rust) 8%, transparent) 0%, transparent 60%), radial-gradient(ellipse at 20% 80%, color-mix(in srgb, var(--color-straw) 4%, transparent) 0%, transparent 50%)",
         }}
       />
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          backgroundImage: "linear-gradient(rgba(196,82,26,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(196,82,26,0.07) 1px, transparent 1px)",
+          backgroundImage:
+            "linear-gradient(color-mix(in srgb, var(--color-rust) 7%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--color-rust) 7%, transparent) 1px, transparent 1px)",
           backgroundSize: "60px 60px",
           maskImage: "radial-gradient(ellipse at center, black 30%, transparent 75%)",
         }}
@@ -365,7 +367,7 @@ function Hero() {
         </motion.div>
 
         <motion.h1
-          className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-hero leading-[1.05] sm:leading-[1] lg:leading-[0.95] text-nav-text mb-3"
+          className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-hero leading-[1.05] sm:leading-[1] lg:leading-[0.95] text-foreground mb-3"
           variants={reveal}
         >
           If It Goes In A{" "}
@@ -385,7 +387,7 @@ function Hero() {
           variants={reveal}
         >
           Top quality equipment at competitive prices, backed by a{" "}
-          <strong className="text-nav-text font-medium">well-trained service team</strong>{" "}
+          <strong className="text-foreground font-medium">well-trained service team</strong>{" "}
           ready to help growers achieve success — just as we have for over half a century.
         </motion.p>
 
@@ -448,7 +450,7 @@ function Hero() {
             <button
               type="button"
               onClick={handlePrevSlide}
-              className="px-3 py-1.5 text-xs font-label font-bold tracking-[2px] uppercase border border-mid/40 text-nav-text hover:border-rust hover:text-rust transition-colors"
+              className="px-3 py-1.5 text-xs font-label font-bold tracking-[2px] uppercase border border-mid/40 text-foreground hover:border-rust hover:text-rust transition-colors"
             >
               Prev
             </button>
@@ -466,7 +468,7 @@ function Hero() {
             <button
               type="button"
               onClick={handleNextSlide}
-              className="px-3 py-1.5 text-xs font-label font-bold tracking-[2px] uppercase border border-mid/40 text-nav-text hover:border-rust hover:text-rust transition-colors"
+              className="px-3 py-1.5 text-xs font-label font-bold tracking-[2px] uppercase border border-mid/40 text-foreground hover:border-rust hover:text-rust transition-colors"
             >
               Next
             </button>
@@ -512,9 +514,9 @@ function Marquee() {
         {items.map((item, i) => (
           <span
             key={`${item}-${i}`}
-            className="font-label text-xs sm:text-section-label tracking-[2px] sm:tracking-[4px] text-white/90 px-6 sm:px-10"
+            className="font-label text-xs sm:text-section-label tracking-[2px] sm:tracking-[4px] text-paper/90 px-6 sm:px-10"
           >
-            <span className="text-white/40">◆  </span>
+            <span className="text-paper/40">◆  </span>
             {item}
           </span>
         ))}
@@ -547,7 +549,7 @@ function About() {
         />
 
         <p className="leading-relaxed text-muted text-sm sm:text-body font-light mb-5">
-          <strong className="text-nav-text font-medium">East Texas Poultry Supply</strong> has proven their ability to help poultry growers achieve success for over half a century. We offer top quality equipment at competitive prices and have a well-trained service team ready to assist.
+          <strong className="text-foreground font-medium">East Texas Poultry Supply</strong> has proven their ability to help poultry growers achieve success for over half a century. We offer top quality equipment at competitive prices and have a well-trained service team ready to assist.
         </p>
 
         <p className="leading-relaxed text-muted text-sm sm:text-body font-light mb-5">
@@ -555,7 +557,7 @@ function About() {
         </p>
 
         <p className="leading-relaxed text-muted text-sm sm:text-body font-light mb-5">
-          Beyond poultry, our retail store stocks water storage tanks, pressure pumps, HVAC motors, capacitors, drive belts, and bearings for farm or industrial use. <strong className="text-nav-text font-medium">We ship worldwide.</strong>
+          Beyond poultry, our retail store stocks water storage tanks, pressure pumps, HVAC motors, capacitors, drive belts, and bearings for farm or industrial use. <strong className="text-foreground font-medium">We ship worldwide.</strong>
         </p>
 
         <div className="mt-8">
@@ -579,7 +581,7 @@ function About() {
             )}
             <div className="font-display text-2xl sm:text-subtitle text-rust leading-none">{year}</div>
             <div className="pt-1.5">
-              <strong className="text-xs sm:text-section-label text-nav-text block mb-1">{title}</strong>
+              <strong className="text-xs sm:text-section-label text-foreground block mb-1">{title}</strong>
               <div className="text-sm sm:text-body text-muted">{desc}</div>
             </div>
           </motion.div>
@@ -617,7 +619,7 @@ function Services() {
           <motion.div key={service.title} variants={reveal}>
             <Link to={service.to}>
               <div
-                className={`relative h-full overflow-hidden cursor-pointer transition-all duration-300 p-6 sm:p-8 md:p-10 ${hovered === index ? "bg-white shadow-lg" : "bg-white"
+                className={`relative h-full overflow-hidden cursor-pointer transition-all duration-300 p-6 sm:p-8 md:p-10 ${hovered === index ? "bg-paper shadow-lg" : "bg-paper"
                   }`}
                 onMouseEnter={() => setHovered(index)}
                 onMouseLeave={() => setHovered(null)}
@@ -627,7 +629,7 @@ function Services() {
                     }`}
                 />
 
-                <h3 className="font-label text-lg sm:text-xl font-bold tracking-[1px] uppercase text-nav-text mb-3">{service.title}</h3>
+                <h3 className="font-label text-lg sm:text-xl font-bold tracking-[1px] uppercase text-foreground mb-3">{service.title}</h3>
                 <p className="text-sm sm:text-body leading-relaxed text-muted font-light">{service.desc}</p>
 
                 <div
@@ -678,7 +680,7 @@ function Products() {
           <motion.div key={product.name} variants={reveal}>
             <Link to={product.to}>
               <div
-                className={`relative h-full cursor-pointer transition-all duration-200 p-6 sm:p-8 md:p-10 bg-white ${hovered === index
+                className={`relative h-full cursor-pointer transition-all duration-200 p-6 sm:p-8 md:p-10 bg-paper ${hovered === index
                   ? "border border-rust -translate-y-1 shadow-lg"
                   : "border border-mid/20"
                   }`}
@@ -686,12 +688,12 @@ function Products() {
                 onMouseLeave={() => setHovered(null)}
               >
                 {product.tag && (
-                  <span className="absolute top-3 right-3 text-[12px] font-bold tracking-[1px] uppercase bg-rust text-white px-1.5 py-0.5">
+                  <span className="absolute top-3 right-3 text-[12px] font-bold tracking-[1px] uppercase bg-rust text-paper px-1.5 py-0.5">
                     {product.tag}
                   </span>
                 )}
 
-                <h3 className="font-label text-lg sm:text-xl font-bold tracking-[1px] uppercase text-nav-text mb-2">{product.name}</h3>
+                <h3 className="font-label text-lg sm:text-xl font-bold tracking-[1px] uppercase text-foreground mb-2">{product.name}</h3>
                 <p className="text-sm sm:text-body leading-relaxed text-muted font-light">{product.sub}</p>
 
                 <div
@@ -712,13 +714,15 @@ function Products() {
 // ============================== Call To Action ==============================
 function CTA() {
   return (
-    <Section className="relative text-center overflow-hidden px-6 sm:px-10 md:px-14 lg:px-24 py-10 sm:py-14 md:py-18 lg:py-20 bg-white border-t border-mid/15">
+    <Section className="relative text-center overflow-hidden px-6 sm:px-10 md:px-14 lg:px-24 py-10 sm:py-14 md:py-18 lg:py-20 bg-paper border-t border-mid/15">
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{ background: "radial-gradient(ellipse at center, rgba(196,82,26,0.08) 0%, transparent 65%)" }}
+        style={{
+          background: "radial-gradient(ellipse at center, color-mix(in srgb, var(--color-rust) 8%, transparent) 0%, transparent 65%)",
+        }}
       />
 
-      <motion.h2 variants={reveal} className="relative font-display leading-[1] text-3xl sm:text-4xl md:text-title text-nav-text mb-5 sm:mb-6">
+      <motion.h2 variants={reveal} className="relative font-display leading-[1] text-3xl sm:text-4xl md:text-title text-foreground mb-5 sm:mb-6">
         Ready to <span className="text-rust">Equip</span><br />Your Farm?
       </motion.h2>
 

@@ -1,4 +1,4 @@
-import { motion } from "framer-motion"
+﻿import { motion } from "framer-motion"
 import { fadeInUp } from "./variants"
 
 export default function Welcome({ adminProfile }) {
@@ -13,7 +13,7 @@ export default function Welcome({ adminProfile }) {
       animate="visible"
       className="flex min-h-[40vh] flex-col items-center justify-center px-4 text-center"
     >
-      <p className="font-display text-3xl sm:text-4xl md:text-5xl text-nav-text leading-tight">
+      <p className="font-display text-3xl sm:text-4xl md:text-5xl text-foreground leading-tight">
         Welcome back,{" "}
         <span className="text-rust">
           {name}

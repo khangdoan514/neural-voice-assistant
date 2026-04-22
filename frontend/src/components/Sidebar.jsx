@@ -122,7 +122,7 @@ const Sidebar = ({ onLogout, userProfile }) => {
         onClick={() => setIsProfileMenuOpen((prev) => !prev)}
         className={`w-full flex items-center gap-3 ${!isDesktopExpanded
             ? "justify-center px-0 py-1.5 bg-transparent border-0 rounded-none"
-            : "px-3 py-2.5 bg-charcoal/80 border border-rust/25 rounded-lg hover:border-rust/50 transition-all"
+            : "px-3 py-2.5 bg-paper/80 border border-rust/25 rounded-lg hover:border-rust/50 transition-all"
           }`}
         title={!isDesktopExpanded ? currentUser.name : undefined}
       >
@@ -138,12 +138,12 @@ const Sidebar = ({ onLogout, userProfile }) => {
               {initials}
             </div>
           )}
-          <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-green-500 border border-charcoal" />
+          <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-green-500 border border-paper" />
         </div>
         {isDesktopExpanded && (
           <>
             <div className="min-w-0 flex-1 text-left">
-              <p className="text-sm font-label font-semibold text-nav-text truncate">{currentUser.name}</p>
+              <p className="text-sm font-label font-semibold text-foreground truncate">{currentUser.name}</p>
               <p className="text-xs text-muted truncate">{currentUser.email}</p>
             </div>
             <ChevronDownIcon className={`h-4 w-4 text-muted transition-transform ${isProfileMenuOpen ? "rotate-180" : ""}`} />
@@ -158,7 +158,7 @@ const Sidebar = ({ onLogout, userProfile }) => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.96 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="absolute left-0 right-0 bottom-full mb-2 bg-charcoal/95 backdrop-blur-sm border border-rust/25 rounded-lg overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
+            className="absolute left-0 right-0 bottom-full mb-2 bg-paper/95 backdrop-blur-sm border border-rust/25 rounded-lg overflow-hidden shadow-[0_10px_30px_rgb(0_0_0_/_0.35)]"
           >
             <motion.button
               initial={{ opacity: 0, x: -8 }}
@@ -170,7 +170,7 @@ const Sidebar = ({ onLogout, userProfile }) => {
                 setIsProfileMenuOpen(false)
                 navigate("/admin/settings")
               }}
-              className="group w-full text-left px-3 py-2 text-sm text-nav-text hover:bg-rust/20 hover:text-rust transition-colors"
+              className="group w-full text-left px-3 py-2 text-sm text-foreground hover:bg-rust/20 hover:text-rust transition-colors"
             >
               <span className="inline-flex items-center gap-2 transition-transform duration-200 group-hover:translate-x-1">
                 <Cog6ToothIcon className="h-4 w-4" />
@@ -187,7 +187,7 @@ const Sidebar = ({ onLogout, userProfile }) => {
                 setIsProfileMenuOpen(false)
                 onLogout()
               }}
-              className="group w-full text-left px-3 py-2 text-sm text-nav-text hover:bg-rust/20 hover:text-rust transition-colors border-t border-rust/10"
+              className="group w-full text-left px-3 py-2 text-sm text-foreground hover:bg-rust/20 hover:text-rust transition-colors border-t border-rust/10"
             >
               <span className="inline-flex items-center gap-2 transition-transform duration-200 group-hover:translate-x-1">
                 <ArrowLeftOnRectangleIcon className="h-4 w-4" />
@@ -281,7 +281,7 @@ const Sidebar = ({ onLogout, userProfile }) => {
                 title={!isDesktopExpanded ? item.label : undefined}
                 className={`flex items-center ${isDesktopExpanded ? "justify-start gap-3 px-3" : "justify-center px-2"} py-2 rounded-lg transition-all duration-200 ${isActive(item.to)
                     ? "bg-rust/20 text-rust"
-                    : "text-nav-text hover:bg-charcoal hover:text-nav-hover"
+                    : "text-foreground hover:bg-paper hover:text-rust"
                   }`}
               >
                 <item.icon className="h-5 w-5" />
@@ -300,7 +300,7 @@ const Sidebar = ({ onLogout, userProfile }) => {
                       title={!isDesktopExpanded ? "Requests" : undefined}
                       className={`flex items-center ${isDesktopExpanded ? "justify-start gap-3 px-3" : "justify-center px-2"} py-2 rounded-lg transition-all duration-200 ${isActive("/admin/support/request")
                           ? "bg-rust/20 text-rust"
-                          : "text-nav-text/90 hover:bg-charcoal hover:text-nav-hover"
+                          : "text-foreground/90 hover:bg-paper hover:text-rust"
                         }`}
                     >
                       <DocumentDuplicateIcon className="h-4 w-4" />
@@ -315,7 +315,7 @@ const Sidebar = ({ onLogout, userProfile }) => {
                       title={!isDesktopExpanded ? "Conversations" : undefined}
                       className={`flex items-center ${isDesktopExpanded ? "justify-start gap-3 px-3" : "justify-center px-2"} py-2 rounded-lg transition-all duration-200 ${isActive("/admin/conversation")
                           ? "bg-rust/20 text-rust"
-                          : "text-nav-text/90 hover:bg-charcoal hover:text-nav-hover"
+                          : "text-foreground/90 hover:bg-paper hover:text-rust"
                         }`}
                     >
                       <DocumentTextIcon className="h-4 w-4" />
@@ -332,7 +332,7 @@ const Sidebar = ({ onLogout, userProfile }) => {
               <button
                 onClick={() => toggleMenu(item.label)}
                 title={!isDesktopExpanded ? item.label : undefined}
-                className={`w-full flex items-center ${isDesktopExpanded ? "justify-between gap-3 px-3" : "justify-center px-2"} py-2 rounded-lg transition-all duration-200 text-nav-text hover:bg-charcoal hover:text-nav-hover`}
+                className={`w-full flex items-center ${isDesktopExpanded ? "justify-between gap-3 px-3" : "justify-center px-2"} py-2 rounded-lg transition-all duration-200 text-foreground hover:bg-paper hover:text-rust`}
               >
                 <div className={`flex items-center ${isDesktopExpanded ? "gap-3" : ""}`}>
                   <item.icon className="h-5 w-5" />
@@ -372,7 +372,7 @@ const Sidebar = ({ onLogout, userProfile }) => {
                             title={!isDesktopExpanded ? child.label : undefined}
                             className={`flex items-center ${isDesktopExpanded ? "justify-start gap-3 px-3" : "justify-center px-2"} py-2 rounded-lg transition-all duration-200 ${isActive(child.to)
                                 ? "bg-rust/20 text-rust"
-                                : "text-nav-text/80 hover:bg-charcoal hover:text-nav-hover"
+                                : "text-foreground/80 hover:bg-paper hover:text-rust"
                               }`}
                           >
                             <child.icon className="h-4 w-4" />
@@ -398,7 +398,7 @@ const Sidebar = ({ onLogout, userProfile }) => {
       {/* Mobile menu trigger */}
       <button
         onClick={() => setIsMobileOpen(true)}
-        className="lg:hidden fixed top-4 left-4 z-40 inline-flex items-center gap-2 rounded-lg border border-rust/30 bg-charcoal/95 px-3 py-2 text-nav-text"
+        className="lg:hidden fixed top-4 left-4 z-40 inline-flex items-center gap-2 rounded-lg border border-rust/30 bg-paper/95 px-3 py-2 text-foreground"
         aria-label="Open admin menu"
       >
         <Bars3Icon className="h-5 w-5 text-rust" />
@@ -408,7 +408,7 @@ const Sidebar = ({ onLogout, userProfile }) => {
       {/* Mobile overlay */}
       {isMobileOpen && (
         <button
-          className="lg:hidden fixed inset-0 z-40 bg-black/50"
+          className="lg:hidden fixed inset-0 z-40 bg-scrim/50"
           onClick={closeMobileMenu}
           aria-label="Close admin menu overlay"
         />
@@ -418,12 +418,12 @@ const Sidebar = ({ onLogout, userProfile }) => {
       <aside
         onMouseEnter={() => setIsDesktopHovered(true)}
         onMouseLeave={() => setIsDesktopHovered(false)}
-        className={`hidden lg:flex ${isDesktopExpanded ? "lg:w-72 xl:w-80 2xl:w-84" : "lg:w-24"} lg:h-screen lg:sticky lg:top-0 lg:self-stretch bg-charcoal/60 border-r border-rust/20 overflow-y-auto overflow-x-hidden transition-all duration-300`}
+        className={`hidden lg:flex ${isDesktopExpanded ? "lg:w-72 xl:w-80 2xl:w-84" : "lg:w-24"} lg:h-screen lg:sticky lg:top-0 lg:self-stretch bg-paper/60 border-r border-rust/20 overflow-y-auto overflow-x-hidden transition-all duration-300`}
       >
         <div className="p-4 xl:p-5 w-full h-full flex flex-col overflow-x-hidden">
           <div className="mb-4 text-center">
             {isDesktopExpanded ? (
-              <h2 className="font-display text-xl sm:text-2xl text-nav-text leading-tight whitespace-nowrap">
+              <h2 className="font-display text-xl sm:text-2xl text-foreground leading-tight whitespace-nowrap">
                 East Texas <span className="text-rust">Poultry Supply</span>
               </h2>
             ) : (
@@ -439,7 +439,7 @@ const Sidebar = ({ onLogout, userProfile }) => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search menu..."
-              className="w-full rounded-lg bg-charcoal border border-rust/20 pl-9 pr-3 py-2 text-sm text-nav-text placeholder:text-muted focus:outline-none focus:border-rust"
+              className="w-full rounded-lg bg-paper border border-rust/20 pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted focus:outline-none focus:border-rust"
             />
           </div>
           <div className="flex-1 mt-2">{renderNav()}</div>
@@ -449,16 +449,16 @@ const Sidebar = ({ onLogout, userProfile }) => {
 
       {/* Mobile sidebar drawer */}
       <aside
-        className={`lg:hidden fixed top-0 left-0 z-50 h-screen w-[84vw] max-w-[320px] bg-charcoal border-r border-rust/20 overflow-y-auto transition-transform duration-300 ${isMobileOpen ? "translate-x-0" : "-translate-x-full"
+        className={`lg:hidden fixed top-0 left-0 z-50 h-screen w-[84vw] max-w-[320px] bg-paper border-r border-rust/20 overflow-y-auto transition-transform duration-300 ${isMobileOpen ? "translate-x-0" : "-translate-x-full"
           }`}
       >
         <div className="p-4 h-full flex flex-col">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-display text-xl sm:text-2xl text-nav-text text-center">
+            <h2 className="font-display text-xl sm:text-2xl text-foreground text-center">
               East Texas <span className="text-rust">Poultry Supply</span>
             </h2>
             <button onClick={closeMobileMenu} aria-label="Close admin menu">
-              <XMarkIcon className="h-5 w-5 text-nav-text hover:text-rust transition-colors" />
+              <XMarkIcon className="h-5 w-5 text-foreground hover:text-rust transition-colors" />
             </button>
           </div>
           <div className="relative mb-4">
@@ -468,7 +468,7 @@ const Sidebar = ({ onLogout, userProfile }) => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search menu..."
-              className="w-full rounded-lg bg-charcoal border border-rust/20 pl-9 pr-3 py-2 text-sm text-nav-text placeholder:text-muted focus:outline-none focus:border-rust"
+              className="w-full rounded-lg bg-paper border border-rust/20 pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted focus:outline-none focus:border-rust"
             />
           </div>
           <div className="flex-1 mt-2">{renderNav()}</div>

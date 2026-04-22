@@ -6,38 +6,19 @@
   --color-rust-dark: #A03F10;
   --color-rust-light: #E8693A;
   --color-straw: #D4B483;
-  --color-cream: #F5F0E8;
 
-  /* ========== Light Scale ========== */
+  /* ========== Other ========== */
   --color-barn: #F9F5F0;
-  --color-charcoal: #FFFFFF;
+  --color-paper: #ffffff;
   --color-mid: #E5D9CC;
   --color-muted: #5C4A3A;
+  --color-foreground: #2c2420;
+  --color-scrim: #000000;
 
   /* ========== Fonts ========== */
   --font-display: "Bebas Neue", sans-serif;
   --font-label: "Barlow Condensed", sans-serif;
   --font-body: "Barlow", sans-serif;
-
-  /* ========== Navbar ========== */
-  --color-nav-bg: #FFFFFF;
-  --color-nav-text: #2C2420;
-  --color-nav-hover: #C4521A;
-  --color-dropdown-bg: #F5F0E8;
-  --color-dropdown-border: rgba(92, 74, 58, 0.1);
-
-  /* ========== Fluid Typography Scale ========== */
-  --text-xs: clamp(0.65rem, 1.5vw, 0.75rem);
-  --text-sm: clamp(0.75rem, 1.8vw, 0.875rem);
-  --text-base: clamp(0.875rem, 2vw, 1rem);
-  --text-lg: clamp(1rem, 2.5vw, 1.125rem);
-  --text-xl: clamp(1.125rem, 3vw, 1.25rem);
-  --text-2xl: clamp(1.25rem, 3.5vw, 1.5rem);
-  --text-3xl: clamp(1.5rem, 4vw, 1.875rem);
-  --text-4xl: clamp(1.875rem, 5vw, 2.25rem);
-  --text-5xl: clamp(2.25rem, 6vw, 2.5rem);
-  --text-6xl: clamp(2.5rem, 7vw, 3rem);
-  --text-7xl: clamp(3rem, 8vw, 3.5rem);
 
   /* ========== Semantic Typography Tokens ========== */
   --text-hero: clamp(50px, 7vw, 70px);
@@ -71,22 +52,7 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 0.95;
 }
 
-/* ========== Animation keyframes ========== */
-@keyframes fade-up {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-fade-up {
-  animation: fade-up 0.6s ease both;
-}
-
+/* ========== Home ========== */
 @keyframes marquee {
   from {
     transform: translateX(0);
@@ -100,22 +66,110 @@ h1, h2, h3, h4, h5, h6 {
   animation: marquee 25s linear infinite;
 }
 
-/* ========== Component scaling ========== */
-.product-card {
-  container-type: inline-size;
-  container-name: product-card;
-}
-
-@container product-card (max-width: 200px) {
-  .product-card-title {
-    font-size: var(--text-sm);
+/* ========== Login ========== */
+@keyframes login-shimmer {
+  0% {
+    background-position: 200% 0;
   }
-  .product-card-sub {
-    font-size: var(--text-xs);
+  100% {
+    background-position: -200% 0;
   }
 }
 
-/* ==========Responsive padding utilities ========== */
-.responsive-section {
-  padding: clamp(2rem, 6vw, 4rem) clamp(1rem, 4vw, 3rem);
+.login-card-shine {
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    color-mix(in srgb, var(--color-rust) 6%, transparent) 50%,
+    transparent 60%
+  );
+  background-size: 200% 100%;
+  animation: login-shimmer 14s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-card-shine {
+    animation: none;
+  }
+
+  .login-btn-sheen {
+    transition: none;
+  }
+
+  .login-btn-sheen,
+  .group:hover .login-btn-sheen {
+    transform: none;
+    opacity: 0;
+  }
+
+  .login-back-link .login-back-arrow {
+    transition-property: color;
+    transition-duration: 0.55s;
+  }
+
+  .login-back-link:hover .login-back-arrow,
+  .login-back-link:focus-visible .login-back-arrow {
+    transform: translateX(0);
+  }
+}
+
+.login-bg-grid {
+  background-image: radial-gradient(
+    color-mix(in srgb, var(--color-muted) 12%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 28px 28px;
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, black 20%, transparent 75%);
+}
+
+.login-back-link .login-back-arrow {
+  transform: translateX(0);
+  transition:
+    transform 0.95s cubic-bezier(0.22, 0.61, 0.36, 1),
+    color 0.35s ease;
+}
+
+.login-back-link:hover .login-back-arrow,
+.login-back-link:focus-visible .login-back-arrow {
+  transform: translateX(-0.5rem);
+  color: var(--color-rust);
+}
+
+/* ========== Support Pages ========== */
+.support-band-grid {
+  opacity: 0.04;
+  background-image: linear-gradient(
+      color-mix(in srgb, var(--color-paper) 100%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--color-paper) 100%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 40px 40px;
+}
+
+.support-band-glow {
+  background: radial-gradient(
+    ellipse at 30% 50%,
+    color-mix(in srgb, var(--color-rust) 12%, transparent) 0%,
+    transparent 60%
+  );
+}
+
+/* ========== Transitions ========== */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.6s ease both;
 }
