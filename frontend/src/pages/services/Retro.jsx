@@ -5,7 +5,7 @@ export default function Retro() {
     <Section
       pageTitle="Retro Services"
       fallbackDescription="Our retro services are designed for optimal performance and energy efficiency."
-      sectionsStorageKey="servicesRetroSections"
+      sectionsStorageKey="servicesRetro"
     />
   )
 }

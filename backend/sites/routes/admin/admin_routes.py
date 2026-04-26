@@ -14,6 +14,7 @@ from sites.routes.home.home_hero import (
     HOME_HERO_BOX_COUNT,
     HOME_HERO_IMAGES_HARD_MAX,
 )
+from sites.routes.home.sections import ALLOWED_SECTION_PAGE_KEYS, normalize_sections
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/api/admin")
 
@@ -126,5 +127,28 @@ def update_home_content():
 
     except Exception as e:
         print(f"Home hero write error: {e}")
+        traceback.print_exc()
+        return jsonify({"error": "Internal server error"}), 500
+
+@admin_bp.route("/content/sections/<page_key>", methods=["PUT", "OPTIONS"])
+def update_page_sections(page_key):
+    if request.method == "OPTIONS":
+        return "", 200
+
+    if page_key not in ALLOWED_SECTION_PAGE_KEYS:
+        return jsonify({"error": "Unknown page key"}), 404
+
+    try:
+        _, err = decode_user_id()
+        if err is not None:
+            return err
+
+        data = request.get_json(silent=True) or {}
+        normalized = normalize_sections(data.get("sections"))
+        row = upsert_site_content(page_key, normalized)
+        return jsonify({"success": True, "sections": row.get("value")}), 200
+
+    except Exception as e:
+        print(f"Sections write error ({page_key}): {e}")
         traceback.print_exc()
         return jsonify({"error": "Internal server error"}), 500

@@ -503,7 +503,7 @@ function Marquee() {
   const MARQUEE_ITEMS = [
     "Feeding Systems", "Watering Systems", "Heating Systems", "Cooling Systems",
     "LED Lighting", "Fan Systems", "Controllers", "Roll Seal Doors",
-    "Cleanout Equipment", "On-Farm Repair", "New Construction",
+    "Used Equipment", "On-Farm Repair", "New Construction",
   ];
 
   const items = [...MARQUEE_ITEMS, ...MARQUEE_ITEMS];
@@ -658,7 +658,7 @@ function Products() {
     { to: "/products/controllers", name: "Controllers", sub: "Environmental controllers, tunnel timers, system automation", tag: "New" },
     { to: "", name: "Roll Seal Doors", sub: "Insulated tunnel door systems for optimal airflow control" },
     { to: "/products/lighting", name: "LED Lighting", sub: "Energy-efficient lighting designed for poultry environments" },
-    { to: "/products/cleanout", name: "Cleanout Equipment", sub: "Litter windrowers, belt scrapers, wash-down systems" },
+    { to: "/products/equipment", name: "Used Equipment", sub: "Quality pre-owned equipment for dependable farm performance and value" },
     { to: "", name: "Motors & Belts", sub: "HVAC motors, capacitors, contactors, drive belts & bearings" },
   ];
 

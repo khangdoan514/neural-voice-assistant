@@ -5,7 +5,7 @@ export default function Heating() {
     <Section
       pageTitle="Heating Systems"
       fallbackDescription="Our heating systems are designed for optimal performance and energy efficiency."
-      sectionsStorageKey="productsHeatingSections"
+      sectionsStorageKey="productsHeating"
     />
   )
 }

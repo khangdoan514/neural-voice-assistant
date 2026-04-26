@@ -5,7 +5,7 @@ export default function Repair() {
     <Section
       pageTitle="Repair Services"
       fallbackDescription="Our repair services are designed for optimal performance and energy efficiency."
-      sectionsStorageKey="servicesRepairSections"
+      sectionsStorageKey="servicesRepair"
     />
   )
 }

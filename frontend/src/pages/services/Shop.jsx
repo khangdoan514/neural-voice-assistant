@@ -5,7 +5,7 @@ export default function Shop() {
     <Section
       pageTitle="Shop"
       fallbackDescription="Our shop services are designed for optimal performance and energy efficiency."
-      sectionsStorageKey="servicesShopSections"
+      sectionsStorageKey="servicesShop"
     />
   )
 }

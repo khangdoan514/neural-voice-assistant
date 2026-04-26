@@ -5,7 +5,7 @@ export default function Feeding() {
     <Section
       pageTitle="Feeding Systems"
       fallbackDescription="Our feeding systems are designed for optimal performance and energy efficiency."
-      sectionsStorageKey="productsFeedingSections"
+      sectionsStorageKey="productsFeeding"
     />
   )
 }

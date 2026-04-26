@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react"
+﻿import { useState, useEffect, useMemo } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { motion } from "framer-motion"
 import { useAdminProfile } from "../hooks/useAdminProfile"
@@ -19,6 +19,8 @@ import AboutEditor from "./admin/AboutEditor"
 import ContactEditor from "./admin/ContactEditor"
 import Settings from "./admin/Settings"
 import ComingSoon from "./admin/ComingSoon"
+import SectionEditor from "./admin/SectionEditor"
+import ImageCrop from "../components/ImageCrop"
 import {
   HERO_IMAGES_HARD_MAX,
   createDefaultHeroCards,
@@ -58,6 +60,21 @@ function cloneDefaultContactPeople() {
   return DEFAULT_CONTACT_PEOPLE.map((p) => ({ ...p }))
 }
 
+const SECTION_EDITOR_CONFIG = {
+  "/admin/products/cooling": { pageLabel: "Cooling Systems", storageKey: "productsCooling" },
+  "/admin/products/heating": { pageLabel: "Heating Systems", storageKey: "productsHeating" },
+  "/admin/products/feeding": { pageLabel: "Feeding Systems", storageKey: "productsFeeding" },
+  "/admin/products/watering": { pageLabel: "Watering Systems", storageKey: "productsWatering" },
+  "/admin/products/fans": { pageLabel: "Fans", storageKey: "productsFans" },
+  "/admin/products/controllers": { pageLabel: "Controllers", storageKey: "productsControllers" },
+  "/admin/products/lighting": { pageLabel: "LED Lighting", storageKey: "productsLighting" },
+  "/admin/products/equipment": { pageLabel: "Used Equipment", storageKey: "productsUsedEquipment" },
+  "/admin/services/construction": { pageLabel: "Construction Services", storageKey: "servicesConstruction" },
+  "/admin/services/repair": { pageLabel: "Repair Services", storageKey: "servicesRepair" },
+  "/admin/services/retro": { pageLabel: "Retro Services", storageKey: "servicesRetro" },
+  "/admin/services/shop": { pageLabel: "Shop", storageKey: "servicesShop" },
+}
+
 export default function Admin() {
   const [activeTab, setActiveTab] = useState("welcome")
   const [conversations, setConversations] = useState([])
@@ -78,10 +95,38 @@ export default function Admin() {
   const [contactPeople, setContactPeople] = useState(() => cloneDefaultContactPeople())
   const navigate = useNavigate()
   const location = useLocation()
+  const activeSectionEditor = useMemo(
+    () => SECTION_EDITOR_CONFIG[location.pathname] || null,
+    [location.pathname]
+  )
   const [settingsFirstName, setSettingsFirstName] = useState("")
   const [settingsLastName, setSettingsLastName] = useState("")
   const [settingsEmail, setSettingsEmail] = useState("")
   const [settingsProfilePicture, setSettingsProfilePicture] = useState("")
+  const [cropState, setCropState] = useState({
+    open: false,
+    imageSrc: "",
+    aspect: 1,
+    onConfirm: null,
+  })
+
+  const cropImageFile = (file, aspect = 1) =>
+    new Promise((resolve) => {
+      if (!file) {
+        resolve("")
+        return
+      }
+      const reader = new FileReader()
+      reader.onload = () => {
+        setCropState({
+          open: true,
+          imageSrc: String(reader.result || ""),
+          aspect,
+          onConfirm: (cropped) => resolve(cropped),
+        })
+      }
+      reader.readAsDataURL(file)
+    })
 
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken")
@@ -181,9 +226,9 @@ export default function Admin() {
 
   const handleSettingsImageUpload = (file) => {
     if (!file) return
-    const reader = new FileReader()
-    reader.onload = () => setSettingsProfilePicture(String(reader.result || ""))
-    reader.readAsDataURL(file)
+    cropImageFile(file, 4 / 3).then((cropped) => {
+      if (cropped) setSettingsProfilePicture(cropped)
+    })
   }
 
   const saveSettings = async () => {
@@ -261,31 +306,23 @@ export default function Admin() {
 
   const handleHomeBoxImageUpload = (boxIndex, imageIndex, file) => {
     if (!file) return
-    const reader = new FileReader()
-    reader.onload = () => {
-      updateHomeBoxImage(boxIndex, imageIndex, String(reader.result || ""))
-    }
-    reader.readAsDataURL(file)
+    cropImageFile(file, 1).then((cropped) => {
+      if (cropped) updateHomeBoxImage(boxIndex, imageIndex, cropped)
+    })
   }
 
   const handleAboutImageUpload = (file) => {
     if (!file) return
-    const reader = new FileReader()
-    reader.onload = () => {
-      setAboutStoryImage(String(reader.result || ""))
-    }
-
-    reader.readAsDataURL(file)
+    cropImageFile(file, 4 / 3).then((cropped) => {
+      if (cropped) setAboutStoryImage(cropped)
+    })
   }
 
   const handleContactBusinessImageUpload = (file) => {
     if (!file) return
-    const reader = new FileReader()
-    reader.onload = () => {
-      setContactBusinessHoursImage(String(reader.result || ""))
-    }
-
-    reader.readAsDataURL(file)
+    cropImageFile(file, 4 / 3).then((cropped) => {
+      if (cropped) setContactBusinessHoursImage(cropped)
+    })
   }
 
   const updateContactPerson = (index, field, value) => {
@@ -305,12 +342,9 @@ export default function Admin() {
 
   const handleContactPersonImageUpload = (index, file) => {
     if (!file) return
-    const reader = new FileReader()
-    reader.onload = () => {
-      updateContactPerson(index, "image", String(reader.result || ""))
-    }
-
-    reader.readAsDataURL(file)
+    cropImageFile(file, 4 / 3).then((cropped) => {
+      if (cropped) updateContactPerson(index, "image", cropped)
+    })
   }
 
   const saveHomeContent = async () => {
@@ -497,9 +531,30 @@ export default function Admin() {
             />
           )}
 
-          {activeTab === "comingSoon" && <ComingSoon />}
+          {activeTab === "comingSoon" && activeSectionEditor && (
+            <SectionEditor
+              pageLabel={activeSectionEditor.pageLabel}
+              sectionsStorageKey={activeSectionEditor.storageKey}
+              cropImageFile={cropImageFile}
+            />
+          )}
+
+          {activeTab === "comingSoon" && !activeSectionEditor && <ComingSoon />}
         </div>
       </div>
+      <ImageCrop
+        open={cropState.open}
+        imageSrc={cropState.imageSrc}
+        aspect={cropState.aspect}
+        onCancel={() => {
+          setCropState({ open: false, imageSrc: "", aspect: 1, onConfirm: null })
+        }}
+        onConfirm={(cropped) => {
+          const cb = cropState.onConfirm
+          setCropState({ open: false, imageSrc: "", aspect: 1, onConfirm: null })
+          if (cb) cb(cropped)
+        }}
+      />
     </div>
   )
 }

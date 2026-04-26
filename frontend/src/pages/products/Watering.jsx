@@ -5,7 +5,7 @@ export default function Watering() {
     <Section
       pageTitle="Watering Systems"
       fallbackDescription="Our watering systems are designed for optimal performance and energy efficiency."
-      sectionsStorageKey="productsWateringSections"
+      sectionsStorageKey="productsWatering"
     />
   )
 }

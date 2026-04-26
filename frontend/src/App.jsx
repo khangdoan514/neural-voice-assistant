@@ -11,6 +11,10 @@ import Feeding from "./pages/products/Feeding"
 import Watering from "./pages/products/Watering"
 import Heating from "./pages/products/Heating"
 import Cooling from "./pages/products/Cooling"
+import Fans from "./pages/products/Fans"
+import Controllers from "./pages/products/Controllers"
+import Lighting from "./pages/products/Lighting"
+import UsedEquipment from "./pages/products/UsedEquipment"
 
 import Pictures from "./pages/Pictures"
 
@@ -77,10 +81,10 @@ export default function App() {
           <Route path="/products/watering" element={<Watering />} />
           <Route path="/products/heating" element={<Heating />} />
           <Route path="/products/cooling" element={<Cooling />} />
-          <Route path="/products/fans" element={<Products />} />
-          <Route path="/products/controllers" element={<Products />} />
-          <Route path="/products/lighting" element={<Products />} />
-          <Route path="/products/cleanout" element={<Products />} />
+          <Route path="/products/fans" element={<Fans />} />
+          <Route path="/products/controllers" element={<Controllers />} />
+          <Route path="/products/lighting" element={<Lighting />} />
+          <Route path="/products/equipment" element={<UsedEquipment />} />
 
           <Route path="/support/about" element={<About />} />
           <Route path="/support/contact" element={<Contact />} />
