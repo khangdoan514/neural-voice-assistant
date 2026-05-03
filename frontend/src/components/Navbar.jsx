@@ -26,7 +26,7 @@ export default function Navbar() {
         { to: "/products/fans", label: "Fans" },
         { to: "/products/controllers", label: "Controllers" },
         { to: "/products/lighting", label: "LED Lighting" },
-        { to: "/products/cleanout", label: "Cleanout Equipment" },
+        { to: "/products/equipment", label: "Used Equipment" },
       ],
     },
     { to: "/pictures", label: "Pictures" },

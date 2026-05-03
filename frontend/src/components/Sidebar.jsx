@@ -83,7 +83,7 @@ const Sidebar = ({ onLogout, userProfile }) => {
         { to: "/admin/products/fans", label: "Fans", icon: WrenchIcon },
         { to: "/admin/products/controllers", label: "Controllers", icon: ComputerDesktopIcon },
         { to: "/admin/products/lighting", label: "LED Lighting", icon: LightBulbIcon },
-        { to: "/admin/products/cleanout", label: "Cleanout Equipment", icon: SparklesIcon },
+        { to: "/admin/products/equipment", label: "Used Equipment", icon: SparklesIcon },
       ],
     },
     {
