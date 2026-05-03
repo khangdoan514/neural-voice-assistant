@@ -95,3 +95,34 @@ export async function saveHomeHeroCardsApi(accessToken, cards) {
 
   return data.cards
 }
+
+export async function fetchPageSectionsApi(pageKey) {
+  const res = await fetch(`${API_BASE_URL}/api/content/sections/${encodeURIComponent(pageKey)}`)
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok) {
+    throw new Error(data.error || `Request failed (${res.status})`)
+  }
+
+  if (!data.success || !Array.isArray(data.sections)) {
+    throw new Error(data.error || "Failed to load page sections")
+  }
+  
+  return data.sections
+}
+
+export async function savePageSectionsApi(accessToken, pageKey, sections) {
+  if (!accessToken) {
+    throw new Error("Not authenticated")
+  }
+
+  const data = await adminJson(accessToken, `/api/admin/content/sections/${encodeURIComponent(pageKey)}`, {
+    method: "PUT",
+    body: JSON.stringify({ sections }),
+  })
+
+  if (!data.success || !Array.isArray(data.sections)) {
+    throw new Error(data.error || "Failed to save page sections")
+  }
+
+  return data.sections
+}

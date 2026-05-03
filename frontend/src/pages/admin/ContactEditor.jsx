@@ -2,6 +2,14 @@ import { motion } from "framer-motion"
 import { PhotoIcon } from "@heroicons/react/24/outline"
 import { fadeInUp, stagger } from "./variants"
 
+const standardInputClass = [
+  "w-full rounded-xl py-3.5 px-4 text-foreground placeholder:text-muted/40",
+  "border bg-paper/95 shadow-none",
+  "transition-[border-color] duration-200 ease-out",
+  "focus:outline-none focus:ring-0 focus:border-rust",
+  "border-rust/15 hover:border-rust/30",
+].join(" ")
+
 export default function ContactEditor({
   contactBusinessHoursImage,
   setContactBusinessHoursImage,
@@ -29,7 +37,7 @@ export default function ContactEditor({
       <motion.div className="space-y-6" variants={stagger} initial="hidden" animate="visible">
         <motion.div
           variants={fadeInUp}
-          className="bg-gradient-to-br from-barn/90 to-paper/50 backdrop-blur-sm border border-rust/15 rounded-xl p-5 max-w-3xl shadow-[0_8px_24px_rgb(0_0_0_/_0.2)]"
+          className="bg-barn/80 backdrop-blur-sm border border-rust/15 rounded-lg p-4 shadow-sm max-w-3xl"
         >
           <p className="text-sm uppercase tracking-[2px] text-rust font-label mb-3">Business Hours Image</p>
           <label className="block text-sm text-muted mb-1">Image URL</label>
@@ -37,7 +45,7 @@ export default function ContactEditor({
             type="text"
             value={contactBusinessHoursImage}
             onChange={(e) => setContactBusinessHoursImage(e.target.value)}
-            className="w-full rounded-lg bg-paper border border-rust/20 px-3 py-2 text-base text-foreground mb-3 focus:outline-none focus:border-rust focus:ring-1 focus:ring-rust/40"
+            className={`${standardInputClass} mb-3`}
             placeholder="https://... or /images/..."
           />
           <label className="block text-sm text-muted mb-1">Upload Image</label>
@@ -49,7 +57,7 @@ export default function ContactEditor({
           />
           <div className="mt-4 h-40 rounded overflow-hidden border border-rust/20 bg-paper/30">
             {contactBusinessHoursImage ? (
-              <img src={contactBusinessHoursImage} alt="Business hours preview" className="w-full h-full object-cover" />
+              <img src={contactBusinessHoursImage} alt="Business hours preview" className="w-full h-full object-contain" />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-sm text-muted">No image selected</div>
             )}
@@ -73,8 +81,7 @@ export default function ContactEditor({
             <motion.div
               key={`contact-person-${index}`}
               variants={fadeInUp}
-              whileHover={{ y: -3, transition: { duration: 0.2 } }}
-              className="bg-gradient-to-br from-barn/90 to-paper/50 backdrop-blur-sm border border-rust/15 rounded-xl p-5 shadow-[0_8px_24px_rgb(0_0_0_/_0.2)]"
+              className="bg-barn/80 backdrop-blur-sm border border-rust/15 rounded-lg p-4 shadow-sm"
             >
               <div className="flex items-center justify-between mb-3">
                 <p className="text-sm uppercase tracking-[2px] text-rust font-label">Person {index + 1}</p>
@@ -93,35 +100,35 @@ export default function ContactEditor({
                 type="text"
                 value={person.name}
                 onChange={(e) => updateContactPerson(index, "name", e.target.value)}
-                className="w-full rounded-lg bg-paper border border-rust/20 px-3 py-2 text-base text-foreground mb-3 focus:outline-none focus:border-rust focus:ring-1 focus:ring-rust/40"
+                className={`${standardInputClass} mb-3`}
               />
               <label className="block text-sm text-muted mb-1">Role</label>
               <input
                 type="text"
                 value={person.role}
                 onChange={(e) => updateContactPerson(index, "role", e.target.value)}
-                className="w-full rounded-lg bg-paper border border-rust/20 px-3 py-2 text-base text-foreground mb-3 focus:outline-none focus:border-rust focus:ring-1 focus:ring-rust/40"
+                className={`${standardInputClass} mb-3`}
               />
               <label className="block text-sm text-muted mb-1">Phone</label>
               <input
                 type="text"
                 value={person.phone}
                 onChange={(e) => updateContactPerson(index, "phone", e.target.value)}
-                className="w-full rounded-lg bg-paper border border-rust/20 px-3 py-2 text-base text-foreground mb-3 focus:outline-none focus:border-rust focus:ring-1 focus:ring-rust/40"
+                className={`${standardInputClass} mb-3`}
               />
               <label className="block text-sm text-muted mb-1">Email</label>
               <input
                 type="text"
                 value={person.email}
                 onChange={(e) => updateContactPerson(index, "email", e.target.value)}
-                className="w-full rounded-lg bg-paper border border-rust/20 px-3 py-2 text-base text-foreground mb-3 focus:outline-none focus:border-rust focus:ring-1 focus:ring-rust/40"
+                className={`${standardInputClass} mb-3`}
               />
               <label className="block text-sm text-muted mb-1">Image URL</label>
               <input
                 type="text"
                 value={person.image}
                 onChange={(e) => updateContactPerson(index, "image", e.target.value)}
-                className="w-full rounded-lg bg-paper border border-rust/20 px-3 py-2 text-base text-foreground mb-3 focus:outline-none focus:border-rust focus:ring-1 focus:ring-rust/40"
+                className={`${standardInputClass} mb-3`}
                 placeholder="https://... or /images/..."
               />
               <label className="block text-sm text-muted mb-1">Upload Image</label>
@@ -133,7 +140,7 @@ export default function ContactEditor({
               />
               <div className="mt-4 h-32 rounded overflow-hidden border border-rust/20 bg-paper/30">
                 {person.image ? (
-                  <img src={person.image} alt={`Contact person ${index + 1}`} className="w-full h-full object-cover" />
+                  <img src={person.image} alt={`Contact person ${index + 1}`} className="w-full h-full object-contain" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-sm text-muted">No image selected</div>
                 )}
